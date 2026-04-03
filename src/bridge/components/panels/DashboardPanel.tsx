@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import {
   DASH_PUBLISH,
@@ -23,11 +23,10 @@ export function DashboardPanel({ active }: { active: boolean }) {
   const { role, openCardThreadFromDashboard, showGeneric, openModal } = useBridge();
   const [studentFilter, setStudentFilter] = useState('');
 
-  const filteredStudents = useMemo(() => {
-    const q = studentFilter.trim().toLowerCase();
-    if (!q) return DASH_STUDENTS;
-    return DASH_STUDENTS.filter((s) => s.name.toLowerCase().includes(q));
-  }, [studentFilter]);
+  const q = studentFilter.trim().toLowerCase();
+  const filteredStudents = !q
+    ? DASH_STUDENTS
+    : DASH_STUDENTS.filter((s) => s.name.toLowerCase().includes(q));
 
   const dashHint =
     role === 'teacher' ? ROLE_COPY.teacher.dashboard ?? DASHBOARD_HINT_DEFAULT : DASHBOARD_HINT_DEFAULT;

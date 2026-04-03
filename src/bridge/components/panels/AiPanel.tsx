@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
+import { AI_DEMO } from '@/bridge/mockData';
 import { cx } from '@/bridge/cx';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 
 export function AiPanel({ active }: { active: boolean }) {
-  const { getHints, aiMessages, setAiMessages, loadAiDemo } = useBridge();
+  const { getHints } = useBridge();
+  const [aiMessages, setAiMessages] = useState(() =>
+    AI_DEMO.map((m) => ({ role: m.role, text: m.text })),
+  );
+  const loadAiDemo = () => {
+    setAiMessages(AI_DEMO.map((m) => ({ role: m.role, text: m.text })));
+  };
   const hints = getHints();
   const [input, setInput] = useState('');
   const threadRef = useRef<HTMLDivElement>(null);

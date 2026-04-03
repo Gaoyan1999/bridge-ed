@@ -4,6 +4,15 @@ import { ROLE_DISPLAY } from '@/bridge/mockData';
 import type { Module, Role } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
 
+export interface SidebarChromeProps {
+  sidebarCollapsed: boolean;
+  toggleSidebarCollapsed: () => void;
+  sidebarMobileOpen: boolean;
+  setSidebarMobileOpen: (open: boolean) => void;
+  roleDropdownOpen: boolean;
+  setRoleDropdownOpen: (open: boolean) => void;
+}
+
 const NAV_MODULES: {
   module: Module;
   href: string;
@@ -17,20 +26,15 @@ const NAV_MODULES: {
   { module: 'mood', href: '#mood', icon: '◎', label: 'Mood' },
 ];
 
-export function Sidebar() {
-  const {
-    role,
-    setRole,
-    module,
-    setModule,
-    sidebarCollapsed,
-    toggleSidebarCollapsed,
-    sidebarMobileOpen,
-    setSidebarMobileOpen,
-    roleDropdownOpen,
-    setRoleDropdownOpen,
-    showToolDemo,
-  } = useBridge();
+export function Sidebar({
+  sidebarCollapsed,
+  toggleSidebarCollapsed,
+  sidebarMobileOpen,
+  setSidebarMobileOpen,
+  roleDropdownOpen,
+  setRoleDropdownOpen,
+}: SidebarChromeProps) {
+  const { role, setRole, module, setModule, showToolDemo } = useBridge();
 
   const ddRef = useRef<HTMLDivElement>(null);
   const meta = ROLE_DISPLAY[role];
@@ -164,6 +168,7 @@ export function Sidebar() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setRole(r);
+                      setRoleDropdownOpen(false);
                     }}
                   >
                     <span className="role-dropdown__opt-emoji" aria-hidden="true">
