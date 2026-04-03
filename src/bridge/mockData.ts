@@ -34,6 +34,27 @@ export const DASH_STUDENTS = [
   { name: 'Carol Zhang', grade: 'G9', parent: 'Ms. Zhang', feedback: '4/1 quiz worry' },
 ];
 
+/** Class / lesson titles for the learning-card wizard (demo roster). */
+export const LEARNING_CARD_CLASS_OPTIONS = [
+  'Week 14 — Factoring review',
+  'Week 13 — Quadratic equations intro',
+  'Week 12 — Pythagorean theorem & applications',
+  'Shakespeare — Reading workshop',
+  'Dept week — light homework & review',
+] as const;
+
+export const LEARNING_CARD_GRADE_OPTIONS = ['G7', 'G8', 'G9', 'G10', 'G11', 'G12'] as const;
+
+/** Subject line for the learning-card wizard — teachers usually reuse the same pick (demo). */
+export const LEARNING_CARD_SUBJECT_OPTIONS = [  
+  'Math',
+  'English',
+  'Literature',
+  'Science',
+  'History',
+  'Art',
+] as const;
+
 export const DASH_SCHEDULE: ScheduleDay[] = [
   { day: 'Mon 4/1', items: ['4:00 PM dept meeting', '6:30 PM parent slot'] },
   { day: 'Tue 4/2', items: ['After-school help'] },
@@ -42,14 +63,14 @@ export const DASH_SCHEDULE: ScheduleDay[] = [
   { day: 'Fri 4/5', items: ['Quiz draft due'] },
 ];
 
-export const PARENT_DASH_CARDS: LearningCardItem[] = [
+const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
   {
     id: 'card-pythagoras',
     title: 'Pythagorean theorem',
     subject: 'Math · Geometry',
     status: 'New',
     summary: 'What right triangles have in common, and why a² + b² = c².',
-    linkedDay: 'Mon 4/1',
+    at: Date.parse('2026-04-01T09:30:00'),
     threadId: 'card-thread-pythagoras',
   },
   {
@@ -58,8 +79,17 @@ export const PARENT_DASH_CARDS: LearningCardItem[] = [
     subject: 'Math · Calculus',
     status: 'In progress',
     summary: 'Derivatives as “how fast something is changing” with everyday examples.',
-    linkedDay: 'Tue 4/2',
+    at: Date.parse('2026-04-02T11:00:00'),
     threadId: 'card-thread-calculus',
+  },
+  {
+    id: 'card-fractions',
+    title: 'What is a fraction?',
+    subject: 'Math · Arithmetic',
+    status: 'New',
+    summary: 'Parts of a whole in plain language—numerator, denominator, and a pizza-slice mental model.',
+    at: Date.parse('2026-04-03T16:45:00'),
+    threadId: 'card-thread-fractions',
   },
   {
     id: 'card-shakespeare',
@@ -67,10 +97,31 @@ export const PARENT_DASH_CARDS: LearningCardItem[] = [
     subject: 'Literature',
     status: 'Reviewed',
     summary: 'Why we still read Shakespeare and how to help with reading at home.',
-    linkedDay: 'Thu 4/4',
+    at: Date.parse('2026-04-04T10:15:00'),
     threadId: 'card-thread-shakespeare',
   },
+  {
+    id: 'card-atmospheric-pressure',
+    title: 'What is atmospheric pressure?',
+    subject: 'Science',
+    status: 'In progress',
+    summary: 'Air pushes on everything around us; how we feel it and a simple “column of air” picture.',
+    at: Date.parse('2026-04-05T08:20:00'),
+    threadId: 'card-thread-atmospheric-pressure',
+  },
+  {
+    id: 'card-water-cycle',
+    title: 'What is the water cycle?',
+    subject: 'Science · Earth',
+    status: 'Reviewed',
+    summary: 'Evaporation, clouds, and rain in one easy loop—no jargon overload.',
+    at: Date.parse('2026-04-06T13:00:00'),
+    threadId: 'card-thread-water-cycle',
+  },
 ];
+
+/** Newest first (by `at`). */
+export const PARENT_DASH_CARDS: LearningCardItem[] = [...PARENT_DASH_CARDS_RAW].sort((a, b) => b.at - a.at);
 
 export const PARENT_DASH_SCHEDULE: ScheduleDay[] = [
   {

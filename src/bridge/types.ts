@@ -23,7 +23,8 @@ export interface LearningCardItem {
   subject: string;
   status: string;
   summary: string;
-  linkedDay: string;
+  /** Unix ms — used for sort order and display via `formatLearningCardLinkedDay`. */
+  at: number;
   threadId: string;
 }
 
@@ -43,4 +44,5 @@ export type ModalState =
   | { type: 'generic'; title: string; body: string }
   | { type: 'book' }
   | { type: 'broadcast' }
-  | { type: 'report' };
+  | { type: 'report' }
+  | { type: 'learningCard' };

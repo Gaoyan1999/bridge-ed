@@ -122,25 +122,24 @@ export function Sidebar({
       />
 
       <aside className={aside} id="sidebar" role="navigation" aria-label="Primary navigation and tools">
-        <div className={cx('flex items-center justify-between gap-1.5 pl-1 pr-0.5', sidebarCollapsed && 'px-0')}>
+        <div
+          className={cx(
+            'flex min-w-0 items-center gap-1.5 pl-1 pr-0.5',
+            sidebarCollapsed ? 'justify-center px-0' : 'justify-between',
+          )}
+        >
           <div
             className={cx(
               'flex min-w-0 items-center gap-2 px-1',
-              sidebarCollapsed && 'justify-center p-0',
+              sidebarCollapsed && 'hidden',
             )}
           >
             <span className="inline-flex items-center justify-center text-[var(--link-blue)]" aria-hidden="true">
               <Sparkles className="block shrink-0" strokeWidth={2} size={20} />
             </span>
-            <span
-              className={cx(
-                'text-[1.125rem] font-semibold tracking-tight text-[var(--text)]',
-                sidebarCollapsed && 'sr-only',
-              )}
-            >
-              BridgeEd
-            </span>
+            <span className="text-[1.125rem] font-semibold tracking-tight text-[var(--text)]">BridgeEd</span>
           </div>
+          {sidebarCollapsed && <span className="sr-only">BridgeEd</span>}
           <button
             type="button"
             className="hidden size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-[var(--pill-bg)] p-0 text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)] md:flex"

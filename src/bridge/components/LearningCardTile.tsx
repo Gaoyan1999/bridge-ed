@@ -1,3 +1,4 @@
+import { formatLearningCardLinkedDay } from '@/bridge/learningCardDates';
 import type { LearningCardItem } from '@/bridge/types';
 
 interface LearningCardTileProps {
@@ -22,7 +23,7 @@ export function LearningCardTile({ card, ctaLabel, onOpen }: LearningCardTilePro
       <p className="parent-card__summary">{card.summary}</p>
       <div className="parent-card__footer">
         <span className="parent-card__cta">{ctaLabel}</span>
-        {card.linkedDay ? <span className="parent-card__linked">Linked to {card.linkedDay}</span> : null}
+        <span className="parent-card__linked">{formatLearningCardLinkedDay(card.at)}</span>
       </div>
     </button>
   );
