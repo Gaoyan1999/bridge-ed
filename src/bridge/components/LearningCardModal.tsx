@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Sparkles } from 'lucide-react';
+import { Check, ListChecks, Sparkles, Users } from 'lucide-react';
 import { Checkbox, Label, Radio, RadioGroup } from 'react-aria-components';
 import {
   DASH_STUDENTS,
@@ -43,10 +43,9 @@ const STEPS = [
   { id: 'input', label: 'Class input' },
   { id: 'draft', label: 'Generate & review' },
   { id: 'audience', label: 'Audience' },
-  { id: 'send', label: 'Send' },
 ] as const;
 
-type Phase = 'input' | 'generating' | 'review' | 'audience' | 'confirm' | 'success';
+type Phase = 'input' | 'generating' | 'review' | 'audience' | 'confirm';
 
 function stepIndex(phase: Phase): number {
   switch (phase) {
@@ -58,8 +57,7 @@ function stepIndex(phase: Phase): number {
     case 'audience':
       return 2;
     case 'confirm':
-    case 'success':
-      return 3;
+      return 2;
     default:
       return 0;
   }
@@ -164,24 +162,7 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
         </p>
       </div>
 
-      {phase === 'success' ? (
-        <div className="learning-card-success">
-          <div className="modal__scroll learning-card-success__scroll">
-            <p className="form-success" id="lc-success" role="status">
-              Learning card sent (demo). Families will see it in Messages; you can open the thread from the next inbox
-              refresh.
-            </p>
-          </div>
-          <div className="modal__footer modal__footer--flush-top">
-            <div className="modal__actions">
-              <Button variant="primary" pill type="button" onClick={onClose}>
-                Done
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="learning-card-wizard">
+      <div className="learning-card-wizard">
           {stepper}
           <div className="learning-card-main">
       {phase === 'input' && (
@@ -362,17 +343,27 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
               className="field field--audience-mode"
             >
               <Label className="field__label">Who should receive this card?</Label>
-              <div className="learning-card-audience-mode">
-                <Radio value="class" className="learning-card-audience-mode__opt">
-                  <span>
-                    <strong>Whole class</strong>
-                    <span className="learning-card-audience-mode__sub">All linked parents ({WHOLE_CLASS_RECIPIENTS})</span>
+              <div className="learning-card-audience-cards">
+                <Radio value="class" className="learning-card-audience-card">
+                  <span className="learning-card-audience-card__icon" aria-hidden="true">
+                    <Users strokeWidth={1.75} size={28} />
+                  </span>
+                  <span className="learning-card-audience-card__body">
+                    <strong className="learning-card-audience-card__title">Whole class</strong>
+                    <span className="learning-card-audience-card__sub">
+                      All linked parents ({WHOLE_CLASS_RECIPIENTS})
+                    </span>
                   </span>
                 </Radio>
-                <Radio value="selected" className="learning-card-audience-mode__opt">
-                  <span>
-                    <strong>Selected parents</strong>
-                    <span className="learning-card-audience-mode__sub">Pick families from your roster (demo)</span>
+                <Radio value="selected" className="learning-card-audience-card">
+                  <span className="learning-card-audience-card__icon" aria-hidden="true">
+                    <ListChecks strokeWidth={1.75} size={28} />
+                  </span>
+                  <span className="learning-card-audience-card__body">
+                    <strong className="learning-card-audience-card__title">Selected parents</strong>
+                    <span className="learning-card-audience-card__sub">
+                      Pick families from your roster (demo)
+                    </span>
                   </span>
                 </Radio>
               </div>
@@ -428,7 +419,7 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
               <p className="learning-card-confirm__lead">You’re about to send this learning card.</p>
               <p className="learning-card-confirm__count">
                 <strong>{recipientCount}</strong> {recipientCount === 1 ? 'family' : 'families'} will get a notification
-                under <strong>Messages</strong> (demo).
+                under <strong>Chat</strong> with BrigeEd AI Powered.
               </p>
               <ul className="learning-card-confirm__bullets">
                 <li>
@@ -448,12 +439,7 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
               <Button variant="text" type="button" onClick={() => setPhase('audience')}>
                 Back
               </Button>
-              <Button
-                variant="primary"
-                pill
-                type="button"
-                onClick={() => setPhase('success')}
-              >
+              <Button variant="primary" pill type="button" onClick={onClose}>
                 Send learning card
               </Button>
             </div>
@@ -462,7 +448,6 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
       )}
           </div>
         </div>
-      )}
     </>
   );
 }
