@@ -1,11 +1,11 @@
-import { HomeLearningCards } from '@/home/HomeLearningCards';
-import './App.css';
+import { BridgeProvider } from '@/bridge/BridgeContext';
+import { BridgeApp } from '@/bridge/BridgeApp';
 
 function App() {
   return (
-    <main className="app-shell">
-      <HomeLearningCards />
-    </main>
+    <BridgeProvider>
+      <BridgeApp />
+    </BridgeProvider>
   );
 }
 
