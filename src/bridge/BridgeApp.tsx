@@ -38,7 +38,7 @@ function BridgeShell() {
 
   return (
     <div
-      className="app flex min-h-screen"
+      className="app flex min-h-0 flex-1 overflow-hidden"
       data-app
     >
       <Sidebar
@@ -51,13 +51,17 @@ function BridgeShell() {
       />
       <main className="main" id="main-content" aria-labelledby="main-heading">
         <div className="main__canvas">
-          <h1 className="visually-hidden" id="main-heading">
-            BridgeEd workspace
-          </h1>
-          <DashboardPanel active={module === 'dashboard'} />
-          <AiPanel active={module === 'ai'} />
-          <ChatPanel active={module === 'chat'} />
-          <MoodPanel key={`${module}-${role}`} active={module === 'mood'} />
+          <div className="main__canvas-inner">
+            <div className="main__canvas-pad">
+              <h1 className="visually-hidden" id="main-heading">
+                BridgeEd workspace
+              </h1>
+              <DashboardPanel active={module === 'dashboard'} />
+              <AiPanel active={module === 'ai'} />
+              <ChatPanel active={module === 'chat'} />
+              <MoodPanel key={`${module}-${role}`} active={module === 'mood'} />
+            </div>
+          </div>
         </div>
       </main>
       <BridgeModals />
@@ -67,9 +71,9 @@ function BridgeShell() {
 
 export function BridgeApp() {
   return (
-    <>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <SkipLink />
       <BridgeShell />
-    </>
+    </div>
   );
 }
