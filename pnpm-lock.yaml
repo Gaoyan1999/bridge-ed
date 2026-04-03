@@ -6,9 +6,7 @@ settings:
 
 importers:
 
-  .: {}
-
-  web:
+  .:
     dependencies:
       dexie:
         specifier: ^4.4.2
