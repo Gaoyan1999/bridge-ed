@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 /* App shell: full-width workspace; theme tokens live in bridge-app.css */
 #root {
   min-height: 100vh;

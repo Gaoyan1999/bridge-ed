@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getDataLayer, getDataSourceMode } from '@/data';
 import type { LearningCard } from '@/data';
+
+async function fetchLearningCards() {
+  const layer = getDataLayer();
+  return layer.learningCards.list();
+}
 
 export function HomeLearningCards() {
   const [cards, setCards] = useState<LearningCard[]>([]);
@@ -8,14 +13,9 @@ export function HomeLearningCards() {
   const [error, setError] = useState<string | null>(null);
   const mode = getDataSourceMode();
 
-  const fetchCards = useCallback(async () => {
-    const layer = getDataLayer();
-    return layer.learningCards.list();
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
-    void fetchCards()
+    void fetchLearningCards()
       .then((list) => {
         if (!cancelled) {
           setCards(list);
@@ -31,13 +31,13 @@ export function HomeLearningCards() {
     return () => {
       cancelled = true;
     };
-  }, [fetchCards]);
+  }, []);
 
   const refresh = async () => {
     setStatus('loading');
     setError(null);
     try {
-      const list = await fetchCards();
+      const list = await fetchLearningCards();
       setCards(list);
       setStatus('ready');
     } catch (e) {
