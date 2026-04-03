@@ -183,15 +183,8 @@ body {
   overflow-y: auto;
 }
 
-.parent-dashboard-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
 @media (max-width: 900px) {
-  .dashboard-grid > .dash-card,
-  .parent-dashboard-grid > .dash-card {
+  .dashboard-grid > .dash-card {
     grid-column: 1 / -1;
   }
 }
@@ -676,6 +669,7 @@ body {
   width: 100%;
   resize: vertical;
   min-height: 3.25rem;
+  margin-top: 0.75rem;
   padding: 0.85rem 1.15rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);

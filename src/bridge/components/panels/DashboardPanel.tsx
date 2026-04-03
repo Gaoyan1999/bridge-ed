@@ -5,13 +5,17 @@ import { ParentDashboardPanel } from './ParentDashboardPanel';
 import { TeacherDashboardPanel } from './TeacherDashboardPanel';
 
 const DASHBOARD_HINT_DEFAULT =
-  'Teacher: class report and pulse · Parent: learning cards, to‑dos, and schedule (demo).';
+  'Class report, learning cards, tasks, posts, class pulse, directory, and this week’s schedule (demo).';
 
 export function DashboardPanel({ active }: { active: boolean }) {
   const { role } = useBridge();
 
   const dashHint =
-    role === 'teacher' ? ROLE_COPY.teacher.dashboard ?? DASHBOARD_HINT_DEFAULT : DASHBOARD_HINT_DEFAULT;
+    role === 'teacher'
+      ? ROLE_COPY.teacher.dashboard ?? DASHBOARD_HINT_DEFAULT
+      : role === 'parent'
+        ? ROLE_COPY.parent.dashboard ?? DASHBOARD_HINT_DEFAULT
+        : DASHBOARD_HINT_DEFAULT;
 
   if (role === 'student') {
     return (
@@ -26,9 +30,9 @@ export function DashboardPanel({ active }: { active: boolean }) {
     );
   }
 
-  if (role === 'teacher') {
-    return <TeacherDashboardPanel active={active} dashHint={dashHint} />;
+  if (role === 'parent') {
+    return <ParentDashboardPanel active={active} dashHint={dashHint} />;
   }
 
-  return <ParentDashboardPanel active={active} dashHint={dashHint} />;
+  return <TeacherDashboardPanel active={active} dashHint={dashHint} />;
 }
