@@ -7,7 +7,6 @@ import { ChatPanel } from '@/bridge/components/panels/ChatPanel';
 import { DashboardPanel } from '@/bridge/components/panels/DashboardPanel';
 import { MoodPanel } from '@/bridge/components/panels/MoodPanel';
 import { useBridge } from '@/bridge/BridgeContext';
-import { cx } from '@/bridge/cx';
 
 const COLLAPSE_KEY = 'bridgeed-sidebar-collapsed';
 
@@ -39,7 +38,7 @@ function BridgeShell() {
 
   return (
     <div
-      className={cx('app', sidebarCollapsed && 'app--sidebar-collapsed', sidebarMobileOpen && 'sidebar-open')}
+      className="app flex min-h-screen"
       data-app
     >
       <Sidebar

@@ -57,7 +57,7 @@ function parseModuleFromHash(): Module {
 }
 
 export function BridgeProvider({ children }: { children: ReactNode }) {
-  const [role, setRoleState] = useState<Role>('parent');
+  const [role, setRoleState] = useState<Role>('teacher');
   const [module, setModuleState] = useState<Module>(() => parseModuleFromHash());
   const [inboxByRole, setInboxByRole] = useState(() => cloneInbox(INITIAL_INBOX));
   const [threads, setThreads] = useState(() => cloneThreads(INITIAL_THREADS));
