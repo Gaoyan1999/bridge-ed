@@ -1,0 +1,7 @@
+{
+  "name": "bridge-ed",
+  "private": true,
+  "pnpm": {
+    "overrides": {}
+  }
+}
