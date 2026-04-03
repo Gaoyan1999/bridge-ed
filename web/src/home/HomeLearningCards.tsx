@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getDataLayer, getDataSourceMode, seedDevDataIfEmpty } from '@/data';
+import { getDataLayer, getDataSourceMode } from '@/data';
 import type { LearningCard } from '@/data';
 
 export function HomeLearningCards() {
@@ -10,7 +10,6 @@ export function HomeLearningCards() {
 
   const fetchCards = useCallback(async () => {
     const layer = getDataLayer();
-    await seedDevDataIfEmpty(layer);
     return layer.learningCards.list();
   }, []);
 
