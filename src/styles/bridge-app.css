@@ -1307,14 +1307,45 @@ body {
 
 .modal__box {
   position: relative;
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 1.35rem 1.5rem;
+  padding: 0;
   max-width: 440px;
   width: 100%;
   max-height: min(90vh, 720px);
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: 0 12px 48px rgba(60, 64, 67, 0.25);
+}
+
+.modal__header {
+  flex-shrink: 0;
+  padding: 1.35rem 1.5rem 0;
+}
+
+.modal__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.5rem;
+}
+
+.modal__footer {
+  flex-shrink: 0;
+  padding: 0.65rem 1.5rem 1.35rem;
+}
+
+.modal__footer .modal__actions {
+  margin-top: 0;
+}
+
+.modal__box > form.book-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .modal__title {
