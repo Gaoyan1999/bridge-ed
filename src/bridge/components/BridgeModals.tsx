@@ -1,10 +1,25 @@
 import { useEffect, useId, useState } from 'react';
+import { Checkbox } from 'react-aria-components';
 import { useBridge } from '@/bridge/BridgeContext';
 import { REPORT_DRAFT_BODY, REPORT_DRAFT_TITLE } from '@/bridge/mockData';
+import { LearningCardModal } from '@/bridge/components/LearningCardModal';
 import { Button } from '@/bridge/components/ui/Button';
+import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
+import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
+import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
+
+const BOOK_SLOT_OPTIONS = [
+  { value: '__none__', label: 'Choose a slot' },
+  { value: 'mon', label: 'Mon 18:00–18:20' },
+  { value: 'wed', label: 'Wed 17:30–17:50' },
+  { value: 'fri', label: 'Fri 16:00–16:20' },
+] as const;
 
 function BookModal({ onClose }: { onClose: () => void }) {
   const [success, setSuccess] = useState(false);
+  const [bookDate, setBookDate] = useState('');
+  const [bookSlot, setBookSlot] = useState<string>(BOOK_SLOT_OPTIONS[0]!.value);
+  const [bookTopic, setBookTopic] = useState('');
   return (
     <>
       <div className="modal__header">
@@ -18,32 +33,33 @@ function BookModal({ onClose }: { onClose: () => void }) {
           id="form-book"
           onSubmit={(e) => {
             e.preventDefault();
+            if (bookSlot === '__none__') return;
             setSuccess(true);
           }}
         >
           <div className="modal__scroll">
-            <label className="field">
-              <span className="field__label">Preferred date</span>
-              <input type="date" className="field__input field__input--pill" id="book-date" required />
-            </label>
-            <label className="field">
-              <span className="field__label">Time slot</span>
-              <select className="field__input field__input--pill" id="book-slot" required defaultValue="">
-                <option value="">Choose a slot</option>
-                <option>Mon 18:00–18:20</option>
-                <option>Wed 17:30–17:50</option>
-                <option>Fri 16:00–16:20</option>
-              </select>
-            </label>
-            <label className="field">
-              <span className="field__label">Topic (optional)</span>
-              <input
-                type="text"
-                className="field__input field__input--pill"
-                id="book-topic"
-                placeholder="e.g. factoring homework"
-              />
-            </label>
+            <FieldTextInput
+              id="book-date"
+              label="Preferred date"
+              type="date"
+              value={bookDate}
+              onChange={setBookDate}
+              isRequired
+            />
+            <FieldSelect
+              id="book-slot"
+              label="Time slot"
+              value={bookSlot}
+              onValueChange={setBookSlot}
+              options={[...BOOK_SLOT_OPTIONS]}
+            />
+            <FieldTextInput
+              id="book-topic"
+              label="Topic (optional)"
+              value={bookTopic}
+              onChange={setBookTopic}
+              placeholder="e.g. factoring homework"
+            />
           </div>
           <div className="modal__footer">
             <div className="modal__actions">
@@ -69,6 +85,8 @@ function BookModal({ onClose }: { onClose: () => void }) {
 
 function BroadcastModal({ onClose }: { onClose: () => void }) {
   const [success, setSuccess] = useState(false);
+  const [bcTitle, setBcTitle] = useState('');
+  const [bcBody, setBcBody] = useState('');
   return (
     <>
       <div className="modal__header">
@@ -86,26 +104,23 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
           }}
         >
           <div className="modal__scroll">
-            <label className="field">
-              <span className="field__label">Title</span>
-              <input
-                type="text"
-                className="field__input field__input--pill"
-                id="bc-title"
-                required
-                placeholder="e.g. This week’s practice set"
-              />
-            </label>
-            <label className="field">
-              <span className="field__label">Message</span>
-              <textarea
-                className="field__input field__input--pill"
-                id="bc-body"
-                rows={4}
-                required
-                placeholder="Your message to the class…"
-              />
-            </label>
+            <FieldTextInput
+              id="bc-title"
+              label="Title"
+              value={bcTitle}
+              onChange={setBcTitle}
+              isRequired
+              placeholder="e.g. This week’s practice set"
+            />
+            <FieldTextArea
+              id="bc-body"
+              label="Message"
+              value={bcBody}
+              onChange={setBcBody}
+              rows={4}
+              isRequired
+              placeholder="Your message to the class…"
+            />
           </div>
           <div className="modal__footer">
             <div className="modal__actions">
@@ -172,51 +187,32 @@ function ReportModal({
           }}
         >
           <div className="modal__scroll">
-            <label className="field">
-              <span className="field__label">Report title</span>
-              <input
-                type="text"
-                className="field__input field__input--pill"
-                id="report-title"
-                required
-                placeholder="e.g. Week 14 — class progress"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field__label">Report body</span>
-              <textarea
-                className="field__input field__input--pill"
-                id="report-body"
-                rows={7}
-                required
-                placeholder="Highlights, reminders, and optional next steps…"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-              />
-            </label>
+            <FieldTextInput
+              id="report-title"
+              label="Report title"
+              value={title}
+              onChange={setTitle}
+              isRequired
+              placeholder="e.g. Week 14 — class progress"
+            />
+            <FieldTextArea
+              id="report-body"
+              label="Report body"
+              value={body}
+              onChange={setBody}
+              rows={7}
+              isRequired
+              placeholder="Highlights, reminders, and optional next steps…"
+            />
             <fieldset className="field field--audience">
               <legend className="field__label">Push to</legend>
               <div className="audience-chips">
-                <label className="audience-chip">
-                  <input
-                    type="checkbox"
-                    id="report-to-students"
-                    checked={toStudents}
-                    onChange={(e) => setToStudents(e.target.checked)}
-                  />
+                <Checkbox isSelected={toStudents} onChange={setToStudents} className="audience-chip audience-chip--rac">
                   <span>👨‍🎓 Students</span>
-                </label>
-                <label className="audience-chip">
-                  <input
-                    type="checkbox"
-                    id="report-to-parents"
-                    checked={toParents}
-                    onChange={(e) => setToParents(e.target.checked)}
-                  />
+                </Checkbox>
+                <Checkbox isSelected={toParents} onChange={setToParents} className="audience-chip audience-chip--rac">
                   <span>👪 Parents</span>
-                </label>
+                </Checkbox>
               </div>
               <p className="field__hint" id={audienceHintId} role="alert" hidden={!audienceHint}>
                 Select at least one audience.
@@ -317,6 +313,23 @@ export function BridgeModals() {
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
           <BroadcastModal onClose={onBackdropClose} />
+        </div>
+      </div>
+    );
+  }
+
+  if (modal.type === 'learningCard') {
+    return (
+      <div
+        className="modal"
+        id="modal-learning-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-learning-card-title"
+      >
+        <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
+        <div className="modal__box modal__box--rounded modal__box--xlarge">
+          <LearningCardModal onClose={onBackdropClose} />
         </div>
       </div>
     );

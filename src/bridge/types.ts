@@ -43,4 +43,5 @@ export type ModalState =
   | { type: 'generic'; title: string; body: string }
   | { type: 'book' }
   | { type: 'broadcast' }
-  | { type: 'report' };
+  | { type: 'report' }
+  | { type: 'learningCard' };

@@ -57,12 +57,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
           variant="secondary"
           pill
           id="btn-teacher-create-card"
-          onClick={() =>
-            showGeneric(
-              'New learning card',
-              'Demo flow: enter class notes → generate parent summary and tonight’s actions → preview & edit → pick audience (class or selected parents) → send. Matches the teacher “publish learning card” flow in UI/UX-Flows.',
-            )
-          }
+          onClick={() => openModal({ type: 'learningCard' })}
         >
           Create card
         </Button>
@@ -109,12 +104,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
         variant="link"
         className="btn--sm dash-card__cta"
         id="btn-new-learning-card"
-        onClick={() =>
-          showGeneric(
-            'New learning card',
-            'Demo flow: enter class notes → generate parent summary and tonight’s actions → preview & edit → pick audience (class or selected parents) → send. Matches the teacher “publish learning card” flow in UI/UX-Flows.',
-          )
-        }
+        onClick={() => openModal({ type: 'learningCard' })}
       >
         + New learning card
       </Button>

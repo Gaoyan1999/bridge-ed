@@ -34,6 +34,27 @@ export const DASH_STUDENTS = [
   { name: 'Carol Zhang', grade: 'G9', parent: 'Ms. Zhang', feedback: '4/1 quiz worry' },
 ];
 
+/** Class / lesson titles for the learning-card wizard (demo roster). */
+export const LEARNING_CARD_CLASS_OPTIONS = [
+  'Week 14 — Factoring review',
+  'Week 13 — Quadratic equations intro',
+  'Week 12 — Pythagorean theorem & applications',
+  'Shakespeare — Reading workshop',
+  'Dept week — light homework & review',
+] as const;
+
+export const LEARNING_CARD_GRADE_OPTIONS = ['G7', 'G8', 'G9', 'G10', 'G11', 'G12'] as const;
+
+/** Subject line for the learning-card wizard — teachers usually reuse the same pick (demo). */
+export const LEARNING_CARD_SUBJECT_OPTIONS = [  
+  'Math',
+  'English',
+  'Literature',
+  'Science',
+  'History',
+  'Art',
+] as const;
+
 export const DASH_SCHEDULE: ScheduleDay[] = [
   { day: 'Mon 4/1', items: ['4:00 PM dept meeting', '6:30 PM parent slot'] },
   { day: 'Tue 4/2', items: ['After-school help'] },
