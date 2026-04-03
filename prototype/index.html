@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BridgeEd — Home–School AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="app" data-app>
+    <button
+      type="button"
+      class="sidebar-toggle"
+      id="sidebar-toggle"
+      aria-expanded="false"
+      aria-controls="sidebar"
+      aria-label="Open or close sidebar"
+    >
+      <span class="sidebar-toggle__bar" aria-hidden="true"></span>
+      <span class="sidebar-toggle__bar" aria-hidden="true"></span>
+      <span class="sidebar-toggle__bar" aria-hidden="true"></span>
+    </button>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
+    <aside
+      class="sidebar"
+      id="sidebar"
+      role="navigation"
+      aria-label="Primary navigation and tools"
+    >
+      <div class="sidebar__brand-row">
+        <div class="sidebar__brand">
+          <span class="sidebar__logo" aria-hidden="true">✦</span>
+          <span class="sidebar__title sidebar__text">BridgeEd</span>
+        </div>
+        <button
+          type="button"
+          class="sidebar-collapse"
+          id="sidebar-collapse"
+          aria-expanded="true"
+          aria-controls="sidebar"
+          title="Collapse sidebar"
+        >
+          <span class="sidebar-collapse__icon" aria-hidden="true">⟨</span>
+          <span class="visually-hidden">Collapse or expand sidebar</span>
+        </button>
+      </div>
+
+      <div class="sidebar__block sidebar__block--role">
+        <p class="sidebar__label" id="role-label"><span class="sidebar__text">View as</span></p>
+        <div class="role-dropdown" id="role-dropdown">
+          <button
+            type="button"
+            class="role-dropdown__trigger"
+            id="role-dropdown-trigger"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-controls="role-dropdown-menu"
+            aria-labelledby="role-label role-dropdown-name"
+          >
+            <span class="role-dropdown__emoji" id="role-dropdown-emoji" aria-hidden="true">👪</span>
+            <span class="role-dropdown__name sidebar__text" id="role-dropdown-name">Parent</span>
+            <span class="role-dropdown__chevron" aria-hidden="true">▾</span>
+          </button>
+          <div
+            class="role-dropdown__menu"
+            id="role-dropdown-menu"
+            role="listbox"
+            tabindex="-1"
+            aria-labelledby="role-label"
+            hidden
+          >
+            <button type="button" class="role-dropdown__option" role="option" data-role="parent" id="role-opt-parent">
+              <span class="role-dropdown__opt-emoji" aria-hidden="true">👪</span>
+              <span>Parent</span>
+            </button>
+            <button type="button" class="role-dropdown__option" role="option" data-role="student" id="role-opt-student">
+              <span class="role-dropdown__opt-emoji" aria-hidden="true">👨‍🎓</span>
+              <span>Student</span>
+            </button>
+            <button type="button" class="role-dropdown__option" role="option" data-role="teacher" id="role-opt-teacher">
+              <span class="role-dropdown__opt-emoji" aria-hidden="true">🧑‍🏫</span>
+              <span>Teacher</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar__nav" aria-label="Modules">
+        <a href="#dashboard" class="nav-item nav-item--teacher-only" data-module="dashboard" id="nav-dashboard" hidden title="Dashboard">
+          <span class="nav-item__icon" aria-hidden="true">▣</span>
+          <span class="sidebar__text">Dashboard</span>
+        </a>
+        <a href="#chat" class="nav-item is-active" data-module="chat" title="Chat">
+          <span class="nav-item__icon" aria-hidden="true">💬</span>
+          <span class="sidebar__text">Chat</span>
+        </a>
+        <a href="#mood" class="nav-item" data-module="mood" title="Mood">
+          <span class="nav-item__icon" aria-hidden="true">◎</span>
+          <span class="sidebar__text">Mood</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__tools">
+        <p class="sidebar__label" id="tools-label"><span class="sidebar__text">Tools</span></p>
+        <div class="tool-list" role="group" aria-labelledby="tools-label">
+          <button type="button" class="tool-btn tool-btn--pill" id="tool-upload" title="Upload a report or transcript (demo)">
+            <span aria-hidden="true">📎</span> <span class="sidebar__text">Upload report</span>
+          </button>
+          <button type="button" class="tool-btn tool-btn--pill" id="tool-practice" title="Generate practice (demo)">
+            <span aria-hidden="true">📋</span> <span class="sidebar__text">Practice</span>
+          </button>
+          <button type="button" class="tool-btn tool-btn--pill" id="tool-snippets" title="Quick phrases (demo)">
+            <span aria-hidden="true">⚡</span> <span class="sidebar__text">Snippets</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="sidebar__foot"><span class="sidebar__text">Prototype · mock data</span></p>
+    </aside>
+
+    <main class="main" id="main-content" aria-labelledby="main-heading">
+      <div class="main__canvas">
+        <h1 class="visually-hidden" id="main-heading">BridgeEd workspace</h1>
+
+        <section
+          class="panel panel--dashboard"
+          id="panel-dashboard"
+          data-panel="dashboard"
+          role="region"
+          aria-labelledby="panel-dashboard-title"
+          hidden
+        >
+          <header class="panel__header">
+            <h2 class="panel__title" id="panel-dashboard-title">Dashboard</h2>
+            <p class="panel__hint">Teacher: class report and pulse · Parent: learning cards, to‑dos, and schedule (demo).</p>
+          </header>
+
+          <!-- Teacher dashboard -->
+          <div class="dashboard-grid" id="teacher-dashboard">
+            <section class="dash-card dash-card--wide dash-card--surface dash-card--banner" aria-labelledby="dash-report-title">
+              <div class="dash-card__head dash-card__head--report">
+                <div>
+                  <h3 class="dash-card__title dash-card__title--sky" id="dash-report-title">Class report</h3>
+                  <p class="dash-card__sub">Write or generate a short report, then push it to <strong>students</strong>, <strong>parents</strong>, or both.</p>
+                </div>
+                <button type="button" class="btn btn--primary btn--pill" id="btn-open-report-modal">
+                  Create report
+                </button>
+              </div>
+            </section>
+
+            <section class="dash-card dash-card--surface teacher-card-section" aria-labelledby="teacher-cards-title">
+              <div class="dash-card__head dash-card__head--report">
+                <div>
+                  <h3 class="dash-card__title dash-card__title--sky" id="teacher-cards-title">Learning cards</h3>
+                  <p class="dash-card__sub">Concept cards for families: definitions, materials, and a simple plan.</p>
+                </div>
+                <button type="button" class="btn btn--secondary btn--pill" id="btn-teacher-create-card">
+                  Create card
+                </button>
+              </div>
+              <div class="parent-cards-grid" id="teacher-cards"></div>
+            </section>
+
+            <section class="dash-card dash-card--surface" aria-labelledby="dash-todo-title">
+              <h3 class="dash-card__title dash-card__title--warm" id="dash-todo-title">Today</h3>
+              <ul class="todo-list" id="dash-todo-list"></ul>
+            </section>
+
+            <section class="dash-card dash-card--surface" aria-labelledby="dash-publish-title">
+              <h3 class="dash-card__title dash-card__title--lavender" id="dash-publish-title">Recent posts</h3>
+              <ul class="publish-list" id="dash-publish-list"></ul>
+              <button type="button" class="btn btn--link btn--sm dash-card__cta" id="btn-new-learning-card">
+                + New learning card
+              </button>
+            </section>
+
+            <section class="dash-card dash-card--wide dash-card--surface" aria-labelledby="dash-stats-title">
+              <h3 class="dash-card__title dash-card__title--sky" id="dash-stats-title">Class pulse</h3>
+              <div class="stat-row" id="dash-stats"></div>
+            </section>
+
+            <section class="dash-card dash-card--wide dash-card--surface" aria-labelledby="dash-students-title">
+              <div class="dash-card__head">
+                <h3 class="dash-card__title" id="dash-students-title">Student directory</h3>
+                <input type="search" class="field__input field__input--inline field__input--pill" id="student-filter" placeholder="Filter by name…" aria-label="Filter students" />
+              </div>
+              <div class="table-wrap table-wrap--flush">
+                <table class="data-table data-table--compact" id="dash-students-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Grade</th>
+                      <th>Parent</th>
+                      <th>Last note</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-students-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="dash-card dash-card--wide dash-card--surface" aria-labelledby="dash-schedule-title">
+              <h3 class="dash-card__title dash-card__title--warm" id="dash-schedule-title">This week</h3>
+              <div class="schedule-week" id="dash-schedule"></div>
+            </section>
+          </div>
+
+          <!-- Parent dashboard -->
+          <div class="parent-dashboard-grid" id="parent-dashboard" hidden>
+            <section class="dash-card dash-card--wide dash-card--surface parent-card-section" aria-labelledby="parent-cards-title">
+              <div class="dash-card__head">
+                <h3 class="dash-card__title dash-card__title--sky" id="parent-cards-title">Learning cards</h3>
+                <p class="parent-cards__hint">Short explanations of key concepts your child is learning.</p>
+              </div>
+              <div class="parent-cards-grid" id="parent-cards"></div>
+            </section>
+
+            <section class="dash-card dash-card--wide dash-card--surface parent-schedule-section" aria-labelledby="parent-schedule-title">
+              <h3 class="dash-card__title dash-card__title--lavender" id="parent-schedule-title">Your child’s schedule</h3>
+              <div class="schedule-week" id="parent-schedule"></div>
+            </section>
+
+            <section class="dash-card dash-card--wide dash-card--surface parent-mood-section" aria-labelledby="parent-mood-title">
+              <h3 class="dash-card__title dash-card__title--warm" id="parent-mood-title">Your child’s mood</h3>
+              <div class="parent-mood-grid" id="parent-mood-grid"></div>
+            </section>
+          </div>
+        </section>
+
+        <section
+          class="panel panel--ai is-visible"
+          id="panel-ai"
+          data-panel="ai"
+          role="region"
+          aria-labelledby="panel-ai-title"
+        >
+          <header class="panel__header">
+            <h2 class="panel__title" id="panel-ai-title">AI assistant</h2>
+            <p class="panel__hint" id="ai-role-hint">Ask about homework, definitions, or paste a teacher note for next steps.</p>
+          </header>
+
+          <div class="chat-thread" id="ai-thread" aria-live="polite"></div>
+
+          <div class="composer composer--bard">
+            <label for="ai-input" class="visually-hidden">Message</label>
+            <textarea
+              id="ai-input"
+              class="composer__input"
+              rows="2"
+              placeholder="e.g. explain the discriminant… or paste this week’s teacher comment"
+            ></textarea>
+            <div class="composer__actions">
+              <button type="button" class="btn btn--text" id="ai-load-demo">Load sample chat</button>
+              <button type="button" class="btn btn--primary btn--pill" id="ai-send">Send</button>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="panel panel--chat"
+          id="panel-chat"
+          data-panel="chat"
+          role="region"
+          aria-labelledby="panel-chat-title"
+          hidden
+        >
+          <header class="panel__header panel__header--split">
+            <div>
+              <h2 class="panel__title" id="panel-chat-title">Chat</h2>
+              <p class="panel__hint" id="chat-role-hint">School notices and chat with your teacher.</p>
+            </div>
+            <button type="button" class="btn btn--primary btn--pill btn--sm" id="btn-broadcast" hidden>
+              Broadcast
+            </button>
+          </header>
+
+          <div class="chat-layout chat-layout--rounded">
+            <div class="inbox" id="inbox-list"></div>
+            <div class="thread-pane">
+              <div class="thread-header">
+                <h3 class="thread-title" id="thread-title">Select a thread</h3>
+                <button type="button" class="btn btn--secondary btn--pill btn--sm" id="btn-book-teacher">
+                  Book a time
+                </button>
+              </div>
+              <div class="msg-thread" id="msg-thread"></div>
+              <div class="composer composer--bard chat-composer">
+                <label for="chat-input" class="visually-hidden">Message</label>
+                <textarea
+                  id="chat-input"
+                  class="composer__input"
+                  rows="2"
+                  placeholder="Type a message to your teacher or family…"
+                ></textarea>
+                <div class="composer__actions">
+                  <button type="button" class="btn btn--primary btn--pill btn--sm" id="chat-send">Send</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="panel panel--mood"
+          id="panel-mood"
+          data-panel="mood"
+          role="region"
+          aria-labelledby="panel-mood-title"
+          hidden
+        >
+          <header class="panel__header" id="mood-panel-header">
+            <h2 class="panel__title" id="panel-mood-title">Mood</h2>
+            <p class="panel__hint" id="mood-role-hint">Log or review how things feel this week.</p>
+          </header>
+
+          <div id="mood-student" class="mood-student-screen" hidden>
+            <div class="emotion-screen" id="emotion-screen">
+              <header class="emotion-screen__top">
+                <button type="button" class="emotion-screen__icon-btn" id="mood-emotion-back" aria-label="Back">
+                  <span aria-hidden="true">‹</span>
+                </button>
+                <h2 class="emotion-screen__heading">Emotion</h2>
+                <button type="button" class="emotion-screen__icon-btn" id="mood-emotion-close" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </header>
+
+              <p class="emotion-screen__prompt">Choose how you’re feeling right now</p>
+
+              <div class="emotion-ripple" id="emotion-ripple" aria-hidden="true">
+                <div class="emotion-ripple__glow"></div>
+                <div class="emotion-ripple__ring emotion-ripple__ring--1"></div>
+                <div class="emotion-ripple__ring emotion-ripple__ring--2"></div>
+                <div class="emotion-ripple__ring emotion-ripple__ring--3"></div>
+              </div>
+
+              <p class="emotion-screen__label" id="emotion-label">Neutral</p>
+
+              <div class="emotion-slider-wrap">
+                <label class="visually-hidden" for="mood-slider">How pleasant does it feel (0–100)</label>
+                <input
+                  type="range"
+                  class="emotion-slider"
+                  id="mood-slider"
+                  min="0"
+                  max="100"
+                  value="50"
+                  step="1"
+                  aria-valuetext="Neutral"
+                />
+                <div class="emotion-slider__ends">
+                  <span>VERY UNPLEASANT</span>
+                  <span>VERY PLEASANT</span>
+                </div>
+              </div>
+
+              <label class="emotion-screen__note-field">
+                <span class="emotion-screen__note-label">Note (optional)</span>
+                <input
+                  type="text"
+                  class="emotion-screen__note-input"
+                  id="mood-note"
+                  maxlength="200"
+                  placeholder="Anything to add?"
+                  autocomplete="off"
+                />
+              </label>
+
+              <button type="button" class="btn emotion-screen__next" id="mood-submit">Next</button>
+              <p class="emotion-screen__success" id="mood-success" role="status" hidden>
+                Saved. Keep going — you can always talk to a parent or teacher.
+              </p>
+            </div>
+          </div>
+
+          <div id="mood-parent" class="mood-block">
+            <h3 class="mood-block__title dash-card__title--sky">This week at a glance</h3>
+            <div class="report-cards" id="parent-mood-report"></div>
+          </div>
+
+          <div id="mood-teacher" class="mood-block" hidden>
+            <h3 class="mood-block__title dash-card__title--lavender">Class mood overview</h3>
+            <div class="table-wrap">
+              <table class="data-table" id="teacher-mood-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Dominant mood</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="modal-generic" role="dialog" aria-modal="true" aria-labelledby="modal-generic-title" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__box modal__box--rounded">
+      <h3 id="modal-generic-title" class="modal__title">Notice</h3>
+      <p id="modal-generic-body" class="modal__body"></p>
+      <button type="button" class="btn btn--text btn--primary-color" data-close-modal>Got it</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-book" role="dialog" aria-modal="true" aria-labelledby="modal-book-title" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__box modal__box--rounded">
+      <h3 id="modal-book-title" class="modal__title">Book a 1:1</h3>
+      <form id="form-book" class="book-form">
+        <label class="field">
+          <span class="field__label">Preferred date</span>
+          <input type="date" class="field__input field__input--pill" id="book-date" required />
+        </label>
+        <label class="field">
+          <span class="field__label">Time slot</span>
+          <select class="field__input field__input--pill" id="book-slot" required>
+            <option value="">Choose a slot</option>
+            <option>Mon 18:00–18:20</option>
+            <option>Wed 17:30–17:50</option>
+            <option>Fri 16:00–16:20</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Topic (optional)</span>
+          <input type="text" class="field__input field__input--pill" id="book-topic" placeholder="e.g. factoring homework" />
+        </label>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--text" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn--primary btn--pill">Send request</button>
+        </div>
+      </form>
+      <p class="form-success" id="book-success" role="status" hidden>Request sent (demo). Your teacher will confirm the slot.</p>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-broadcast" role="dialog" aria-modal="true" aria-labelledby="modal-broadcast-title" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__box modal__box--rounded">
+      <h3 id="modal-broadcast-title" class="modal__title">Broadcast</h3>
+      <form id="form-broadcast" class="book-form">
+        <label class="field">
+          <span class="field__label">Title</span>
+          <input type="text" class="field__input field__input--pill" id="bc-title" required placeholder="e.g. This week’s practice set" />
+        </label>
+        <label class="field">
+          <span class="field__label">Message</span>
+          <textarea class="field__input field__input--pill" id="bc-body" rows="4" required placeholder="Your message to the class…"></textarea>
+        </label>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--text" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn--primary btn--pill">Send to class</button>
+        </div>
+      </form>
+      <p class="form-success" id="bc-success" role="status" hidden>Sent (demo).</p>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-report" role="dialog" aria-modal="true" aria-labelledby="modal-report-title" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__box modal__box--rounded modal__box--wide">
+      <h3 id="modal-report-title" class="modal__title">Create &amp; push report</h3>
+      <p class="modal__lede">Recipients get a copy in <strong>Messages</strong>. (Demo: stored in this browser session only.)</p>
+      <form id="form-report" class="book-form">
+        <label class="field">
+          <span class="field__label">Report title</span>
+          <input type="text" class="field__input field__input--pill" id="report-title" required placeholder="e.g. Week 14 — class progress" />
+        </label>
+        <label class="field">
+          <span class="field__label">Report body</span>
+          <textarea class="field__input field__input--pill" id="report-body" rows="7" required placeholder="Highlights, reminders, and optional next steps…"></textarea>
+        </label>
+        <fieldset class="field field--audience">
+          <legend class="field__label">Push to</legend>
+          <div class="audience-chips">
+            <label class="audience-chip">
+              <input type="checkbox" id="report-to-students" checked />
+              <span>👨‍🎓 Students</span>
+            </label>
+            <label class="audience-chip">
+              <input type="checkbox" id="report-to-parents" checked />
+              <span>👪 Parents</span>
+            </label>
+          </div>
+          <p class="field__hint" id="report-audience-hint" role="alert" hidden>Select at least one audience.</p>
+        </fieldset>
+        <div class="report-actions">
+          <button type="button" class="btn btn--text" id="btn-report-draft">Generate draft (demo)</button>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--text" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn--primary btn--pill">Push report</button>
+        </div>
+      </form>
+      <p class="form-success" id="report-success" role="status" hidden>
+        Report pushed. Students and/or parents will see it under Messages.
+      </p>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
