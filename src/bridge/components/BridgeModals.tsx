@@ -7,9 +7,11 @@ function BookModal({ onClose }: { onClose: () => void }) {
   const [success, setSuccess] = useState(false);
   return (
     <>
-      <h3 id="modal-book-title" className="modal__title">
-        Book a 1:1
-      </h3>
+      <div className="modal__header">
+        <h3 id="modal-book-title" className="modal__title">
+          Book a 1:1
+        </h3>
+      </div>
       {!success ? (
         <form
           className="book-form"
@@ -19,41 +21,48 @@ function BookModal({ onClose }: { onClose: () => void }) {
             setSuccess(true);
           }}
         >
-          <label className="field">
-            <span className="field__label">Preferred date</span>
-            <input type="date" className="field__input field__input--pill" id="book-date" required />
-          </label>
-          <label className="field">
-            <span className="field__label">Time slot</span>
-            <select className="field__input field__input--pill" id="book-slot" required defaultValue="">
-              <option value="">Choose a slot</option>
-              <option>Mon 18:00–18:20</option>
-              <option>Wed 17:30–17:50</option>
-              <option>Fri 16:00–16:20</option>
-            </select>
-          </label>
-          <label className="field">
-            <span className="field__label">Topic (optional)</span>
-            <input
-              type="text"
-              className="field__input field__input--pill"
-              id="book-topic"
-              placeholder="e.g. factoring homework"
-            />
-          </label>
-          <div className="modal__actions">
-            <Button variant="text" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" pill type="submit">
-              Send request
-            </Button>
+          <div className="modal__scroll">
+            <label className="field">
+              <span className="field__label">Preferred date</span>
+              <input type="date" className="field__input field__input--pill" id="book-date" required />
+            </label>
+            <label className="field">
+              <span className="field__label">Time slot</span>
+              <select className="field__input field__input--pill" id="book-slot" required defaultValue="">
+                <option value="">Choose a slot</option>
+                <option>Mon 18:00–18:20</option>
+                <option>Wed 17:30–17:50</option>
+                <option>Fri 16:00–16:20</option>
+              </select>
+            </label>
+            <label className="field">
+              <span className="field__label">Topic (optional)</span>
+              <input
+                type="text"
+                className="field__input field__input--pill"
+                id="book-topic"
+                placeholder="e.g. factoring homework"
+              />
+            </label>
+          </div>
+          <div className="modal__footer">
+            <div className="modal__actions">
+              <Button variant="text" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button variant="primary" pill type="submit">
+                Send request
+              </Button>
+            </div>
           </div>
         </form>
-      ) : null}
-      <p className="form-success" id="book-success" role="status" hidden={!success}>
-        Request sent (demo). Your teacher will confirm the slot.
-      </p>
+      ) : (
+        <div className="modal__scroll">
+          <p className="form-success" id="book-success" role="status" hidden={!success}>
+            Request sent (demo). Your teacher will confirm the slot.
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -62,9 +71,11 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
   const [success, setSuccess] = useState(false);
   return (
     <>
-      <h3 id="modal-broadcast-title" className="modal__title">
-        Broadcast
-      </h3>
+      <div className="modal__header">
+        <h3 id="modal-broadcast-title" className="modal__title">
+          Broadcast
+        </h3>
+      </div>
       {!success ? (
         <form
           className="book-form"
@@ -74,39 +85,46 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
             setSuccess(true);
           }}
         >
-          <label className="field">
-            <span className="field__label">Title</span>
-            <input
-              type="text"
-              className="field__input field__input--pill"
-              id="bc-title"
-              required
-              placeholder="e.g. This week’s practice set"
-            />
-          </label>
-          <label className="field">
-            <span className="field__label">Message</span>
-            <textarea
-              className="field__input field__input--pill"
-              id="bc-body"
-              rows={4}
-              required
-              placeholder="Your message to the class…"
-            />
-          </label>
-          <div className="modal__actions">
-            <Button variant="text" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" pill type="submit">
-              Send to class
-            </Button>
+          <div className="modal__scroll">
+            <label className="field">
+              <span className="field__label">Title</span>
+              <input
+                type="text"
+                className="field__input field__input--pill"
+                id="bc-title"
+                required
+                placeholder="e.g. This week’s practice set"
+              />
+            </label>
+            <label className="field">
+              <span className="field__label">Message</span>
+              <textarea
+                className="field__input field__input--pill"
+                id="bc-body"
+                rows={4}
+                required
+                placeholder="Your message to the class…"
+              />
+            </label>
+          </div>
+          <div className="modal__footer">
+            <div className="modal__actions">
+              <Button variant="text" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button variant="primary" pill type="submit">
+                Send to class
+              </Button>
+            </div>
           </div>
         </form>
-      ) : null}
-      <p className="form-success" id="bc-success" role="status" hidden={!success}>
-        Sent (demo).
-      </p>
+      ) : (
+        <div className="modal__scroll">
+          <p className="form-success" id="bc-success" role="status" hidden={!success}>
+            Sent (demo).
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -128,12 +146,14 @@ function ReportModal({
 
   return (
     <>
-      <h3 id="modal-report-title" className="modal__title">
-        Create &amp; push report
-      </h3>
-      <p className="modal__lede">
-        Recipients get a copy in <strong>Messages</strong>. (Demo: stored in this browser session only.)
-      </p>
+      <div className="modal__header">
+        <h3 id="modal-report-title" className="modal__title">
+          Create &amp; push report
+        </h3>
+        <p className="modal__lede">
+          Recipients get a copy in <strong>Messages</strong>. (Demo: stored in this browser session only.)
+        </p>
+      </div>
       {!success ? (
         <form
           className="book-form"
@@ -151,82 +171,89 @@ function ReportModal({
             setSuccess(true);
           }}
         >
-          <label className="field">
-            <span className="field__label">Report title</span>
-            <input
-              type="text"
-              className="field__input field__input--pill"
-              id="report-title"
-              required
-              placeholder="e.g. Week 14 — class progress"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </label>
-          <label className="field">
-            <span className="field__label">Report body</span>
-            <textarea
-              className="field__input field__input--pill"
-              id="report-body"
-              rows={7}
-              required
-              placeholder="Highlights, reminders, and optional next steps…"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
-          </label>
-          <fieldset className="field field--audience">
-            <legend className="field__label">Push to</legend>
-            <div className="audience-chips">
-              <label className="audience-chip">
-                <input
-                  type="checkbox"
-                  id="report-to-students"
-                  checked={toStudents}
-                  onChange={(e) => setToStudents(e.target.checked)}
-                />
-                <span>👨‍🎓 Students</span>
-              </label>
-              <label className="audience-chip">
-                <input
-                  type="checkbox"
-                  id="report-to-parents"
-                  checked={toParents}
-                  onChange={(e) => setToParents(e.target.checked)}
-                />
-                <span>👪 Parents</span>
-              </label>
+          <div className="modal__scroll">
+            <label className="field">
+              <span className="field__label">Report title</span>
+              <input
+                type="text"
+                className="field__input field__input--pill"
+                id="report-title"
+                required
+                placeholder="e.g. Week 14 — class progress"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </label>
+            <label className="field">
+              <span className="field__label">Report body</span>
+              <textarea
+                className="field__input field__input--pill"
+                id="report-body"
+                rows={7}
+                required
+                placeholder="Highlights, reminders, and optional next steps…"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+              />
+            </label>
+            <fieldset className="field field--audience">
+              <legend className="field__label">Push to</legend>
+              <div className="audience-chips">
+                <label className="audience-chip">
+                  <input
+                    type="checkbox"
+                    id="report-to-students"
+                    checked={toStudents}
+                    onChange={(e) => setToStudents(e.target.checked)}
+                  />
+                  <span>👨‍🎓 Students</span>
+                </label>
+                <label className="audience-chip">
+                  <input
+                    type="checkbox"
+                    id="report-to-parents"
+                    checked={toParents}
+                    onChange={(e) => setToParents(e.target.checked)}
+                  />
+                  <span>👪 Parents</span>
+                </label>
+              </div>
+              <p className="field__hint" id={audienceHintId} role="alert" hidden={!audienceHint}>
+                Select at least one audience.
+              </p>
+            </fieldset>
+            <div className="report-actions">
+              <Button
+                variant="text"
+                type="button"
+                id="btn-report-draft"
+                onClick={() => {
+                  setTitle(REPORT_DRAFT_TITLE);
+                  setBody(REPORT_DRAFT_BODY);
+                }}
+              >
+                Generate draft (demo)
+              </Button>
             </div>
-            <p className="field__hint" id={audienceHintId} role="alert" hidden={!audienceHint}>
-              Select at least one audience.
-            </p>
-          </fieldset>
-          <div className="report-actions">
-            <Button
-              variant="text"
-              type="button"
-              id="btn-report-draft"
-              onClick={() => {
-                setTitle(REPORT_DRAFT_TITLE);
-                setBody(REPORT_DRAFT_BODY);
-              }}
-            >
-              Generate draft (demo)
-            </Button>
           </div>
-          <div className="modal__actions">
-            <Button variant="text" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" pill type="submit">
-              Push report
-            </Button>
+          <div className="modal__footer">
+            <div className="modal__actions">
+              <Button variant="text" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button variant="primary" pill type="submit">
+                Push report
+              </Button>
+            </div>
           </div>
         </form>
-      ) : null}
-      <p className="form-success" id="report-success" role="status" hidden={!success}>
-        Report pushed. Students and/or parents will see it under Messages.
-      </p>
+      ) : (
+        <div className="modal__scroll">
+          <p className="form-success" id="report-success" role="status" hidden={!success}>
+            Report pushed. Students and/or parents will see it under Messages.
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -253,13 +280,21 @@ export function BridgeModals() {
       <div className="modal" id="modal-generic" role="dialog" aria-modal="true" aria-labelledby="modal-generic-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
-          <h3 id="modal-generic-title" className="modal__title">
-            {modal.title}
-          </h3>
-          <p className="modal__body">{modal.body}</p>
-          <Button variant="text" primaryColor onClick={onBackdropClose}>
-            Got it
-          </Button>
+          <div className="modal__header">
+            <h3 id="modal-generic-title" className="modal__title">
+              {modal.title}
+            </h3>
+          </div>
+          <div className="modal__scroll">
+            <p className="modal__body">{modal.body}</p>
+          </div>
+          <div className="modal__footer">
+            <div className="modal__actions">
+              <Button variant="text" primaryColor onClick={onBackdropClose}>
+                Got it
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
