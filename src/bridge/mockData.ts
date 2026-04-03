@@ -108,6 +108,7 @@ export const ROLE_COPY: Record<
   { dashboard?: string; ai: string; chat: string; mood: string }
 > = {
   parent: {
+    dashboard: 'Learning cards, your child’s week, and mood snapshot (demo).',
     ai: 'Ask about homework, definitions, or paste a teacher note to get clear next steps.',
     chat: 'School notices, chat with the teacher, and book a one-to-one slot.',
     mood: 'See your child’s weekly mood summary and trends.',
