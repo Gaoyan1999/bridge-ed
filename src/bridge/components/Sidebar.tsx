@@ -40,10 +40,11 @@ const NAV_MODULES: {
   Icon: LucideIcon;
   label: string;
   hideForStudent?: boolean;
+  studentOnly?: boolean;
 }[] = [
   { module: 'dashboard', href: '#dashboard', Icon: LayoutDashboard, label: 'Dashboard', hideForStudent: true },
   { module: 'chat', href: '#chat', Icon: MessageSquare, label: 'Chat' },
-  { module: 'mood', href: '#mood', Icon: Smile, label: 'Mood' },
+  { module: 'mood', href: '#mood', Icon: Smile, label: 'Mood', studentOnly: true },
 ];
 
 export function Sidebar({
@@ -87,7 +88,7 @@ export function Sidebar({
   };
 
   const aside = cx(
-    'z-40 flex shrink-0 flex-col gap-[1.15rem] border-r border-[var(--border-light)] bg-[var(--bg-sidebar)] py-4 transition-[width] duration-200 ease-in-out',
+    'z-40 flex h-full min-h-0 shrink-0 flex-col gap-[1.15rem] overflow-y-auto border-r border-[var(--border-light)] bg-[var(--bg-sidebar)] py-4 transition-[width] duration-200 ease-in-out',
     sidebarCollapsed ? 'w-[var(--sidebar-width-collapsed)] px-1.5' : 'w-[var(--sidebar-width)] px-[0.85rem]',
     'max-md:fixed max-md:bottom-0 max-md:left-0 max-md:top-0 max-md:z-40 max-md:-translate-x-full max-md:shadow-[4px_0_24px_rgba(0,0,0,0.12)] max-md:transition-transform',
     sidebarMobileOpen && 'max-md:translate-x-0',
@@ -251,7 +252,8 @@ export function Sidebar({
 
         <nav className="flex flex-col gap-0.5" aria-label="Modules">
           {NAV_MODULES.map((n) => {
-            const hidden = n.hideForStudent && role === 'student';
+            const hidden =
+              (n.hideForStudent && role === 'student') || (n.studentOnly && role !== 'student');
             if (hidden) return null;
             const NavIcon = n.Icon;
             const isActive = module === n.module;
@@ -346,15 +348,6 @@ export function Sidebar({
             </button>
           </div>
         </div>
-
-        <p
-          className={cx(
-            'm-0 px-2 text-[0.6875rem] text-[var(--text-muted)]',
-            sidebarCollapsed && 'hidden',
-          )}
-        >
-          Prototype · mock data
-        </p>
       </aside>
     </>
   );

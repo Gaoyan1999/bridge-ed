@@ -70,6 +70,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('hashchange', syncHashToModule);
   }, []);
 
+  useEffect(() => {
+    if (role !== 'student' && module === 'mood') {
+      setModuleState('dashboard');
+      if (typeof history !== 'undefined' && history.replaceState) {
+        history.replaceState(null, '', '#dashboard');
+      }
+    }
+  }, [role, module]);
+
   const setModule = (m: Module) => {
     if (!MODULES.includes(m)) return;
     setModuleState(m);
