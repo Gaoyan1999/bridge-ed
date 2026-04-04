@@ -166,7 +166,7 @@ function ReportModal({
           Create &amp; push report
         </h3>
         <p className="modal__lede">
-          Recipients get a copy in <strong>Messages</strong>. (Demo: stored in this browser session only.)
+          Recipients get a copy in <strong>Chat</strong>.
         </p>
       </div>
       {!success ? (
@@ -246,7 +246,7 @@ function ReportModal({
       ) : (
         <div className="modal__scroll">
           <p className="form-success" id="report-success" role="status" hidden={!success}>
-            Report pushed. Students and/or parents will see it under Messages.
+            Report pushed. Students and/or parents will see it under Chat.
           </p>
         </div>
       )}

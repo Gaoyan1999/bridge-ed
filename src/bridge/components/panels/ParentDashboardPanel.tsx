@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
-import { PARENT_DASH_MOOD, PARENT_DASH_SCHEDULE } from '@/bridge/mockData';
-import { getDataLayer, getDataSourceMode, getDebugMode } from '@/data';
+import { PARENT_DASH_SCHEDULE, PARENT_MOOD_CHILDREN } from '@/bridge/mockData';
+import { getDataLayer, getDebugMode } from '@/data';
+import type { StudentMoodBackend } from '@/data/entity/student-mood-backend';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
+import { getCurrentWeekLocalDateRange } from '@/bridge/moodWeek';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
 import { LearningCardTile } from '@/bridge/components/LearningCardTile';
+import { ParentMoodWeek } from '@/bridge/components/ParentMoodWeek';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards } = useBridge();
+  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch } = useBridge();
   const [cards, setCards] = useState<LearningCardItem[]>([]);
-  const dataSourceMode = getDataSourceMode();
+  const [moodEntries, setMoodEntries] = useState<StudentMoodBackend[]>([]);
   const debugMode = getDebugMode();
 
   const onDebugDeleteLearningCard = useCallback(
@@ -43,6 +46,24 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
     };
   }, [learningCardsEpoch]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const { start, end } = getCurrentWeekLocalDateRange();
+    void getDataLayer()
+      .studentMoods.getChildrenMood()
+      .then((rows) => {
+        if (!cancelled) {
+          setMoodEntries(rows.filter((r) => r.localDate >= start && r.localDate <= end));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setMoodEntries([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [studentMoodsEpoch]);
+
   const sections = [
     <DashboardCard
       key="cards"
@@ -51,22 +72,20 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       id="parent-cards-title"
       title="Learning cards"
       titleColor="sky"
-      subtitle="Short explanations of key concepts your child is learning."
+      subtitle="Short explanations of key concepts your children are learning."
       subtitleClassName="parent-cards__hint"
     >
       <div className="parent-cards-grid" id="parent-cards">
         {cards.length === 0 ? (
           <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
-            {dataSourceMode === 'api'
-              ? 'No cards from API. Set VITE_DATA_SOURCE=indexeddb in .env for local Dexie storage, or implement GET /learning-cards.'
-              : 'No learning cards yet. Switch to the teacher role and create one — it is stored in this browser (IndexedDB).'}
+            No learning cards yet. Switch to the teacher role and create one.
           </p>
         ) : (
           cards.map((c) => (
             <LearningCardTile
               key={c.id}
               card={c}
-              ctaLabel="Open in Messages"
+              ctaLabel="Open in Chat"
               onOpen={openCardThreadFromDashboard}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
@@ -97,17 +116,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       title="Your child’s mood"
       titleColor="warm"
     >
-      <div className="parent-mood-grid" id="parent-mood-grid">
-        {PARENT_DASH_MOOD.map((m) => (
-          <div key={m.day} className="parent-mood-day">
-            <span className="parent-mood-day__date">{m.day}</span>
-            <span className="parent-mood-day__emoji" aria-hidden="true">
-              {m.emoji}
-            </span>
-            <span className="parent-mood-day__label">{m.label}</span>
-          </div>
-        ))}
-      </div>
+      <ParentMoodWeek childrenProfiles={PARENT_MOOD_CHILDREN} entries={moodEntries} />
     </DashboardCard>,
   ];
 

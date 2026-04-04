@@ -1,4 +1,5 @@
-import type { InboxItem, LearningCardItem, MoodDay, Role, ScheduleDay, ThreadMessage } from './types';
+import type { StudentMoodKind } from '@/data/entity/student-mood-backend';
+import type { InboxItem, LearningCardItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
 
 export const MODULES = ['dashboard', 'ai', 'chat', 'mood'] as const;
 
@@ -33,6 +34,14 @@ export const DASH_STUDENTS = [
   { name: 'Betty Li', grade: 'G9', parent: 'Mr. Li', feedback: '—' },
   { name: 'Carol Zhang', grade: 'G9', parent: 'Ms. Zhang', feedback: '4/1 quiz worry' },
 ];
+
+/** Parent mood week: one row per child. Student mood save uses the first entry (TODO: auth). */
+export const PARENT_MOOD_CHILDREN: ParentMoodChildProfile[] = [
+  { studentId: 'student-alex-wang', displayName: 'Alex Wang' },
+  { studentId: 'student-betty-li', displayName: 'Betty Li' },
+];
+
+export const DEMO_STUDENT_MOOD_PROFILE = PARENT_MOOD_CHILDREN[0]!;
 
 /** Class / lesson titles for the learning-card wizard (demo roster). */
 export const LEARNING_CARD_CLASS_OPTIONS = [
@@ -255,14 +264,15 @@ export const PARENT_DASH_SCHEDULE: ScheduleDay[] = [
   },
 ];
 
-export const PARENT_DASH_MOOD: MoodDay[] = [
-  { day: 'Mon', emoji: '🙂', label: 'Okay' },
-  { day: 'Tue', emoji: '😄', label: 'Happy' },
-  { day: 'Wed', emoji: '😐', label: 'Neutral' },
-  { day: 'Thu', emoji: '😕', label: 'Tired' },
-  { day: 'Fri', emoji: '😄', label: 'Excited' },
-  { day: 'Sat', emoji: '😄', label: 'Excited' },
-  { day: 'Sun', emoji: '😄', label: 'Excited' },
+/** Demo week row — emoji/label come from `studentMoodKindEmoji` / `studentMoodKindLabel` per `kind`. */
+export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
+  { day: 'Mon', kind: 'okay' },
+  { day: 'Tue', kind: 'happy' },
+  { day: 'Wed', kind: 'neutral' },
+  { day: 'Thu', kind: 'tired' },
+  { day: 'Fri', kind: 'excited' },
+  { day: 'Sat', kind: 'excited' },
+  { day: 'Sun', kind: 'excited' },
 ];
 
 export const ROLE_COPY: Record<

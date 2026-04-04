@@ -1,19 +1,51 @@
 import { useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
+import { formatLocalYmd } from '@/bridge/moodWeek';
 import { moodSpectrumLabel } from '@/bridge/moodUtils';
-import { PARENT_REPORT, TEACHER_MOOD_ROWS } from '@/bridge/mockData';
+import { DEMO_STUDENT_MOOD_PROFILE, PARENT_REPORT, TEACHER_MOOD_ROWS } from '@/bridge/mockData';
+import { getDataLayer } from '@/data';
+import { buildStudentMoodFromCheckIn, studentMoodStableId } from '@/data/student-mood-mappers';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
 export function MoodPanel({ active }: { active: boolean }) {
-  const { role, getHints, setModule } = useBridge();
+  const { role, getHints, setModule, bumpStudentMoods } = useBridge();
   const hints = getHints();
   const [slider, setSlider] = useState(50);
   const [note, setNote] = useState('');
   const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const pleasant = slider / 100;
   const label = moodSpectrumLabel(slider);
+
+  async function submitStudentMood() {
+    setSaving(true);
+    try {
+      const layer = getDataLayer();
+      const profile = DEMO_STUDENT_MOOD_PROFILE;
+      const localDate = formatLocalYmd(new Date());
+      const id = studentMoodStableId(profile.studentId, localDate);
+      const existing = await layer.studentMoods.get(id);
+      const built = buildStudentMoodFromCheckIn({
+        studentId: profile.studentId,
+        studentDisplayName: profile.displayName,
+        pleasant: slider,
+        note,
+        localDate,
+      });
+      await layer.studentMoods.put({
+        ...built,
+        createdAt: existing?.createdAt ?? built.createdAt,
+      });
+      bumpStudentMoods();
+      setSuccess(true);
+    } catch (e) {
+      console.error('[Mood] persist failed', e);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <section
@@ -101,11 +133,17 @@ export function MoodPanel({ active }: { active: boolean }) {
             />
           </label>
 
-          <button type="button" className="btn emotion-screen__next" id="mood-submit" onClick={() => setSuccess(true)}>
-            Next
+          <button
+            type="button"
+            className="btn emotion-screen__next"
+            id="mood-submit"
+            disabled={saving}
+            onClick={() => void submitStudentMood()}
+          >
+            {saving ? 'Saving…' : 'Next'}
           </button>
           <p className="emotion-screen__success" id="mood-success" role="status" hidden={!success}>
-            Saved. Keep going — you can always talk to a parent or teacher.
+            Saved. Your parent can see this week’s check-in on the dashboard.
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
 import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS, DASH_TODOS } from '@/bridge/mockData';
-import { getDataLayer, getDataSourceMode, getDebugMode } from '@/data';
+import { getDataLayer, getDebugMode } from '@/data';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
@@ -14,7 +14,6 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
   const { openCardThreadFromDashboard, showGeneric, openModal, learningCardsEpoch, bumpLearningCards } = useBridge();
   const [studentFilter, setStudentFilter] = useState('');
   const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
-  const dataSourceMode = getDataSourceMode();
   const debugMode = getDebugMode();
 
   const onDebugDeleteLearningCard = useCallback(
@@ -93,9 +92,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       <div className="parent-cards-grid mt-2" id="teacher-cards">
         {learningCards.length === 0 ? (
           <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
-            {dataSourceMode === 'api'
-              ? 'No cards from API. Set VITE_DATA_SOURCE=indexeddb for local Dexie, or wire POST/GET /learning-cards.'
-              : 'No learning cards yet. Use Create card — stored in this browser (IndexedDB) as a full LearningCardBackend row.'}
+            No learning cards yet. Use Create card to add one.
           </p>
         ) : (
           learningCards.map((c) => (

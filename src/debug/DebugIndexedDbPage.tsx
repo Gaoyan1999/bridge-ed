@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import { getDataSourceMode } from '@/data/config';
 import {
   exportIndexedDbSnapshot,
   importIndexedDbSnapshotFullReplace,
@@ -16,7 +15,6 @@ function downloadJson(filename: string, value: unknown) {
 }
 
 export function DebugIndexedDbPage() {
-  const mode = getDataSourceMode();
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -27,7 +25,9 @@ export function DebugIndexedDbPage() {
       const snapshot = await exportIndexedDbSnapshot();
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
       downloadJson(`bridge-ed-indexeddb-${stamp}.json`, snapshot);
-      setStatus(`Exported ${snapshot.learningCards.length} learning card(s).`);
+      setStatus(
+        `Exported ${snapshot.learningCards.length} learning card(s), ${snapshot.studentMoods.length} mood row(s).`,
+      );
     } catch (e) {
       console.error(e);
       setStatus(e instanceof Error ? e.message : 'Export failed.');
@@ -70,17 +70,6 @@ export function DebugIndexedDbPage() {
             database as one JSON file. Import clears all stores, then writes the snapshot (full replace).
           </p>
         </header>
-
-        {mode === 'api' && (
-          <div
-            className="rounded-[var(--radius-sm)] border border-[var(--border)] px-4 py-3 text-sm"
-            style={{ background: 'var(--info-banner)' }}
-            role="status"
-          >
-            <strong className="font-medium">Data source is API.</strong> The main app does not read IndexedDB in this
-            mode, but you can still import/export the local DB for fixtures or after switching back to IndexedDB mode.
-          </div>
-        )}
 
         <div className="flex flex-wrap gap-3">
           <button type="button" className="btn btn--primary btn--sm" disabled={busy} onClick={() => void onExport()}>

@@ -45,9 +45,12 @@ interface BridgeContextValue {
   showToolDemo: (title: string, body: string) => void;
   showGeneric: (title: string, body: string) => void;
   getHints: () => { ai: string; chat: string; mood: string; dashboard?: string };
-  /** Bump when learning cards in IndexedDB change so dashboards refetch. */
+  /** Bump when learning cards change in storage so dashboards refetch. */
   learningCardsEpoch: number;
   bumpLearningCards: () => void;
+  /** Bump when student mood entries change so parent dashboard refetches. */
+  studentMoodsEpoch: number;
+  bumpStudentMoods: () => void;
 }
 
 const BridgeContext = createContext<BridgeContextValue | null>(null);
@@ -67,6 +70,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [selectedInboxId, setSelectedInboxId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
+  const [studentMoodsEpoch, setStudentMoodsEpoch] = useState(0);
 
   useEffect(() => {
     const syncHashToModule = () => setModuleState(parseModuleFromHash());
@@ -209,6 +213,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   };
 
   const bumpLearningCards = () => setLearningCardsEpoch((n) => n + 1);
+  const bumpStudentMoods = () => setStudentMoodsEpoch((n) => n + 1);
 
   const value: BridgeContextValue = {
     role,
@@ -230,6 +235,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     getHints,
     learningCardsEpoch,
     bumpLearningCards,
+    studentMoodsEpoch,
+    bumpStudentMoods,
   };
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;

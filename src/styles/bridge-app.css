@@ -438,7 +438,7 @@ body {
 }
 
 @media (max-width: 900px) {
-  .parent-mood-grid {
+  .parent-mood-grid:not(.parent-mood-grid--week) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
@@ -469,6 +469,62 @@ body {
   display: block;
   font-size: 0.65rem;
   color: var(--text-muted);
+}
+
+.parent-mood-day__label--muted {
+  opacity: 0.65;
+}
+
+.parent-mood-week {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.parent-mood-child-block {
+  margin: 0;
+}
+
+.parent-mood-child__name {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.parent-mood-week-grid-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -0.1rem;
+  padding: 0 0.1rem;
+}
+
+.parent-mood-grid--week {
+  min-width: min(100%, 38rem);
+  grid-template-columns: repeat(7, minmax(4.25rem, 1fr));
+}
+
+.parent-mood-day--today {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px rgba(11, 87, 208, 0.18);
+  background: var(--accent-soft);
+}
+
+.parent-mood-day--empty:not(.parent-mood-day--today) {
+  opacity: 0.92;
+}
+
+.parent-mood-day--placeholder {
+  border-style: dashed;
+  opacity: 0.72;
+  background: var(--pill-bg);
+}
+
+@media (max-width: 900px) {
+  .parent-mood-grid--week {
+    min-width: 32rem;
+    grid-template-columns: repeat(7, minmax(3.85rem, 1fr));
+  }
 }
 
 .audience-chips {
