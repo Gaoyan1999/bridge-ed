@@ -15,6 +15,7 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import { ROLE_DISPLAY } from '@/bridge/mockData';
 import type { Module, Role } from '@/bridge/types';
@@ -41,16 +42,20 @@ const NAV_MODULES: {
   module: Module;
   href: string;
   Icon: LucideIcon;
-  label: string;
   hideForStudent?: boolean;
   studentOnly?: boolean;
   hideForTeacher?: boolean;
 }[] = [
-  { module: 'dashboard', href: '#dashboard', Icon: LayoutDashboard, label: 'Dashboard', hideForStudent: true },
-  { module: 'knowledge', href: '#knowledge', Icon: BookOpen, label: 'Knowledge', hideForTeacher: true },
-  { module: 'chat', href: '#chat', Icon: MessageSquare, label: 'Messages' },
-  { module: 'mood', href: '#mood', Icon: Smile, label: 'Mood', studentOnly: true },
+  { module: 'dashboard', href: '#dashboard', Icon: LayoutDashboard, hideForStudent: true },
+  { module: 'knowledge', href: '#knowledge', Icon: BookOpen, hideForTeacher: true },
+  { module: 'chat', href: '#chat', Icon: MessageSquare },
+  { module: 'mood', href: '#mood', Icon: Smile, studentOnly: true },
 ];
+
+const UI_LANGS = ['en', 'zh', 'fr'] as const;
+type UiLang = (typeof UI_LANGS)[number];
+
+const LANG_SHORT: Record<UiLang, string> = { en: 'EN', zh: '中', fr: 'FR' };
 
 export function Sidebar({
   sidebarCollapsed,
@@ -60,10 +65,13 @@ export function Sidebar({
   roleDropdownOpen,
   setRoleDropdownOpen,
 }: SidebarChromeProps) {
+  const { t, i18n } = useTranslation();
   const { role, setRole, setCurrentUserId, users, currentUser, currentUserId, module, setModule, showToolDemo } =
     useBridge();
 
   const ddRef = useRef<HTMLDivElement>(null);
+  const rawLng = (i18n.resolvedLanguage ?? i18n.language ?? 'en').split('-')[0]?.toLowerCase() ?? 'en';
+  const activeUiLang: UiLang = rawLng === 'zh' || rawLng === 'fr' ? rawLng : 'en';
   const meta = ROLE_DISPLAY[role];
   const RoleIcon = ROLE_ICONS[role];
   const viewLabel = currentUser?.name ?? meta.label;
@@ -114,7 +122,7 @@ export function Sidebar({
         id="sidebar-toggle"
         aria-expanded={sidebarMobileOpen}
         aria-controls="sidebar"
-        aria-label="Open or close sidebar"
+        aria-label={t('sidebar.sidebarToggle')}
         onClick={() => setSidebarMobileOpen(!sidebarMobileOpen)}
       >
         <span className="block h-0.5 w-[1.1rem] rounded-[1px] bg-[var(--text-muted)]" aria-hidden="true" />
@@ -133,7 +141,7 @@ export function Sidebar({
         aria-hidden="true"
       />
 
-      <aside className={aside} id="sidebar" role="navigation" aria-label="Primary navigation and tools">
+      <aside className={aside} id="sidebar" role="navigation" aria-label={t('sidebar.primaryNav')}>
         <div
           className={cx(
             'flex min-w-0 items-center gap-1.5 pl-1 pr-0.5',
@@ -158,7 +166,7 @@ export function Sidebar({
             id="sidebar-collapse"
             aria-expanded={!sidebarCollapsed}
             aria-controls="sidebar"
-            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={sidebarCollapsed ? t('sidebar.expandSidebar') : t('sidebar.collapseSidebar')}
             onClick={toggleSidebarCollapsed}
           >
             <span
@@ -167,7 +175,7 @@ export function Sidebar({
             >
               <ChevronLeft className="block shrink-0" strokeWidth={2} size={18} />
             </span>
-            <span className="sr-only">Collapse or expand sidebar</span>
+            <span className="sr-only">{t('sidebar.collapseExpand')}</span>
           </button>
         </div>
 
@@ -179,7 +187,7 @@ export function Sidebar({
             )}
             id="role-label"
           >
-            View as
+            {t('sidebar.viewAs')}
           </p>
           <div className="relative w-full" id="role-dropdown" ref={ddRef}>
             <button
@@ -295,7 +303,7 @@ export function Sidebar({
           </div>
         </div>
 
-        <nav className="flex flex-col gap-0.5" aria-label="Modules">
+        <nav className="flex flex-col gap-0.5" aria-label={t('sidebar.moduleNavAria')}>
           {NAV_MODULES.map((n) => {
             const hidden =
               (n.hideForStudent && role === 'student') ||
@@ -304,6 +312,7 @@ export function Sidebar({
             if (hidden) return null;
             const NavIcon = n.Icon;
             const isActive = module === n.module;
+            const navLabel = t(`nav.${n.module}`);
             return (
               <a
                 key={n.module}
@@ -315,84 +324,123 @@ export function Sidebar({
                 )}
                 data-module={n.module}
                 id={n.module === 'dashboard' ? 'nav-dashboard' : undefined}
-                title={n.label}
+                title={navLabel}
                 hidden={hidden}
                 onClick={(e) => onNav(e, n.module)}
               >
                 <span className="inline-flex items-center justify-center leading-none opacity-90" aria-hidden="true">
                   <NavIcon className="block shrink-0" strokeWidth={2} size={18} />
                 </span>
-                <span className={cx(sidebarCollapsed && 'sr-only')}>{n.label}</span>
+                <span className={cx(sidebarCollapsed && 'sr-only')}>{navLabel}</span>
               </a>
             );
           })}
         </nav>
 
-        <div className="mt-auto border-t border-[var(--border-light)] pt-[0.65rem]">
-          <p
-            className={cx(
-              'mb-[0.45rem] px-2 py-0 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]',
-              sidebarCollapsed && 'm-0 h-0 overflow-hidden',
-            )}
-            id="tools-label"
-          >
-            Tools
-          </p>
-          <div className="flex flex-col gap-[0.35rem]" role="group" aria-labelledby="tools-label">
-            <button
-              type="button"
+        <div className="mt-auto flex flex-col gap-[0.65rem] border-t border-[var(--border-light)] pt-[0.65rem]">
+          <div role="group" aria-labelledby="language-label">
+            <p
               className={cx(
-                'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
-                sidebarCollapsed && 'justify-center px-1.5',
+                'mb-[0.45rem] px-2 py-0 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]',
+                sidebarCollapsed && 'sr-only',
               )}
-              id="tool-upload"
-              title="Upload a report or transcript (demo)"
-              onClick={() =>
-                showToolDemo(
-                  'Upload report',
-                  'Demo: upload weekly notes, report cards, or PDFs so the AI can reference them in chat.',
-                )
-              }
+              id="language-label"
             >
-              <Paperclip className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
-              <span className={cx(sidebarCollapsed && 'sr-only')}>Upload report</span>
-            </button>
-            <button
-              type="button"
+              {t('sidebar.language')}
+            </p>
+            <div
               className={cx(
-                'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
-                sidebarCollapsed && 'justify-center px-1.5',
+                'flex min-w-0 gap-1',
+                sidebarCollapsed ? 'justify-center px-0' : 'px-2',
               )}
-              id="tool-practice"
-              title="Generate practice (demo)"
-              onClick={() =>
-                showToolDemo(
-                  'Generate practice',
-                  'Demo: create 2–3 short items from the current learning-card topic for the student to try.',
-                )
-              }
+              aria-label={sidebarCollapsed ? t('sidebar.languageAria') : undefined}
             >
-              <ClipboardList className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
-              <span className={cx(sidebarCollapsed && 'sr-only')}>Practice</span>
-            </button>
-            <button
-              type="button"
+              {UI_LANGS.map((code) => {
+                const active = activeUiLang === code;
+                const label = t(`sidebar.languages.${code}`);
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    className={cx(
+                      'flex min-h-[2rem] min-w-0 flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] border-none px-1.5 py-1.5 text-[0.7rem] font-semibold leading-tight text-[var(--text)] transition-colors',
+                      active
+                        ? 'bg-[var(--info-banner)] text-[var(--link-blue)]'
+                        : 'bg-[var(--pill-bg)] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
+                    )}
+                    aria-pressed={active}
+                    aria-label={label}
+                    title={label}
+                    onClick={() => void i18n.changeLanguage(code)}
+                  >
+                    {sidebarCollapsed ? (
+                      <span aria-hidden="true">{LANG_SHORT[code]}</span>
+                    ) : (
+                      <span className="truncate">{label}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-[var(--border-light)] pt-[0.65rem]">
+            <p
               className={cx(
-                'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
-                sidebarCollapsed && 'justify-center px-1.5',
+                'mb-[0.45rem] px-2 py-0 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]',
+                sidebarCollapsed && 'm-0 h-0 overflow-hidden',
               )}
-              id="tool-snippets"
-              title="Quick phrases (demo)"
-              onClick={() =>
-                showToolDemo(
-                  'Quick phrases',
-                  'Demo: one-tap inserts like “Explain shorter” or “Give a real-life example” into the composer.',
-                )
-              }
+              id="tools-label"
             >
-              <Zap className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
-              <span className={cx(sidebarCollapsed && 'sr-only')}>Snippets</span>
-            </button>
+              {t('sidebar.tools')}
+            </p>
+            <div className="flex flex-col gap-[0.35rem]" role="group" aria-labelledby="tools-label">
+              <button
+                type="button"
+                className={cx(
+                  'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
+                  sidebarCollapsed && 'justify-center px-1.5',
+                )}
+                id="tool-upload"
+                title={t('sidebar.uploadTitle')}
+                onClick={() =>
+                  showToolDemo(t('sidebar.uploadDemoTitle'), t('sidebar.uploadDemoBody'))
+                }
+              >
+                <Paperclip className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
+                <span className={cx(sidebarCollapsed && 'sr-only')}>{t('sidebar.uploadReport')}</span>
+              </button>
+              <button
+                type="button"
+                className={cx(
+                  'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
+                  sidebarCollapsed && 'justify-center px-1.5',
+                )}
+                id="tool-practice"
+                title={t('sidebar.practiceTitle')}
+                onClick={() =>
+                  showToolDemo(t('sidebar.practiceDemoTitle'), t('sidebar.practiceDemoBody'))
+                }
+              >
+                <ClipboardList className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
+                <span className={cx(sidebarCollapsed && 'sr-only')}>{t('sidebar.practiceTool')}</span>
+              </button>
+              <button
+                type="button"
+                className={cx(
+                  'flex cursor-pointer items-center gap-1.5 rounded-full border-none bg-[var(--pill-bg)] px-3 py-2 text-left text-[0.8125rem] font-[inherit] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
+                  sidebarCollapsed && 'justify-center px-1.5',
+                )}
+                id="tool-snippets"
+                title={t('sidebar.snippetsTitle')}
+                onClick={() =>
+                  showToolDemo(t('sidebar.snippetsDemoTitle'), t('sidebar.snippetsDemoBody'))
+                }
+              >
+                <Zap className="block shrink-0 opacity-90" strokeWidth={2} size={16} aria-hidden={true} />
+                <span className={cx(sidebarCollapsed && 'sr-only')}>{t('sidebar.snippets')}</span>
+              </button>
+            </div>
           </div>
         </div>
       </aside>

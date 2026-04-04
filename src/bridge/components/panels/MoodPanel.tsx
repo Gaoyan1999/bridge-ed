@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
+import { panelHintsForRole } from '@/bridge/panelHints';
 import { formatLocalYmd } from '@/bridge/moodWeek';
 import { moodSpectrumLabel } from '@/bridge/moodUtils';
 import { DEMO_STUDENT_MOOD_PROFILE, PARENT_REPORT, TEACHER_MOOD_ROWS } from '@/bridge/mockData';
@@ -9,8 +11,9 @@ import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
 export function MoodPanel({ active }: { active: boolean }) {
-  const { role, currentUser, getHints, setModule, bumpStudentMoods } = useBridge();
-  const hints = getHints();
+  const { t } = useTranslation();
+  const { role, currentUser, setModule, bumpStudentMoods } = useBridge();
+  const hints = panelHintsForRole(t, role);
   const [slider, setSlider] = useState(50);
   const [note, setNote] = useState('');
   const [success, setSuccess] = useState(false);

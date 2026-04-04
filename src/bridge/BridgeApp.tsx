@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { BridgeModals } from '@/bridge/components/BridgeModals';
 import { SkipLink } from '@/bridge/components/SkipLink';
 import { Sidebar } from '@/bridge/components/Sidebar';
-import { AiPanel } from '@/bridge/components/panels/AiPanel';
 import { ChatPanel } from '@/bridge/components/panels/ChatPanel';
 import { KnowledgePanel } from '@/bridge/components/panels/KnowledgePanel';
 import { DashboardPanel } from '@/bridge/components/panels/DashboardPanel';
@@ -58,7 +57,6 @@ function BridgeShell() {
                 BridgeEd workspace
               </h1>
               <DashboardPanel active={module === 'dashboard'} />
-              <AiPanel active={module === 'ai'} />
               <ChatPanel active={module === 'chat'} />
               <KnowledgePanel active={module === 'knowledge'} />
               <MoodPanel key={`${module}-${role}`} active={module === 'mood'} />

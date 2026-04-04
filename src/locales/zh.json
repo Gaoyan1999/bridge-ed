@@ -29,8 +29,7 @@
     "dashboard": "仪表盘",
     "knowledge": "知识",
     "chat": "消息",
-    "mood": "心情",
-    "ai": "AI 助手"
+    "mood": "心情"
   },
   "sidebar": {
     "viewAs": "视角",
@@ -40,55 +39,58 @@
     "sidebarToggle": "打开或关闭侧栏",
     "collapseExpand": "收起或展开侧栏",
     "primaryNav": "主导航与工具",
+    "moduleNavAria": "主要模块",
     "language": "语言",
+    "languageAria": "选择界面语言",
+    "languages": {
+      "en": "English",
+      "zh": "中文",
+      "fr": "Français"
+    },
     "uploadReport": "上传报告",
     "practiceTool": "练习",
     "snippets": "短语",
-    "uploadTitle": "上传报告或成绩单（演示）",
+    "uploadTitle": "上传报告或成绩单",
     "uploadDemoTitle": "上传报告",
     "uploadDemoBody": "演示：上传周记、成绩单或 PDF，供 AI 在对话中引用。",
-    "practiceTitle": "生成练习（演示）",
+    "practiceTitle": "生成练习",
     "practiceDemoTitle": "生成练习",
     "practiceDemoBody": "演示：根据当前学习卡主题生成 2–3 道小题供学生尝试。",
-    "snippetsTitle": "快捷短语（演示）",
+    "snippetsTitle": "快捷短语",
     "snippetsDemoTitle": "快捷短语",
     "snippetsDemoBody": "演示：一键插入如「请简短解释」或「举个生活例子」到输入框。"
   },
   "hints": {
     "parent": {
-      "dashboard": "学习卡、孩子一周安排与心情快照（演示）。",
-      "ai": "询问作业、概念释义，或粘贴老师留言以获得清晰下一步。",
+      "dashboard": "学习卡、孩子一周安排与心情快照。",
       "chat": "学校通知、与老师聊天，以及预约一对一时间。",
       "knowledge": "选择一张学习卡，就该主题与 BridgeEd AI 对话——释义、练习思路与下一步。",
       "mood": "查看孩子每周心情摘要与趋势。"
     },
     "student": {
-      "ai": "此处显示提示与练习思路（演示）。更深入辅导请使用家长视图。",
-      "chat": "班级通知与老师发来的消息（演示）。",
+      "chat": "班级通知与老师发来的消息。",
       "knowledge": "选择班级学习卡，就该主题与 BridgeEd AI 对话——练习思路与简明讲解。",
       "mood": "拖动滑块表示此刻感受，然后点「下一步」保存心情打卡。"
     },
     "teacher": {
       "dashboard": "撰写班级报告并通过消息推送给学生与家长——以及任务、动态与本周安排。",
-      "ai": "预览面向家长的 AI 表述；通过消息与学习卡发布。",
       "chat": "向班级或家长广播，并管理预约请求。",
       "mood": "班级心情总览与学习反馈并列。"
     },
-    "dashboardFallback": "班级报告、学习卡、任务、动态、班级脉搏、花名册与本周日程（演示）。"
+    "dashboardFallback": "班级报告、学习卡、任务、动态、班级脉搏、花名册与本周日程。"
   },
   "panels": {
     "dashboard": "仪表盘",
     "knowledge": "知识",
     "messages": "消息",
-    "mood": "心情",
-    "ai": "AI 助手"
+    "mood": "心情"
   },
   "knowledge": {
     "emptyStudent": "还没有学习卡。老师发送到班级后会显示在这里。",
     "emptyParent": "还没有学习卡。请在仪表盘查看老师分享的内容。",
     "selectCard": "选择一张卡片",
     "composerPlaceholder": "询问本卡主题，或粘贴作业问题…",
-    "demoThread": "从仪表盘打开此卡以开始 AI 对话（演示）。",
+    "demoThread": "从仪表盘打开此卡以开始 AI 对话。",
     "ariaSuggestedTasks": "今晚建议任务",
     "ariaSubjectStatus": "科目与状态",
     "taskShort": {
@@ -98,13 +100,8 @@
     },
     "practice": {
       "button": "练习",
-      "mockReply": "**小练习（演示）**\n\n我们用**梵高的画法**来做一个小练习：**画一朵向日葵**。\n\n- **笔触：** 厚涂与短笔触——像梵高一样留下清晰颜料痕迹，不必涂得很平。\n- **颜色：** 以明亮黄色为主，用少量深绿、赭石点缀花心与阴影。\n- **花盘与花瓣：** 先画扁圆花盘，再用放射状笔触勾出花瓣方向，可加一点旋转感。\n\n画完后可以说说你用的三种颜色、想改进的地方——或上传照片。"
+      "mockReply": "**小练习**\n\n我们用**梵高的画法**来做一个小练习：**画一朵向日葵**。\n\n- **笔触：** 厚涂与短笔触——像梵高一样留下清晰颜料痕迹，不必涂得很平。\n- **颜色：** 以明亮黄色为主，用少量深绿、赭石点缀花心与阴影。\n- **花盘与花瓣：** 先画扁圆花盘，再用放射状笔触勾出花瓣方向，可加一点旋转感。\n\n画完后可以说说你用的三种颜色、想改进的地方——或上传照片。"
     }
-  },
-  "ai": {
-    "placeholder": "例如：解释判别式… 或粘贴本周老师评语",
-    "loadSample": "加载示例对话",
-    "demoReply": "（演示）收到。正式环境中，回复将遵循学校规则与安全策略。可补充年级或教材以获得更贴切帮助。"
   },
   "chat": {
     "placeholderParent": "给老师发消息…",
@@ -114,7 +111,7 @@
     "broadcast": "广播",
     "selectThread": "选择会话",
     "bookTime": "预约时间",
-    "noMessagesInThread": "此会话暂无消息（演示）。"
+    "noMessagesInThread": "此会话暂无消息。"
   },
   "mood": {
     "emotion": "情绪",
@@ -175,6 +172,9 @@
     "deleteConfirm": "删除「{{title}}」？",
     "deleteAria": "删除学习卡：{{title}}",
     "delete": "删除",
-    "linkedTo": "关联于 {{date}}"
+    "linkedTo": "关联于 {{date}}",
+    "status": {
+      "New": "新"
+    }
   }
 }

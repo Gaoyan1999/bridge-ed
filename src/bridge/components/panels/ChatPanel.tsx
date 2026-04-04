@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
+import { panelHintsForRole } from '@/bridge/panelHints';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { requestChatReply } from '@/bridge/chatApi';
 import { Button } from '@/bridge/components/ui/Button';
@@ -14,7 +15,6 @@ export function ChatPanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
   const {
     role,
-    getHints,
     inboxByRole,
     threads,
     selectedInboxId,
@@ -22,7 +22,7 @@ export function ChatPanel({ active }: { active: boolean }) {
     appendChatMessage,
     openModal,
   } = useBridge();
-  const hints = getHints();
+  const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({

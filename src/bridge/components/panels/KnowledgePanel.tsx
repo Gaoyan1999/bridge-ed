@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
+import { panelHintsForRole } from '@/bridge/panelHints';
 import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import {
@@ -125,7 +126,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
   const {
     role,
-    getHints,
     learningCardsEpoch,
     knowledgeThreads,
     selectedKnowledgeThreadId,
@@ -134,7 +134,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     seedKnowledgeThreadIfEmpty,
     currentUser,
   } = useBridge();
-  const hints = getHints();
+  const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
   const [practiceBusy, setPracticeBusy] = useState(false);
   const [cards, setCards] = useState<LearningCardItem[]>([]);
