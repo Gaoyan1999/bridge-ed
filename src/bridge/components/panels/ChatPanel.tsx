@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
+import { requestChatReply } from '@/bridge/chatApi';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
@@ -31,6 +32,8 @@ export function ChatPanel({ active }: { active: boolean }) {
       else if (reason === 'type') window.alert(t('common.imagesOnly'));
     },
   });
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const items = inboxByRole[role];
   const inboxKey = items.map((i) => i.id).join(',');
@@ -55,13 +58,14 @@ export function ChatPanel({ active }: { active: boolean }) {
         ? t('chat.placeholderTeacher')
         : t('chat.placeholderStudent');
 
-  const send = () => {
+  const send = async () => {
     const v = input.trim();
     const attachments =
       pending.length > 0
         ? pending.map((p) => ({ kind: 'image' as const, url: p.dataUrl, name: p.name }))
         : undefined;
-    if ((!v && !attachments?.length) || !threadId) return;
+    if ((!v && !attachments?.length) || !threadId || isSending) return;
+    const history = threads[threadId] ?? [];
     appendChatMessage(threadId, {
       who: 'You',
       type: 'out',
@@ -71,6 +75,32 @@ export function ChatPanel({ active }: { active: boolean }) {
     setInput('');
     clear();
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (!v) return;
+    setIsSending(true);
+    setError(null);
+    try {
+      const result = await requestChatReply({
+        role,
+        threadTitle: current?.title ?? '',
+        threadId,
+        message: v,
+        history,
+      });
+      appendChatMessage(threadId, {
+        who: result.source === 'curricullm' ? 'BridgeEd AI' : 'BridgeEd AI (demo)',
+        type: 'in',
+        text: result.reply,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      appendChatMessage(threadId, {
+        who: 'BridgeEd AI',
+        type: 'in',
+        text: 'Sorry, I could not generate a reply just now. Please try again.',
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -155,6 +185,11 @@ export function ChatPanel({ active }: { active: boolean }) {
                 </div>
               ))
             )}
+            {error && (
+              <p className="panel__hint" role="alert">
+                {error}
+              </p>
+            )}
           </div>
           <input
             ref={fileInputRef}
@@ -208,8 +243,15 @@ export function ChatPanel({ active }: { active: boolean }) {
                 >
                   <ImagePlus strokeWidth={2} size={20} aria-hidden />
                 </Button>
-                <Button variant="primary" pill className="btn--sm" id="chat-send" onClick={send}>
-                  {t('common.send')}
+                <Button
+                  variant="primary"
+                  pill
+                  className="btn--sm"
+                id="chat-send"
+                onClick={() => void send()}
+                disabled={isSending}
+              >
+                  {isSending ? 'Sending...' : t('common.send')}
                 </Button>
               </>
             }

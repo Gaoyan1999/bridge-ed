@@ -11,6 +11,8 @@ export type MockLearningCardInput = {
   topic: string;
   gradeSubject: string;
   notes: string;
+  grade?: string;
+  subject?: string;
 };
 
 export function mockGenerateLearningCard(_input: MockLearningCardInput): Promise<MockLearningCardDraft> {
