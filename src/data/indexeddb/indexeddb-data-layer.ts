@@ -1,6 +1,7 @@
 import { bridgeDb } from './bridge-db';
 import type { DataLayer, LearningCardsRepository, StudentMoodsRepository, UsersRepository } from '../repositories';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
+import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { UserBackend } from '../entity/user-backend';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
@@ -25,6 +26,7 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
         if (id === 'teacher-1' && r.authorUserId === '1') return true;
         return false;
       })
+      .map((r) => normalizeLearningCardBackend(r))
       .sort(sortByCreatedAtDesc);
   }
 
@@ -41,7 +43,7 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
       if (card.audience.mode === 'whole_class') return true;
       return card.audience.selectedStudentIds.some((sid) => childSet.has(sid));
     });
-    return filtered.sort(sortByCreatedAtDesc);
+    return filtered.map((r) => normalizeLearningCardBackend(r)).sort(sortByCreatedAtDesc);
   }
 
   async listForStudentUser(studentUserId: string): Promise<LearningCardBackend[]> {
@@ -56,11 +58,12 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
       if (card.audience.mode === 'whole_class') return true;
       return card.audience.selectedStudentIds.some((id) => id === sid);
     });
-    return filtered.sort(sortByCreatedAtDesc);
+    return filtered.map((r) => normalizeLearningCardBackend(r)).sort(sortByCreatedAtDesc);
   }
 
   async get(id: string): Promise<LearningCardBackend | undefined> {
-    return bridgeDb.learningCards.get(id);
+    const raw = await bridgeDb.learningCards.get(id);
+    return raw ? normalizeLearningCardBackend(raw) : undefined;
   }
 
   async put(card: LearningCardBackend): Promise<void> {

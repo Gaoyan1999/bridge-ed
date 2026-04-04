@@ -9,6 +9,7 @@ import {
   type StudentMoodBackend,
 } from '../entity/student-mood-backend';
 import type { UserBackend, UserRole } from '../entity/user-backend';
+import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
 export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 1 as const;
@@ -29,7 +30,7 @@ function isLearningCardRow(v: unknown): v is LearningCardBackend {
   if (!isRecord(v)) return false;
   return (
     typeof v.id === 'string' &&
-    v.schemaVersion === LEARNING_CARD_SCHEMA_VERSION &&
+    (v.schemaVersion === 1 || v.schemaVersion === LEARNING_CARD_SCHEMA_VERSION) &&
     typeof v.createdAt === 'string' &&
     typeof v.updatedAt === 'string'
   );
@@ -135,7 +136,7 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
     if (!isLearningCardRow(row)) {
       throw new Error(`Invalid learningCards[${i}]: expected a full LearningCardBackend record.`);
     }
-    learningCards.push(row);
+    learningCards.push(normalizeLearningCardBackend(row));
   }
 
   const moodsRaw = Array.isArray(data.studentMoods) ? data.studentMoods : [];

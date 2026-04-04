@@ -1,8 +1,41 @@
-import type { LearningCardCreatePayload, LearningCardItem } from '@/bridge/types';
+import type {
+  LearningCardCreatePayload,
+  LearningCardItem,
+  LearningCardTonightAction,
+  LearningCardTonightActionPreset,
+} from '@/bridge/types';
+import { LEARNING_CARD_TONIGHT_ACTION_PRESETS } from '@/bridge/types';
 import {
   LEARNING_CARD_SCHEMA_VERSION,
   type LearningCardBackend,
 } from '@/data/entity/learning-card-backend';
+
+function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
+  return typeof v === 'string' && (LEARNING_CARD_TONIGHT_ACTION_PRESETS as readonly string[]).includes(v);
+}
+
+/** Ensures exactly three fixed presets; migrates legacy rows that only had `text` + `include`. */
+export function normalizeTonightActions(raw: unknown): LearningCardTonightAction[] {
+  const arr = Array.isArray(raw) ? raw : [];
+  const out: LearningCardTonightAction[] = [];
+  for (let i = 0; i < 3; i++) {
+    const row = arr[i] as Partial<LearningCardTonightAction> & { preset?: unknown } | undefined;
+    const preset = row && isTonightPreset(row.preset) ? row.preset : LEARNING_CARD_TONIGHT_ACTION_PRESETS[i]!;
+    const include = typeof row?.include === 'boolean' ? row.include : true;
+    const text = typeof row?.text === 'string' ? row.text : '';
+    out.push({ preset, include, text });
+  }
+  return out;
+}
+
+/** Normalize stored card (legacy `tonightActions` / schema v1 → current). */
+export function normalizeLearningCardBackend(card: LearningCardBackend): LearningCardBackend {
+  return {
+    ...card,
+    schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
+    tonightActions: normalizeTonightActions(card.tonightActions),
+  };
+}
 
 /**
  * Fallback author when the wizard is opened without a teacher session (align with `reference/data.json` teachers).
@@ -51,7 +84,11 @@ export function learningCardCreatePayloadToBackend(
     teacherNotes: ci.notes,
     gradeSubjectLine: ci.gradeSubjectLine,
     parentSummary: payload.generated.parentSummary,
-    tonightActions: payload.generated.tonightActions.map((a) => ({ text: a.text, include: a.include })),
+    tonightActions: payload.generated.tonightActions.map((a) => ({
+      preset: a.preset,
+      include: a.include,
+      text: a.text,
+    })),
     audience: {
       mode: payload.audience.mode === 'class' ? 'whole_class' : 'selected_parents',
       recipientCount: payload.audience.recipientCount,
@@ -81,10 +118,11 @@ export function sampleLearningCardBackend(): LearningCardBackend {
     teacherNotes: '',
     gradeSubjectLine: 'G9 · Math',
     parentSummary: '调试插入：家长摘要会出现在这里。',
-    tonightActions: [
-      { text: '和孩子一起回顾今日关键词', include: true },
-      { text: '完成书上一道小题', include: true },
-    ],
+    tonightActions: normalizeTonightActions([
+      { preset: 'quiz', include: true, text: '' },
+      { preset: 'parent_led_practice', include: true, text: '' },
+      { preset: 'explain_to_parent', include: false, text: '' },
+    ]),
     audience: {
       mode: 'whole_class',
       recipientCount: 28,
@@ -134,20 +172,7 @@ export function learningCardItemToBackendSnapshot(
     teacherNotes: '',
     gradeSubjectLine,
     parentSummary: item.summary,
-    tonightActions: [
-      {
-        text: `Tonight: revisit “${item.title}” with one class or homework example.`,
-        include: true,
-      },
-      {
-        text: 'Ask your child to explain the main idea in their own words.',
-        include: true,
-      },
-      {
-        text: 'If it’s stuck after ~15 minutes, note the question and message the teacher.',
-        include: true,
-      },
-    ],
+    tonightActions: normalizeTonightActions(item.tonightActions),
     audience: {
       mode: 'whole_class',
       recipientCount: 28,
@@ -173,5 +198,6 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     summary: summary.length > 0 ? summary : '—',
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
+    tonightActions: normalizeTonightActions(backend.tonightActions),
   };
 }

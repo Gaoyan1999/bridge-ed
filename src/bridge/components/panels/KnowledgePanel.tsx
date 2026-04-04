@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
-import type { LearningCardItem } from '@/bridge/types';
+import { LEARNING_CARD_TONIGHT_PRESET_SHORT, type LearningCardItem } from '@/bridge/types';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
@@ -36,6 +36,20 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'statu
     out.push({ key: 'status', kind: 'status', aria: 'Status', text: st });
   }
   return out;
+}
+
+function KnowledgeTonightTasks({ card }: { card: Pick<LearningCardItem, 'tonightActions'> }) {
+  const tasks = card.tonightActions.filter((a) => a.include);
+  if (!tasks.length) return null;
+  return (
+    <div className="knowledge-inbox__tasks" role="group" aria-label="Tonight’s suggested tasks">
+      {tasks.map((a) => (
+        <span key={a.preset} className="knowledge-inbox__task-chip">
+          {LEARNING_CARD_TONIGHT_PRESET_SHORT[a.preset]}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject' | 'status'> }) {
@@ -73,7 +87,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     setSelectedKnowledgeThreadId,
     appendKnowledgeMessage,
     seedKnowledgeThreadIfEmpty,
-    openModal,
     currentUser,
   } = useBridge();
   const hints = getHints();
@@ -217,18 +230,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
               <h3 className="thread-title" id="knowledge-thread-title">
                 {current?.title ?? 'Select a card'}
               </h3>
-              {currentCard ? <KnowledgeCardLabels card={currentCard} /> : null}
+              {currentCard ? (
+                <div className="flex justify-between">
+                  <KnowledgeCardLabels card={currentCard} />
+                  <KnowledgeTonightTasks card={currentCard} />
+                </div>
+              ) : null}
             </div>
-            <Button
-              variant="secondary"
-              pill
-              className="btn--sm"
-              id="btn-book-teacher-knowledge"
-              hidden={role !== 'parent'}
-              onClick={() => openModal({ type: 'book' })}
-            >
-              Book a time
-            </Button>
           </div>
           <div className="msg-thread" id="knowledge-msg-thread">
             {!msgs.length ? (

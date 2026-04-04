@@ -1,3 +1,5 @@
+import type { LearningCardTonightAction } from '@/bridge/types';
+
 /**
  * Backend contract for Learning Cards — intended for REST/JSON APIs and IndexedDB documents.
  *
@@ -11,7 +13,7 @@
  * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`, `sendStatus`
  */
 
-export const LEARNING_CARD_SCHEMA_VERSION = 1 as const;
+export const LEARNING_CARD_SCHEMA_VERSION = 2 as const;
 
 /** Who receives the card (maps from wizard `class` / `selected`). */
 export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
@@ -19,10 +21,8 @@ export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
 /** Teacher-side send pipeline. */
 export type LearningCardSendStatus = 'draft' | 'sent' | 'failed';
 
-export type LearningCardTonightActionBackend = {
-  text: string;
-  include: boolean;
-};
+/** Same shape as `LearningCardTonightAction` in persisted JSON / IndexedDB. */
+export type LearningCardTonightActionBackend = LearningCardTonightAction;
 
 /**
  * Canonical persisted record for one learning card (create → send → optional updates).
