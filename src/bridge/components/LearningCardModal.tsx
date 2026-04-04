@@ -306,7 +306,7 @@ export function LearningCardModal({
               value={notes}
               onChange={setNotes}
               rows={3}
-              placeholder="Anything the model should emphasize for families…"
+              placeholder="Anything the model should emphasize for families..."
             />
           </div>
           <div className="modal__footer">
@@ -328,7 +328,7 @@ export function LearningCardModal({
             <div className="learning-card-gen__orb" aria-hidden="true">
               <Sparkles className="learning-card-gen__sparkle" strokeWidth={2} size={28} />
             </div>
-            <p className="learning-card-gen__title">Generating parent summary…</p>
+            <p className="learning-card-gen__title">Generating parent summary...</p>
             <p className="learning-card-gen__hint">Drafting a short parent summary from your notes.</p>
             <div className="learning-card-gen__dots" aria-hidden="true">
               <span />
@@ -361,7 +361,7 @@ export function LearningCardModal({
                   <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
                 </div>
                 <p className="learning-card-ai-hint__text">
-                  Families will see this in their preferred language — we translate the summary automatically for each
+                  Families will see this in their preferred language - we translate the summary automatically for each
                   parent.
                 </p>
               </div>
@@ -516,17 +516,17 @@ export function LearningCardModal({
         <div className="book-form learning-card-form">
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-confirm">
-              <p className="learning-card-confirm__lead">You’re about to send this learning card.</p>
+              <p className="learning-card-confirm__lead">You&apos;re about to send this learning card.</p>
               <p className="learning-card-confirm__count">
                 <strong>{recipientCount}</strong> {recipientCount === 1 ? 'family' : 'families'} will get a notification
                 under <strong>Knowledge</strong> powered by BridgeEd AI.
               </p>
               <ul className="learning-card-confirm__bullets">
                 <li>
-                  Summary: {summary.trim() ? 'Ready' : '—'}
+                  Summary: {summary.trim() ? 'Ready' : '-'}
                 </li>
                 <li>
-                  Tonight’s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
+                  Tonight&apos;s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
                   {LEARNING_CARD_TONIGHT_ACTION_PRESETS.length}
                 </li>
                 <li>
