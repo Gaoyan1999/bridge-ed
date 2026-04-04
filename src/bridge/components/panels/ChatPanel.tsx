@@ -1,9 +1,17 @@
+<<<<<<< Updated upstream
 import { useEffect, useState } from 'react';
+=======
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ImagePlus } from 'lucide-react';
+>>>>>>> Stashed changes
 import { useBridge } from '@/bridge/BridgeContext';
+import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
+import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
 export function ChatPanel({ active }: { active: boolean }) {
   const {
@@ -18,6 +26,14 @@ export function ChatPanel({ active }: { active: boolean }) {
   } = useBridge();
   const hints = getHints();
   const [input, setInput] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
+    onReject: (reason) => {
+      if (reason === 'size') window.alert(t('common.imageTooLarge'));
+      else if (reason === 'max') window.alert(t('common.maxImages', { count: MAX_MESSAGE_IMAGES }));
+      else if (reason === 'type') window.alert(t('common.imagesOnly'));
+    },
+  });
 
   const items = inboxByRole[role];
   const inboxKey = items.map((i) => i.id).join(',');
@@ -44,9 +60,20 @@ export function ChatPanel({ active }: { active: boolean }) {
 
   const send = () => {
     const v = input.trim();
-    if (!v || !threadId) return;
-    appendChatMessage(threadId, { who: 'You', type: 'out', text: v });
+    const attachments =
+      pending.length > 0
+        ? pending.map((p) => ({ kind: 'image' as const, url: p.dataUrl, name: p.name }))
+        : undefined;
+    if ((!v && !attachments?.length) || !threadId) return;
+    appendChatMessage(threadId, {
+      who: 'You',
+      type: 'out',
+      text: v,
+      ...(attachments ? { attachments } : {}),
+    });
     setInput('');
+    clear();
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
@@ -121,12 +148,36 @@ export function ChatPanel({ active }: { active: boolean }) {
             ) : (
               msgs.map((m, idx) => (
                 <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
+<<<<<<< Updated upstream
                   <div className="msg__who">{m.who}</div>
                   <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+=======
+                  <div className="msg__who">
+                    {m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who}
+                  </div>
+                  <MessageAttachmentGrid attachments={m.attachments} />
+                  {m.text?.trim() ? (
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+                  ) : null}
+>>>>>>> Stashed changes
                 </div>
               ))
             )}
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            id="chat-file-input"
+            aria-hidden
+            tabIndex={-1}
+            onChange={(e) => {
+              void addFromFileList(e.target.files);
+              e.target.value = '';
+            }}
+          />
           <Composer
             inputId="chat-input"
             className="chat-composer"
@@ -134,10 +185,47 @@ export function ChatPanel({ active }: { active: boolean }) {
             value={input}
             onChange={setInput}
             placeholder={placeholder}
+            previewSlot={
+              pending.length > 0 ? (
+                <div className="composer__preview-strip">
+                  {pending.map((p) => (
+                    <div key={p.id} className="composer__preview-chip">
+                      <img src={p.dataUrl} alt="" />
+                      <button
+                        type="button"
+                        className="composer__preview-remove"
+                        aria-label={t('common.removeAttachment')}
+                        onClick={() => remove(p.id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            }
             actions={
+<<<<<<< Updated upstream
               <Button variant="primary" pill className="btn--sm" id="chat-send" onClick={send}>
                 Send
               </Button>
+=======
+              <>
+                <Button
+                  type="button"
+                  variant="text"
+                  className="btn--sm composer__attach-btn"
+                  id="chat-attach-image"
+                  aria-label={t('common.attachImage')}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <ImagePlus strokeWidth={2} size={20} aria-hidden />
+                </Button>
+                <Button variant="primary" pill className="btn--sm" id="chat-send" onClick={send}>
+                  {t('common.send')}
+                </Button>
+              </>
+>>>>>>> Stashed changes
             }
           />
         </div>

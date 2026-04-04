@@ -39,7 +39,10 @@ function cloneInbox(initial: typeof INITIAL_INBOX) {
 function cloneThreads(initial: Record<string, ThreadMessage[]>) {
   const out: Record<string, ThreadMessage[]> = {};
   for (const k of Object.keys(initial)) {
-    out[k] = initial[k]!.map((m) => ({ ...m }));
+    out[k] = initial[k]!.map((m) => ({
+      ...m,
+      attachments: m.attachments?.map((a) => ({ ...a })),
+    }));
   }
   return out;
 }

@@ -1,0 +1,180 @@
+{
+  "app": {
+    "workspaceTitle": "Espace BridgeEd"
+  },
+  "skipLink": {
+    "main": "Aller au contenu principal"
+  },
+  "common": {
+    "send": "Envoyer",
+    "cancel": "Annuler",
+    "subject": "Matière",
+    "status": "Statut",
+    "you": "Vous",
+    "bridgedAi": "BridgeEd IA",
+    "message": "Message",
+    "delete": "Supprimer",
+    "attachImage": "Ajouter une image",
+    "removeAttachment": "Retirer l’image",
+    "imageTooLarge": "Chaque image doit faire moins de 5 Mo.",
+    "maxImages": "Jusqu’à {{count}} images.",
+    "imagesOnly": "Seules les images sont acceptées."
+  },
+  "roles": {
+    "parent": "Parent",
+    "student": "Élève",
+    "teacher": "Enseignant"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "knowledge": "Savoirs",
+    "chat": "Messages",
+    "mood": "Humeur",
+    "ai": "Assistant IA"
+  },
+  "sidebar": {
+    "viewAs": "Voir en tant que",
+    "tools": "Outils",
+    "expandSidebar": "Développer le panneau",
+    "collapseSidebar": "Réduire le panneau",
+    "sidebarToggle": "Ouvrir ou fermer le panneau",
+    "collapseExpand": "Réduire ou développer le panneau",
+    "primaryNav": "Navigation principale et outils",
+    "language": "Langue",
+    "uploadReport": "Importer un rapport",
+    "practiceTool": "Pratique",
+    "snippets": "Phrases",
+    "uploadTitle": "Importer un rapport ou un relevé (démo)",
+    "uploadDemoTitle": "Importer un rapport",
+    "uploadDemoBody": "Démo : notes hebdomadaires, bulletins ou PDF pour que l’IA puisse s’y référer.",
+    "practiceTitle": "Générer de la pratique (démo)",
+    "practiceDemoTitle": "Générer de la pratique",
+    "practiceDemoBody": "Démo : 2–3 exercices courts à partir du sujet de la fiche d’apprentissage.",
+    "snippetsTitle": "Phrases rapides (démo)",
+    "snippetsDemoTitle": "Phrases rapides",
+    "snippetsDemoBody": "Démo : insertions en un clic comme « Explique plus court » ou « Donne un exemple concret »."
+  },
+  "hints": {
+    "parent": {
+      "dashboard": "Fiches d’apprentissage, semaine de l’enfant et aperçu de l’humeur (démo).",
+      "ai": "Posez des questions sur les devoirs ou les définitions, ou collez une note du prof pour des prochaines étapes claires.",
+      "chat": "Annonces, échanges avec l’enseignant et prise de rendez-vous individuel.",
+      "knowledge": "Choisissez une fiche et discutez du sujet avec BridgeEd IA — définitions, idées de pratique et suite.",
+      "mood": "Résumé hebdomadaire de l’humeur de l’enfant et tendances."
+    },
+    "student": {
+      "ai": "Indices et idées de pratique ici (démo). Un accompagnement plus poussé reste côté parents.",
+      "chat": "Annonces de classe et messages de l’enseignant (démo).",
+      "knowledge": "Choisissez une fiche de cours et discutez avec BridgeEd IA — idées de pratique et explications courtes.",
+      "mood": "Déplacez le curseur de très désagréable à très agréable, puis appuyez sur Suivant pour enregistrer."
+    },
+    "teacher": {
+      "dashboard": "Rédigez des rapports de classe et envoyez-les aux élèves et parents via Messages — tâches, publications et semaine.",
+      "ai": "Prévisualisez ce que l’IA pourrait dire aux parents ; publiez via Messages et les fiches.",
+      "chat": "Diffusez à la classe ou aux parents et gérez les demandes de rendez-vous.",
+      "mood": "Vue d’ensemble de l’humeur de la classe avec le retour sur l’apprentissage."
+    },
+    "dashboardFallback": "Rapport de classe, fiches, tâches, publications, pouls de la classe, annuaire et semaine (démo)."
+  },
+  "panels": {
+    "dashboard": "Tableau de bord",
+    "knowledge": "Savoirs",
+    "messages": "Messages",
+    "mood": "Humeur",
+    "ai": "Assistant IA"
+  },
+  "knowledge": {
+    "emptyStudent": "Pas encore de fiches. Quand l’enseignant en enverra une à la classe, elle apparaîtra ici.",
+    "emptyParent": "Pas encore de fiches. Ouvrez le tableau de bord pour voir ce que l’enseignant a partagé.",
+    "selectCard": "Choisir une fiche",
+    "composerPlaceholder": "Posez une question sur le sujet de la fiche ou collez un exercice…",
+    "demoThread": "Ouvrez cette fiche depuis le tableau de bord pour démarrer le fil IA (démo).",
+    "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
+    "ariaSubjectStatus": "Matière et statut",
+    "taskShort": {
+      "quiz": "Quiz",
+      "parent_led_practice": "Pratique",
+      "explain_to_parent": "Explication"
+    },
+    "practice": {
+      "button": "Pratique",
+      "mockReply": "**Mini-pratique (démo)**\n\nUtilisons la **manière de Van Gogh** pour un petit exercice : **peindre un tournesol**.\n\n- **Pinceau :** Peinture épaisse et coups courts — laissez des marques visibles comme Van Gogh ; pas besoin d’être parfaitement lisse.\n- **Couleur :** Jaune vif comme ton principal ; un peu de vert profond et d’ocre pour le cœur et les ombres.\n- **Cœur et pétales :** Commencez par une ovale plate pour le cœur, puis des traits rayonnants pour les pétales — un peu de mouvement si vous voulez.\n\nEnsuite, dites quelles trois couleurs vous avez utilisées, ce que vous ajusteriez — ou envoyez une photo."
+    }
+  },
+  "ai": {
+    "placeholder": "ex. expliquer le discriminant… ou coller le commentaire de la semaine",
+    "loadSample": "Charger l’exemple",
+    "demoReply": "(Démo) Compris. En production, les réponses suivent les règles et la sécurité de l’école. Ajoutez le niveau ou le manuel pour un aide plus ciblée."
+  },
+  "chat": {
+    "placeholderParent": "Écrivez à l’enseignant…",
+    "placeholderTeacher": "Écrivez à cette famille ou à la classe…",
+    "placeholderStudent": "Écrivez un message…",
+    "emptyInbox": "Aucun message pour l’instant.",
+    "broadcast": "Diffuser",
+    "selectThread": "Choisir une conversation",
+    "bookTime": "Prendre rendez-vous",
+    "noMessagesInThread": "Aucun message dans cette conversation (démo)."
+  },
+  "mood": {
+    "emotion": "Émotion",
+    "back": "Retour",
+    "close": "Fermer",
+    "prompt": "Comment vous sentez-vous maintenant ?",
+    "sliderHelp": "À quel point c’est agréable (0–100)",
+    "veryUnpleasant": "TRÈS DÉSAGRÉABLE",
+    "veryPleasant": "TRÈS AGRÉABLE",
+    "noteOptional": "Note (facultatif)",
+    "notePlaceholder": "Une précision ?",
+    "saving": "Enregistrement…",
+    "next": "Suivant",
+    "savedSuccess": "Enregistré. Vos parents pourront voir ce point sur le tableau de bord cette semaine.",
+    "weekAtGlance": "Cette semaine en un coup d’œil",
+    "classOverview": "Aperçu de l’humeur de la classe",
+    "colStudent": "Élève",
+    "colDominant": "Humeur dominante",
+    "colNote": "Note"
+  },
+  "dashboard": {
+    "parent": {
+      "cardsTitle": "Fiches d’apprentissage",
+      "cardsSubtitle": "Brèves explications des notions que vos enfants étudient.",
+      "noCards": "Pas encore de fiches. Passez en rôle enseignant pour en créer une.",
+      "scheduleTitle": "Emploi du temps de votre enfant",
+      "moodTitle": "Humeur de votre enfant",
+      "moodEmpty": "Aucun enfant lié à ce parent dans les données locales. Importez un instantané avec un tableau users (ex. reference/data.json) via Debug → IndexedDB.",
+      "ctaOpenKnowledge": "Ouvrir dans Savoirs"
+    },
+    "teacher": {
+      "classReport": "Rapport de classe",
+      "classReportSubtitle": "Rédigez ou générez un court rapport, puis envoyez-le aux élèves, aux parents ou aux deux.",
+      "createReport": "Créer un rapport",
+      "learningCards": "Fiches d’apprentissage",
+      "learningCardsSubtitle": "Fiches pour les familles : définitions, matériel et plan simple.",
+      "createCard": "Créer une fiche",
+      "noCards": "Pas encore de fiches. Utilisez Créer une fiche pour en ajouter.",
+      "ctaOpen": "Ouvrir",
+      "today": "Aujourd’hui",
+      "recentPosts": "Publications récentes",
+      "newLearningCard": "+ Nouvelle fiche",
+      "classPulse": "Pouls de la classe",
+      "studentDirectory": "Annuaire des élèves",
+      "filterPlaceholder": "Filtrer par nom…",
+      "filterAria": "Filtrer les élèves",
+      "colStudent": "Élève",
+      "colGrade": "Niveau",
+      "colParent": "Parent",
+      "colLastNote": "Dernière note",
+      "view": "Voir",
+      "studentDetailTitle": "Détail élève",
+      "studentDetailBody": "Démo : coordonnées, retours sur les fiches et historique des rendez-vous apparaîtraient ici.",
+      "thisWeek": "Cette semaine"
+    }
+  },
+  "learningCard": {
+    "deleteConfirm": "Supprimer « {{title}} » ?",
+    "deleteAria": "Supprimer la fiche : {{title}}",
+    "delete": "Supprimer",
+    "linkedTo": "Lié au {{date}}"
+  }
+}
