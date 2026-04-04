@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { getDataLayer, getDataSourceMode } from '@/data';
-import type { LearningCard } from '@/data';
+import type { LearningCardBackend } from '@/data';
+import { sampleLearningCardBackend } from '@/data/learning-card-mappers';
 
 async function fetchLearningCards() {
   const layer = getDataLayer();
-  return layer.learningCards.list();
+  return layer.learningCards.listByUserId('local');
 }
 
 export function HomeLearningCards() {
-  const [cards, setCards] = useState<LearningCard[]>([]);
+  const [cards, setCards] = useState<LearningCardBackend[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
   const mode = getDataSourceMode();
@@ -49,11 +50,7 @@ export function HomeLearningCards() {
   const addSample = async () => {
     try {
       const layer = getDataLayer();
-      await layer.learningCards.create({
-        title: `示例学习卡 · ${new Date().toLocaleString()}`,
-        teacherSummary: '调试插入：老师侧摘要会出现在这里。',
-        parentActions: ['和孩子一起回顾今日关键词', '完成书上一道小题', '签字或拍照反馈'],
-      });
+      await layer.learningCards.put(sampleLearningCardBackend());
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -102,15 +99,15 @@ export function HomeLearningCards() {
       <ul className="home-learning__list">
         {cards.map((card) => (
           <li key={card.id} className="learning-card">
-            <h2 className="learning-card__title">{card.title}</h2>
-            <p className="learning-card__summary">{card.teacherSummary}</p>
+            <h2 className="learning-card__title">{card.topic || card.classLessonTitle}</h2>
+            <p className="learning-card__summary">{card.parentSummary}</p>
             <p className="learning-card__label">家长可执行动作</p>
             <ol className="learning-card__actions">
-              {card.parentActions.map((action, i) => (
-                <li key={i}>{action}</li>
+              {card.tonightActions.filter((a) => a.include && a.text.trim()).map((action, i) => (
+                <li key={i}>{action.text}</li>
               ))}
             </ol>
-            <p className="learning-card__meta">更新 {new Date(card.updatedAt).toLocaleString()}</p>
+            <p className="learning-card__meta">创建 {new Date(card.createdAt).toLocaleString()}</p>
           </li>
         ))}
       </ul>

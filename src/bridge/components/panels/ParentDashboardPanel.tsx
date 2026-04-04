@@ -1,12 +1,47 @@
+import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
-import { PARENT_DASH_CARDS, PARENT_DASH_MOOD, PARENT_DASH_SCHEDULE } from '@/bridge/mockData';
+import type { LearningCardItem } from '@/bridge/types';
+import { PARENT_DASH_MOOD, PARENT_DASH_SCHEDULE } from '@/bridge/mockData';
+import { getDataLayer, getDataSourceMode, getDebugMode } from '@/data';
+import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
 import { LearningCardTile } from '@/bridge/components/LearningCardTile';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard } = useBridge();
+  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards } = useBridge();
+  const [cards, setCards] = useState<LearningCardItem[]>([]);
+  const dataSourceMode = getDataSourceMode();
+  const debugMode = getDebugMode();
+
+  const onDebugDeleteLearningCard = useCallback(
+    async (card: LearningCardItem) => {
+      if (!window.confirm(`Delete “${card.title}”?`)) return;
+      try {
+        await getDataLayer().learningCards.delete(card.id);
+        bumpLearningCards();
+      } catch (e) {
+        console.error('[LearningCard] delete failed', e);
+      }
+    },
+    [bumpLearningCards],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .learningCards.listByUserId('local')
+      .then((rows) => {
+        if (!cancelled) setCards(rows.map(learningCardBackendToItem));
+      })
+      .catch(() => {
+        if (!cancelled) setCards([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [learningCardsEpoch]);
 
   const sections = [
     <DashboardCard
@@ -20,9 +55,24 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       subtitleClassName="parent-cards__hint"
     >
       <div className="parent-cards-grid" id="parent-cards">
-        {PARENT_DASH_CARDS.map((c) => (
-          <LearningCardTile key={c.id} card={c} ctaLabel="Open in Messages" onOpen={openCardThreadFromDashboard} />
-        ))}
+        {cards.length === 0 ? (
+          <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
+            {dataSourceMode === 'api'
+              ? 'No cards from API. Set VITE_DATA_SOURCE=indexeddb in .env for local Dexie storage, or implement GET /learning-cards.'
+              : 'No learning cards yet. Switch to the teacher role and create one — it is stored in this browser (IndexedDB).'}
+          </p>
+        ) : (
+          cards.map((c) => (
+            <LearningCardTile
+              key={c.id}
+              card={c}
+              ctaLabel="Open in Messages"
+              onOpen={openCardThreadFromDashboard}
+              debugDelete={debugMode}
+              onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
+            />
+          ))
+        )}
       </div>
     </DashboardCard>,
 

@@ -255,7 +255,7 @@ function ReportModal({
 }
 
 export function BridgeModals() {
-  const { modal, closeModal, pushTeacherReport } = useBridge();
+  const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -329,7 +329,7 @@ export function BridgeModals() {
       >
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded modal__box--xlarge">
-          <LearningCardModal onClose={onBackdropClose} />
+          <LearningCardModal onClose={onBackdropClose} onSaved={bumpLearningCards} />
         </div>
       </div>
     );

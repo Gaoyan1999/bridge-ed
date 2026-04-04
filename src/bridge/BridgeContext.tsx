@@ -45,6 +45,9 @@ interface BridgeContextValue {
   showToolDemo: (title: string, body: string) => void;
   showGeneric: (title: string, body: string) => void;
   getHints: () => { ai: string; chat: string; mood: string; dashboard?: string };
+  /** Bump when learning cards in IndexedDB change so dashboards refetch. */
+  learningCardsEpoch: number;
+  bumpLearningCards: () => void;
 }
 
 const BridgeContext = createContext<BridgeContextValue | null>(null);
@@ -63,6 +66,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [threads, setThreads] = useState(() => cloneThreads(INITIAL_THREADS));
   const [selectedInboxId, setSelectedInboxId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
+  const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
 
   useEffect(() => {
     const syncHashToModule = () => setModuleState(parseModuleFromHash());
@@ -204,6 +208,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     showGeneric(title, body);
   };
 
+  const bumpLearningCards = () => setLearningCardsEpoch((n) => n + 1);
+
   const value: BridgeContextValue = {
     role,
     setRole,
@@ -222,6 +228,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     showToolDemo,
     showGeneric,
     getHints,
+    learningCardsEpoch,
+    bumpLearningCards,
   };
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;

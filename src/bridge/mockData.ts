@@ -63,7 +63,8 @@ export const DASH_SCHEDULE: ScheduleDay[] = [
   { day: 'Fri 4/5', items: ['Quiz draft due'] },
 ];
 
-const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
+/** Parent dashboard demo cards — also used to build IndexedDB import fixtures. */
+export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
   {
     id: 'card-pythagoras',
     title: 'Pythagorean theorem',
@@ -118,6 +119,114 @@ const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     at: Date.parse('2026-04-06T13:00:00'),
     threadId: 'card-thread-water-cycle',
   },
+  {
+    id: 'card-quadratic-equations',
+    title: 'Quadratic equations in standard form',
+    subject: 'Math · Algebra',
+    status: 'In progress',
+    summary: 'From ax² + bx + c = 0 to factoring and the quadratic formula—when to use which.',
+    at: Date.parse('2026-04-07T09:00:00'),
+    threadId: 'card-thread-quadratic-equations',
+  },
+  {
+    id: 'card-photosynthesis',
+    title: 'What is photosynthesis?',
+    subject: 'Science · Biology',
+    status: 'New',
+    summary: 'How plants turn light, water, and CO₂ into sugar and oxygen—simple words, one diagram.',
+    at: Date.parse('2026-04-07T15:30:00'),
+    threadId: 'card-thread-photosynthesis',
+  },
+  {
+    id: 'card-metaphor',
+    title: 'What is a metaphor?',
+    subject: 'English · Writing',
+    status: 'New',
+    summary: 'Not literal comparison—how metaphors work in poems and everyday speech.',
+    at: Date.parse('2026-04-08T10:20:00'),
+    threadId: 'card-thread-metaphor',
+  },
+  {
+    id: 'card-periodic-table',
+    title: 'Reading the periodic table',
+    subject: 'Science · Chemistry',
+    status: 'In progress',
+    summary: 'Groups, periods, and atomic number—why the table’s shape is not random.',
+    at: Date.parse('2026-04-09T08:45:00'),
+    threadId: 'card-thread-periodic-table',
+  },
+  {
+    id: 'card-linear-graphs',
+    title: 'Linear functions on a graph',
+    subject: 'Math · Algebra',
+    status: 'Reviewed',
+    summary: 'Slope and y-intercept in context: “rise over run” without the stress.',
+    at: Date.parse('2026-04-09T14:10:00'),
+    threadId: 'card-thread-linear-graphs',
+  },
+  {
+    id: 'card-civil-war',
+    title: 'The U.S. Civil War — big picture',
+    subject: 'History · U.S.',
+    status: 'Reviewed',
+    summary: 'Causes, turning points, and why we study it—without a 50-name quiz.',
+    at: Date.parse('2026-04-10T11:00:00'),
+    threadId: 'card-thread-civil-war',
+  },
+  {
+    id: 'card-cells',
+    title: 'Plant vs animal cells',
+    subject: 'Science · Biology',
+    status: 'In progress',
+    summary: 'Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.',
+    at: Date.parse('2026-04-11T09:50:00'),
+    threadId: 'card-thread-cells',
+  },
+  {
+    id: 'card-persuasive-essay',
+    title: 'Building a persuasive paragraph',
+    subject: 'English',
+    status: 'New',
+    summary: 'Claim, evidence, reasoning—one paragraph at a time before the full essay.',
+    at: Date.parse('2026-04-12T16:00:00'),
+    threadId: 'card-thread-persuasive-essay',
+  },
+  {
+    id: 'card-renaissance',
+    title: 'What was the Renaissance?',
+    subject: 'History · World',
+    status: 'New',
+    summary: 'Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.',
+    at: Date.parse('2026-04-13T10:05:00'),
+    threadId: 'card-thread-renaissance',
+  },
+  {
+    id: 'card-probability',
+    title: 'Probability in everyday situations',
+    subject: 'Math · Statistics',
+    status: 'In progress',
+    summary: 'Simple events, “and” vs “or,” and why a coin flip is still 50–50.',
+    at: Date.parse('2026-04-14T13:25:00'),
+    threadId: 'card-thread-probability',
+  },
+  {
+    id: 'card-constitution',
+    title: 'The Constitution — three branches',
+    subject: 'History · Civics',
+    status: 'Reviewed',
+    summary: 'Legislative, executive, judicial—checks and balances in one page.',
+    at: Date.parse('2026-04-15T08:15:00'),
+    threadId: 'card-thread-constitution',
+  },
+  {
+    id: 'card-art-perspective',
+    title: 'One-point perspective in drawing',
+    subject: 'Art',
+    status: 'New',
+    summary: 'Horizon line and vanishing point—why hallways “feel” deep on paper.',
+    at: Date.parse('2026-04-16T14:40:00'),
+    threadId: 'card-thread-art-perspective',
+  },
 ];
 
 /** Newest first (by `at`). */
@@ -152,6 +261,8 @@ export const PARENT_DASH_MOOD: MoodDay[] = [
   { day: 'Wed', emoji: '😐', label: 'Neutral' },
   { day: 'Thu', emoji: '😕', label: 'Tired' },
   { day: 'Fri', emoji: '😄', label: 'Excited' },
+  { day: 'Sat', emoji: '😄', label: 'Excited' },
+  { day: 'Sun', emoji: '😄', label: 'Excited' },
 ];
 
 export const ROLE_COPY: Record<
