@@ -1,6 +1,6 @@
 export type Role = 'parent' | 'student' | 'teacher';
 
-export type Module = 'dashboard' | 'ai' | 'chat' | 'knowledge' | 'mood';
+export type Module = 'dashboard' | 'chat' | 'knowledge' | 'mood';
 
 export type InboxKind = 'broadcast' | 'dm' | 'booking' | 'draft' | 'report' | 'card';
 

@@ -1,21 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
-import { ROLE_COPY } from '@/bridge/mockData';
 import { cx } from '@/bridge/cx';
 import { ParentDashboardPanel } from './ParentDashboardPanel';
 import { TeacherDashboardPanel } from './TeacherDashboardPanel';
 
-const DASHBOARD_HINT_DEFAULT =
-  'Class report, learning cards, tasks, posts, class pulse, directory, and this week’s schedule (demo).';
-
 export function DashboardPanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const { role } = useBridge();
 
   const dashHint =
     role === 'teacher'
-      ? ROLE_COPY.teacher.dashboard ?? DASHBOARD_HINT_DEFAULT
+      ? t('hints.teacher.dashboard')
       : role === 'parent'
-        ? ROLE_COPY.parent.dashboard ?? DASHBOARD_HINT_DEFAULT
-        : DASHBOARD_HINT_DEFAULT;
+        ? t('hints.parent.dashboard')
+        : t('hints.dashboardFallback');
 
   if (role === 'student') {
     return (

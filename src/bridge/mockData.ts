@@ -5,7 +5,7 @@ import { normalizeTonightActions } from '@/data/learning-card-mappers';
 /** Demo fixtures: teacher “tonight” presets (IndexedDB import uses full `LearningCardItem`). */
 const DEMO_TONIGHT_ALL = normalizeTonightActions([]);
 
-export const MODULES = ['dashboard', 'ai', 'chat', 'knowledge', 'mood'] as const;
+export const MODULES = ['dashboard', 'chat', 'knowledge', 'mood'] as const;
 
 export const ROLE_DISPLAY: Record<
   string,
@@ -298,64 +298,6 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
   { day: 'Fri', kind: 'excited' },
   { day: 'Sat', kind: 'excited' },
   { day: 'Sun', kind: 'excited' },
-];
-
-export const ROLE_COPY: Record<
-  string,
-  { dashboard?: string; ai: string; chat: string; knowledge?: string; mood: string }
-> = {
-  parent: {
-    dashboard: 'Learning cards, your child’s week, and mood snapshot (demo).',
-    ai: 'Ask about homework, definitions, or paste a teacher note to get clear next steps.',
-    chat: 'School notices, chat with the teacher, and book a one-to-one slot.',
-    knowledge:
-      'Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.',
-    mood: 'See your child’s weekly mood summary and trends.',
-  },
-  student: {
-    ai: 'Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.',
-    chat: 'Class notices and messages from your teacher (demo).',
-    knowledge:
-      'Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.',
-    mood: 'Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in.',
-  },
-  teacher: {
-    dashboard:
-      'Create class reports and push them to students and parents under Messages—plus tasks, posts, and your week.',
-    ai: 'Preview how AI might read to parents; publish through Messages and learning cards.',
-    chat: 'Broadcast to class or parents and manage booking requests.',
-    mood: 'Class mood overview alongside learning feedback.',
-  },
-};
-
-export const AI_DEMO = [
-  {
-    role: 'user' as const,
-    text: 'What does the discriminant Δ mean in my child’s math homework? How do I explain it in plain language?',
-  },
-  {
-    role: 'ai' as const,
-    text:
-      'You can say: Δ helps us see how many real roots the equation has.\n\n' +
-      'Tonight, try this:\n' +
-      '1. Write the equation in standard form ax²+bx+c=0 and read off a, b, c.\n' +
-      '2. Compute Δ=b²−4ac. Sign only: positive → two roots, zero → one repeated root, negative → no real roots.\n' +
-      '3. You don’t need the full formula tonight—practice spotting a, b, c first.',
-  },
-  {
-    role: 'user' as const,
-    text:
-      'The weekly note says: class quiz average 72, my child 68, most points lost on factoring steps. What should we do next?',
-  },
-  {
-    role: 'ai' as const,
-    text:
-      'Here are four next steps:\n\n' +
-      '1. Together, circle every quiz item tagged “factoring” and redo only those.\n' +
-      '2. Spend 10 minutes on the textbook example: rewrite a quadratic as (x−?)(x−?).\n' +
-      '3. You don’t need to solve end-to-end—ask: “Is this step splitting into two brackets?”\n' +
-      '4. If it’s still stuck after two nights, message the teacher with the question number and book a short check-in.',
-  },
 ];
 
 export const INITIAL_INBOX: Record<Role, InboxItem[]> = {

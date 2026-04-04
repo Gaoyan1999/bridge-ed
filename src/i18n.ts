@@ -26,8 +26,20 @@ void i18n.use(initReactI18next).init({
   lng: initialLanguage(),
   fallbackLng: 'en',
   supportedLngs: ['en', 'zh', 'fr'],
+  nonExplicitSupportedLngs: true,
   interpolation: { escapeValue: false },
   react: { useSuspense: false },
+});
+
+i18n.on('languageChanged', (lng) => {
+  try {
+    const short = lng.split('-')[0]?.toLowerCase() ?? 'en';
+    if (short === 'en' || short === 'zh' || short === 'fr') {
+      localStorage.setItem('i18nextLng', short);
+    }
+  } catch {
+    /* ignore */
+  }
 });
 
 export default i18n;

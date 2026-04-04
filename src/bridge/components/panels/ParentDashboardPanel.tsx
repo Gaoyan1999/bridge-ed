@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
 import { DEMO_PARENT_USER_ID, PARENT_DASH_SCHEDULE } from '@/bridge/mockData';
@@ -15,6 +16,7 @@ import { ParentMoodWeek } from '@/bridge/components/ParentMoodWeek';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
+  const { t } = useTranslation();
   const { openKnowledgeFromCard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
     useBridge();
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
@@ -25,7 +27,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
 
   const onDebugDeleteLearningCard = useCallback(
     async (card: LearningCardItem) => {
-      if (!window.confirm(`Delete “${card.title}”?`)) return;
+      if (!window.confirm(t('learningCard.deleteConfirm', { title: card.title }))) return;
       try {
         await getDataLayer().learningCards.delete(card.id);
         bumpLearningCards();
@@ -33,7 +35,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
         console.error('[LearningCard] delete failed', e);
       }
     },
-    [bumpLearningCards],
+    [bumpLearningCards, t],
   );
 
   useEffect(() => {
@@ -78,22 +80,22 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       span={12}
       className="parent-card-section"
       id="parent-cards-title"
-      title="Learning cards"
+      title={t('dashboard.parent.cardsTitle')}
       titleColor="sky"
-      subtitle="Short explanations of key concepts your children are learning."
+      subtitle={t('dashboard.parent.cardsSubtitle')}
       subtitleClassName="parent-cards__hint"
     >
       <div className="parent-cards-grid" id="parent-cards">
         {cards.length === 0 ? (
           <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
-            No learning cards yet. Switch to the teacher role and create one.
+            {t('dashboard.parent.noCards')}
           </p>
         ) : (
           cards.map((c) => (
             <LearningCardTile
               key={c.id}
               card={c}
-              ctaLabel="Open in Knowledge"
+              ctaLabel={t('dashboard.parent.ctaOpenKnowledge')}
               onOpen={openKnowledgeFromCard}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
@@ -108,7 +110,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       span={12}
       className="parent-schedule-section"
       id="parent-schedule-title"
-      title="Your child’s schedule"
+      title={t('dashboard.parent.scheduleTitle')}
       titleColor="lavender"
     >
       <div className="schedule-week" id="parent-schedule">
@@ -121,13 +123,12 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       span={12}
       className="parent-mood-section"
       id="parent-mood-title"
-      title="Your child’s mood"
+      title={t('dashboard.parent.moodTitle')}
       titleColor="warm"
     >
       {moodChildren.length === 0 ? (
         <p className="parent-cards__hint" id="parent-mood-empty">
-          No children linked for this parent in local data. Import a snapshot that includes a users array (e.g. reference/data.json)
-          from Debug → IndexedDB.
+          {t('dashboard.parent.moodEmpty')}
         </p>
       ) : (
         <ParentMoodWeek childrenProfiles={moodChildren} entries={moodEntries} />

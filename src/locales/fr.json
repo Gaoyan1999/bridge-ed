@@ -29,8 +29,7 @@
     "dashboard": "Tableau de bord",
     "knowledge": "Savoirs",
     "chat": "Messages",
-    "mood": "Humeur",
-    "ai": "Assistant IA"
+    "mood": "Humeur"
   },
   "sidebar": {
     "viewAs": "Voir en tant que",
@@ -40,55 +39,58 @@
     "sidebarToggle": "Ouvrir ou fermer le panneau",
     "collapseExpand": "Réduire ou développer le panneau",
     "primaryNav": "Navigation principale et outils",
+    "moduleNavAria": "Modules principaux",
     "language": "Langue",
+    "languageAria": "Choisir la langue de l’interface",
+    "languages": {
+      "en": "English",
+      "zh": "中文",
+      "fr": "Français"
+    },
     "uploadReport": "Importer un rapport",
     "practiceTool": "Pratique",
     "snippets": "Phrases",
-    "uploadTitle": "Importer un rapport ou un relevé (démo)",
+    "uploadTitle": "Importer un rapport ou un relevé",
     "uploadDemoTitle": "Importer un rapport",
     "uploadDemoBody": "Démo : notes hebdomadaires, bulletins ou PDF pour que l’IA puisse s’y référer.",
-    "practiceTitle": "Générer de la pratique (démo)",
+    "practiceTitle": "Générer de la pratique",
     "practiceDemoTitle": "Générer de la pratique",
     "practiceDemoBody": "Démo : 2–3 exercices courts à partir du sujet de la fiche d’apprentissage.",
-    "snippetsTitle": "Phrases rapides (démo)",
+    "snippetsTitle": "Phrases rapides",
     "snippetsDemoTitle": "Phrases rapides",
     "snippetsDemoBody": "Démo : insertions en un clic comme « Explique plus court » ou « Donne un exemple concret »."
   },
   "hints": {
     "parent": {
-      "dashboard": "Fiches d’apprentissage, semaine de l’enfant et aperçu de l’humeur (démo).",
-      "ai": "Posez des questions sur les devoirs ou les définitions, ou collez une note du prof pour des prochaines étapes claires.",
+      "dashboard": "Fiches d’apprentissage, semaine de l’enfant et aperçu de l’humeur.",
       "chat": "Annonces, échanges avec l’enseignant et prise de rendez-vous individuel.",
       "knowledge": "Choisissez une fiche et discutez du sujet avec BridgeEd IA — définitions, idées de pratique et suite.",
       "mood": "Résumé hebdomadaire de l’humeur de l’enfant et tendances."
     },
     "student": {
-      "ai": "Indices et idées de pratique ici (démo). Un accompagnement plus poussé reste côté parents.",
-      "chat": "Annonces de classe et messages de l’enseignant (démo).",
+      "chat": "Annonces de classe et messages de l’enseignant.",
       "knowledge": "Choisissez une fiche de cours et discutez avec BridgeEd IA — idées de pratique et explications courtes.",
       "mood": "Déplacez le curseur de très désagréable à très agréable, puis appuyez sur Suivant pour enregistrer."
     },
     "teacher": {
       "dashboard": "Rédigez des rapports de classe et envoyez-les aux élèves et parents via Messages — tâches, publications et semaine.",
-      "ai": "Prévisualisez ce que l’IA pourrait dire aux parents ; publiez via Messages et les fiches.",
       "chat": "Diffusez à la classe ou aux parents et gérez les demandes de rendez-vous.",
       "mood": "Vue d’ensemble de l’humeur de la classe avec le retour sur l’apprentissage."
     },
-    "dashboardFallback": "Rapport de classe, fiches, tâches, publications, pouls de la classe, annuaire et semaine (démo)."
+    "dashboardFallback": "Rapport de classe, fiches, tâches, publications, pouls de la classe, annuaire et semaine."
   },
   "panels": {
     "dashboard": "Tableau de bord",
     "knowledge": "Savoirs",
     "messages": "Messages",
-    "mood": "Humeur",
-    "ai": "Assistant IA"
+    "mood": "Humeur"
   },
   "knowledge": {
     "emptyStudent": "Pas encore de fiches. Quand l’enseignant en enverra une à la classe, elle apparaîtra ici.",
     "emptyParent": "Pas encore de fiches. Ouvrez le tableau de bord pour voir ce que l’enseignant a partagé.",
     "selectCard": "Choisir une fiche",
     "composerPlaceholder": "Posez une question sur le sujet de la fiche ou collez un exercice…",
-    "demoThread": "Ouvrez cette fiche depuis le tableau de bord pour démarrer le fil IA (démo).",
+    "demoThread": "Ouvrez cette fiche depuis le tableau de bord pour démarrer le fil IA.",
     "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
     "ariaSubjectStatus": "Matière et statut",
     "taskShort": {
@@ -98,13 +100,8 @@
     },
     "practice": {
       "button": "Pratique",
-      "mockReply": "**Mini-pratique (démo)**\n\nUtilisons la **manière de Van Gogh** pour un petit exercice : **peindre un tournesol**.\n\n- **Pinceau :** Peinture épaisse et coups courts — laissez des marques visibles comme Van Gogh ; pas besoin d’être parfaitement lisse.\n- **Couleur :** Jaune vif comme ton principal ; un peu de vert profond et d’ocre pour le cœur et les ombres.\n- **Cœur et pétales :** Commencez par une ovale plate pour le cœur, puis des traits rayonnants pour les pétales — un peu de mouvement si vous voulez.\n\nEnsuite, dites quelles trois couleurs vous avez utilisées, ce que vous ajusteriez — ou envoyez une photo."
+      "mockReply": "**Mini-pratique**\n\nUtilisons la **manière de Van Gogh** pour un petit exercice : **peindre un tournesol**.\n\n- **Pinceau :** Peinture épaisse et coups courts — laissez des marques visibles comme Van Gogh ; pas besoin d’être parfaitement lisse.\n- **Couleur :** Jaune vif comme ton principal ; un peu de vert profond et d’ocre pour le cœur et les ombres.\n- **Cœur et pétales :** Commencez par une ovale plate pour le cœur, puis des traits rayonnants pour les pétales — un peu de mouvement si vous voulez.\n\nEnsuite, dites quelles trois couleurs vous avez utilisées, ce que vous ajusteriez — ou envoyez une photo."
     }
-  },
-  "ai": {
-    "placeholder": "ex. expliquer le discriminant… ou coller le commentaire de la semaine",
-    "loadSample": "Charger l’exemple",
-    "demoReply": "(Démo) Compris. En production, les réponses suivent les règles et la sécurité de l’école. Ajoutez le niveau ou le manuel pour un aide plus ciblée."
   },
   "chat": {
     "placeholderParent": "Écrivez à l’enseignant…",
@@ -114,7 +111,7 @@
     "broadcast": "Diffuser",
     "selectThread": "Choisir une conversation",
     "bookTime": "Prendre rendez-vous",
-    "noMessagesInThread": "Aucun message dans cette conversation (démo)."
+    "noMessagesInThread": "Aucun message dans cette conversation."
   },
   "mood": {
     "emotion": "Émotion",
@@ -175,6 +172,9 @@
     "deleteConfirm": "Supprimer « {{title}} » ?",
     "deleteAria": "Supprimer la fiche : {{title}}",
     "delete": "Supprimer",
-    "linkedTo": "Lié au {{date}}"
+    "linkedTo": "Lié au {{date}}",
+    "status": {
+      "New": "Nouveau"
+    }
   }
 }

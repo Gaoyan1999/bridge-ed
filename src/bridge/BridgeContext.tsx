@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
-import { INITIAL_INBOX, INITIAL_THREADS, MODULES, ROLE_COPY } from '@/bridge/mockData';
+import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import type { InboxItem, LearningCardItem, ModalState, Module, Role, ThreadMessage } from '@/bridge/types';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
@@ -82,7 +82,6 @@ interface BridgeContextValue {
   closeModal: () => void;
   showToolDemo: (title: string, body: string) => void;
   showGeneric: (title: string, body: string) => void;
-  getHints: () => { ai: string; chat: string; mood: string; dashboard?: string; knowledge?: string };
   /** Bump when learning cards change in storage so dashboards refetch. */
   learningCardsEpoch: number;
   bumpLearningCards: () => void;
@@ -165,7 +164,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (role !== 'student') return;
-    if (module !== 'dashboard' && module !== 'ai') return;
+    if (module !== 'dashboard') return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- student shell is Chat + Mood only
     setModuleState('chat');
     if (typeof history !== 'undefined' && history.replaceState) {
@@ -194,7 +193,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     if (r === 'teacher' || r === 'parent') {
       setModule('dashboard');
     } else {
-      // Student home: Chat (+ Mood in nav), not AI assistant.
+      // Student home: Chat (+ Mood in nav), not the parent dashboard.
       setModuleState((cur) => {
         if (cur !== 'dashboard') return cur;
         if (typeof history !== 'undefined' && history.replaceState) {
@@ -231,17 +230,6 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     }
     setRoleWhenNoUsers(r);
     applyRoleNavigation(r);
-  };
-
-  const getHints = () => {
-    const c = ROLE_COPY[role];
-    return {
-      ai: c?.ai ?? '',
-      chat: c?.chat ?? '',
-      mood: c?.mood ?? '',
-      dashboard: c?.dashboard,
-      knowledge: c?.knowledge,
-    };
   };
 
   const pushTeacherReport = (title: string, body: string, toStudents: boolean, toParents: boolean) => {
@@ -367,7 +355,6 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     closeModal,
     showToolDemo,
     showGeneric,
-    getHints,
     learningCardsEpoch,
     bumpLearningCards,
     studentMoodsEpoch,

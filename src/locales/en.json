@@ -29,8 +29,7 @@
     "dashboard": "Dashboard",
     "knowledge": "Knowledge",
     "chat": "Messages",
-    "mood": "Mood",
-    "ai": "AI assistant"
+    "mood": "Mood"
   },
   "sidebar": {
     "viewAs": "View as",
@@ -40,55 +39,58 @@
     "sidebarToggle": "Open or close sidebar",
     "collapseExpand": "Collapse or expand sidebar",
     "primaryNav": "Primary navigation and tools",
+    "moduleNavAria": "Main modules",
     "language": "Language",
+    "languageAria": "Select interface language",
+    "languages": {
+      "en": "English",
+      "zh": "中文",
+      "fr": "Français"
+    },
     "uploadReport": "Upload report",
     "practiceTool": "Practice",
     "snippets": "Snippets",
-    "uploadTitle": "Upload a report or transcript (demo)",
+    "uploadTitle": "Upload a report or transcript",
     "uploadDemoTitle": "Upload report",
     "uploadDemoBody": "Demo: upload weekly notes, report cards, or PDFs so the AI can reference them in chat.",
-    "practiceTitle": "Generate practice (demo)",
+    "practiceTitle": "Generate practice",
     "practiceDemoTitle": "Generate practice",
     "practiceDemoBody": "Demo: create 2–3 short items from the current learning-card topic for the student to try.",
-    "snippetsTitle": "Quick phrases (demo)",
+    "snippetsTitle": "Quick phrases",
     "snippetsDemoTitle": "Quick phrases",
     "snippetsDemoBody": "Demo: one-tap inserts like “Explain shorter” or “Give a real-life example” into the composer."
   },
   "hints": {
     "parent": {
-      "dashboard": "Learning cards, your child’s week, and mood snapshot (demo).",
-      "ai": "Ask about homework, definitions, or paste a teacher note to get clear next steps.",
+      "dashboard": "Learning cards, your child’s week, and mood snapshot.",
       "chat": "School notices, chat with the teacher, and book a one-to-one slot.",
       "knowledge": "Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.",
       "mood": "See your child’s weekly mood summary and trends."
     },
     "student": {
-      "ai": "Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.",
-      "chat": "Class notices and messages from your teacher (demo).",
+      "chat": "Class notices and messages from your teacher.",
       "knowledge": "Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.",
       "mood": "Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in."
     },
     "teacher": {
       "dashboard": "Create class reports and push them to students and parents under Messages—plus tasks, posts, and your week.",
-      "ai": "Preview how AI might read to parents; publish through Messages and learning cards.",
       "chat": "Broadcast to class or parents and manage booking requests.",
       "mood": "Class mood overview alongside learning feedback."
     },
-    "dashboardFallback": "Class report, learning cards, tasks, posts, class pulse, directory, and this week’s schedule (demo)."
+    "dashboardFallback": "Class report, learning cards, tasks, posts, class pulse, directory, and this week’s schedule."
   },
   "panels": {
     "dashboard": "Dashboard",
     "knowledge": "Knowledge",
     "messages": "Messages",
-    "mood": "Mood",
-    "ai": "AI assistant"
+    "mood": "Mood"
   },
   "knowledge": {
     "emptyStudent": "No learning cards yet. When your teacher sends a card to your class, it will show up here.",
     "emptyParent": "No learning cards yet. Open the dashboard to see cards your teacher shared.",
     "selectCard": "Select a card",
     "composerPlaceholder": "Ask about this card’s topic, or paste a homework question…",
-    "demoThread": "Open this card from the dashboard to start the AI thread (demo).",
+    "demoThread": "Open this card from the dashboard to start the AI thread.",
     "ariaSuggestedTasks": "Tonight’s suggested tasks",
     "ariaSubjectStatus": "Subject and status",
     "taskShort": {
@@ -98,13 +100,8 @@
     },
     "practice": {
       "button": "Practice",
-      "mockReply": "**Mini practice (Demo)**\n\nLet’s use **Van Gogh’s approach** for a quick exercise: **paint a sunflower**.\n\n- **Brushwork:** Use thick paint and short strokes—leave visible marks like Van Gogh; it doesn’t need to be perfectly smooth.\n- **Color:** Bright yellow as the main hue; add a little deep green and ochre for the center and shadows.\n- **Head and petals:** Start with a flat oval for the flower head, then use radiating strokes for petal direction—add a hint of swirl or movement if you like.\n\nWhen you’re done, share the three colors you used, what you’d tweak next—or upload a photo."
+      "mockReply": "**Mini practice**\n\nLet’s use **Van Gogh’s approach** for a quick exercise: **paint a sunflower**.\n\n- **Brushwork:** Use thick paint and short strokes—leave visible marks like Van Gogh; it doesn’t need to be perfectly smooth.\n- **Color:** Bright yellow as the main hue; add a little deep green and ochre for the center and shadows.\n- **Head and petals:** Start with a flat oval for the flower head, then use radiating strokes for petal direction—add a hint of swirl or movement if you like.\n\nWhen you’re done, share the three colors you used, what you’d tweak next—or upload a photo."
     }
-  },
-  "ai": {
-    "placeholder": "e.g. explain the discriminant… or paste this week’s teacher comment",
-    "loadSample": "Load sample chat",
-    "demoReply": "(Demo) Got it. In production, replies follow your school’s rules and safety policies. Add grade level or textbook if you want tighter help."
   },
   "chat": {
     "placeholderParent": "Type a message to your teacher…",
@@ -114,7 +111,7 @@
     "broadcast": "Broadcast",
     "selectThread": "Select a thread",
     "bookTime": "Book a time",
-    "noMessagesInThread": "No messages in this thread (demo)."
+    "noMessagesInThread": "No messages in this thread."
   },
   "mood": {
     "emotion": "Emotion",
@@ -175,6 +172,9 @@
     "deleteConfirm": "Delete “{{title}}”?",
     "deleteAria": "Delete learning card: {{title}}",
     "delete": "Delete",
-    "linkedTo": "Linked to {{date}}"
+    "linkedTo": "Linked to {{date}}",
+    "status": {
+      "New": "New"
+    }
   }
 }
