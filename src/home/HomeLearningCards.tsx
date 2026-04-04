@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getDataLayer, getDataSourceMode } from '@/data';
+import { getDataLayer } from '@/data';
 import type { LearningCardBackend } from '@/data';
 import { sampleLearningCardBackend } from '@/data/learning-card-mappers';
 
@@ -12,7 +12,6 @@ export function HomeLearningCards() {
   const [cards, setCards] = useState<LearningCardBackend[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
-  const mode = getDataSourceMode();
 
   useEffect(() => {
     let cancelled = false;
@@ -61,12 +60,7 @@ export function HomeLearningCards() {
     <section className="home-learning">
       <header className="home-learning__header">
         <h1 className="home-learning__title">BridgeEd</h1>
-        <p className="home-learning__subtitle">
-          首页预览 · 数据来自 <span className="home-learning__mode">{mode}</span>
-          {mode === 'api' && (
-            <span className="home-learning__hint">（需配置 VITE_API_BASE_URL）</span>
-          )}
-        </p>
+        <p className="home-learning__subtitle">首页预览</p>
       </header>
 
       <div className="home-learning__toolbar">
@@ -93,7 +87,7 @@ export function HomeLearningCards() {
       )}
 
       {status === 'ready' && cards.length === 0 && !error && (
-        <p className="home-learning__empty">暂无学习卡。可点「插入一条示例」或检查 API 配置。</p>
+        <p className="home-learning__empty">暂无学习卡。可点「插入一条示例」。</p>
       )}
 
       <ul className="home-learning__list">

@@ -7,8 +7,9 @@
  * - DELETE /learning-cards/:id
  */
 import { ApiError, apiRequest } from './api-client';
-import type { DataLayer, LearningCardsRepository } from '../repositories';
+import type { DataLayer, LearningCardsRepository, StudentMoodsRepository } from '../repositories';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
+import type { StudentMoodBackend } from '../entity/student-mood-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
@@ -34,7 +35,32 @@ class ApiLearningCardsRepo implements LearningCardsRepository {
   }
 }
 
+/** Future: GET/PUT `/student-moods` — local demo uses IndexedDB only. */
+class ApiStudentMoodsRepo implements StudentMoodsRepository {
+  async get(_id: string): Promise<StudentMoodBackend | undefined> {
+    return undefined;
+  }
+
+  async put(_entry: StudentMoodBackend): Promise<void> {
+    /* wire when API exists */
+  }
+
+  async listInLocalDateRange(_start: string, _end: string): Promise<StudentMoodBackend[]> {
+    return [];
+  }
+
+  async getChildrenMood(_parentUserId?: string): Promise<StudentMoodBackend[]> {
+    void _parentUserId;
+    return [];
+  }
+
+  async delete(_id: string): Promise<void> {
+    /* wire when API exists */
+  }
+}
+
 export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
+  readonly studentMoods = new ApiStudentMoodsRepo();
 }

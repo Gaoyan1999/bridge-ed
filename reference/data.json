@@ -1,6 +1,6 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-03T12:00:00.000Z",
+  "exportedAt": "2026-04-04T04:17:00.989Z",
   "learningCards": [
     {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
@@ -188,6 +188,43 @@
       "threadId": "card-thread-constitution"
     },
     {
+      "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-04T03:48:48.238Z",
+      "updatedAt": "2026-04-04T03:48:48.238Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "G9",
+      "subject": "Art",
+      "topic": "Draw a sunflower",
+      "teacherNotes": "",
+      "gradeSubjectLine": "G9 · Art",
+      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "tonightActions": [
+        {
+          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown.",
+          "include": true
+        },
+        {
+          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern).",
+          "include": true
+        },
+        {
+          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-04T03:48:48.238Z",
+      "threadId": "card-thread-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7"
+    },
+    {
       "id": "card-metaphor",
       "schemaVersion": 1,
       "createdAt": "2026-03-31T00:20:00.000Z",
@@ -297,6 +334,112 @@
       "sendStatus": "sent",
       "sentAt": "2026-04-02T23:15:00.000Z",
       "threadId": "card-thread-shakespeare"
+    }
+  ],
+  "studentMoods": [
+    {
+      "id": "sm:student-alex-wang:2026-03-30",
+      "schemaVersion": 2,
+      "studentId": "student-alex-wang",
+      "studentDisplayName": "Alex Wang",
+      "localDate": "2026-03-30",
+      "pleasant": 55,
+      "mood": "okay",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-03-30T12:00:00.000Z",
+      "updatedAt": "2026-03-30T12:00:00.000Z"
+    },
+    {
+      "id": "sm:student-alex-wang:2026-03-31",
+      "schemaVersion": 2,
+      "studentId": "student-alex-wang",
+      "studentDisplayName": "Alex Wang",
+      "localDate": "2026-03-31",
+      "pleasant": 78,
+      "mood": "happy",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-03-31T12:00:00.000Z",
+      "updatedAt": "2026-03-31T12:00:00.000Z"
+    },
+    {
+      "id": "sm:student-alex-wang:2026-04-01",
+      "schemaVersion": 2,
+      "studentId": "student-alex-wang",
+      "studentDisplayName": "Alex Wang",
+      "localDate": "2026-04-01",
+      "pleasant": 52,
+      "mood": "neutral",
+      "note": "Long day",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-04-01T12:00:00.000Z",
+      "updatedAt": "2026-04-01T12:00:00.000Z"
+    },
+    {
+      "id": "sm:student-alex-wang:2026-04-02",
+      "schemaVersion": 2,
+      "studentId": "student-alex-wang",
+      "studentDisplayName": "Alex Wang",
+      "localDate": "2026-04-02",
+      "pleasant": 28,
+      "mood": "tired",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-04-02T12:00:00.000Z",
+      "updatedAt": "2026-04-02T12:00:00.000Z"
+    },
+    {
+      "id": "sm:student-alex-wang:2026-04-04",
+      "schemaVersion": 2,
+      "studentId": "student-alex-wang",
+      "studentDisplayName": "Alex Wang",
+      "localDate": "2026-04-04",
+      "pleasant": 88,
+      "mood": "excited",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-04-04T10:00:00.000Z",
+      "updatedAt": "2026-04-04T10:00:00.000Z"
+    },
+    {
+      "id": "sm:student-betty-li:2026-03-31",
+      "schemaVersion": 2,
+      "studentId": "student-betty-li",
+      "studentDisplayName": "Betty Li",
+      "localDate": "2026-03-31",
+      "pleasant": 48,
+      "mood": "neutral",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-03-31T15:00:00.000Z",
+      "updatedAt": "2026-03-31T15:00:00.000Z"
+    },
+    {
+      "id": "sm:student-betty-li:2026-04-02",
+      "schemaVersion": 2,
+      "studentId": "student-betty-li",
+      "studentDisplayName": "Betty Li",
+      "localDate": "2026-04-02",
+      "pleasant": 72,
+      "mood": "happy",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-04-02T15:00:00.000Z",
+      "updatedAt": "2026-04-02T15:00:00.000Z"
+    },
+    {
+      "id": "sm:student-betty-li:2026-04-05",
+      "schemaVersion": 2,
+      "studentId": "student-betty-li",
+      "studentDisplayName": "Betty Li",
+      "localDate": "2026-04-05",
+      "pleasant": 58,
+      "mood": "okay",
+      "note": "",
+      "authorUserId": "demo-student",
+      "createdAt": "2026-04-05T11:00:00.000Z",
+      "updatedAt": "2026-04-05T11:00:00.000Z"
     }
   ]
 }

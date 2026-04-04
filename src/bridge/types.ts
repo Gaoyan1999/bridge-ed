@@ -28,6 +28,12 @@ export interface LearningCardItem {
   threadId: string;
 }
 
+/** Parent dashboard — children linked to mood check-ins (demo roster). */
+export type ParentMoodChildProfile = {
+  studentId: string;
+  displayName: string;
+};
+
 /** One “tonight’s action” row after generate / edit in the wizard. */
 export type LearningCardTonightAction = {
   text: string;
@@ -63,12 +69,6 @@ export type LearningCardCreatePayload = {
 export interface ScheduleDay {
   day: string;
   items: string[];
-}
-
-export interface MoodDay {
-  day: string;
-  emoji: string;
-  label: string;
 }
 
 export type ModalState =

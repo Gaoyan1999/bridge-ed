@@ -71,7 +71,7 @@ export function LearningCardModal({
   onSaved,
 }: {
   onClose: () => void;
-  /** Called after a card is persisted (IndexedDB / API). */
+  /** Called after a card is persisted. */
   onSaved?: () => void;
 }) {
   const [classLesson, setClassLesson] = useState<string>(() =>
