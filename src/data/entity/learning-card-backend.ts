@@ -1,7 +1,7 @@
 import type { LearningCardTonightAction } from '@/bridge/types';
 
 /**
- * Backend contract for Learning Cards — intended for REST/JSON APIs and IndexedDB documents.
+ * Backend contract for Learning Cards intended for REST/JSON APIs and IndexedDB documents.
  *
  * Conventions:
  * - **Timestamps**: ISO 8601 strings in **UTC** (e.g. `2026-04-04T18:30:00.000Z`). IndexedDB stores the same strings.
@@ -25,7 +25,7 @@ export type LearningCardSendStatus = 'draft' | 'sent' | 'failed';
 export type LearningCardTonightActionBackend = LearningCardTonightAction;
 
 /**
- * Canonical persisted record for one learning card (create → send → optional updates).
+ * Canonical persisted record for one learning card (create -> send -> optional updates).
  * **What you `put()` in IndexedDB should match this shape exactly (plus future optional fields).**
  */
 export interface LearningCardBackend {
@@ -45,11 +45,11 @@ export interface LearningCardBackend {
   classLessonTitle: string;
   grade: string;
   subject: string;
-  /** Primary title line for listings (wizard “Topic & focus”). */
+  /** Primary title line for listings (wizard "Topic & focus"). */
   topic: string;
   /** Optional notes passed to the generator. */
   teacherNotes: string;
-  /** Denormalized: e.g. `G9 · Math` — same as wizard `gradeSubjectLine`. */
+  /** Denormalized: e.g. `G9 · Math` - same as wizard `gradeSubjectLine`. */
   gradeSubjectLine: string;
 
   /** AI / teacher-edited parent-facing summary. */

@@ -28,7 +28,7 @@ export function normalizeTonightActions(raw: unknown): LearningCardTonightAction
   return out;
 }
 
-/** Normalize stored card (legacy `tonightActions` / schema v1 → current). */
+/** Normalize stored card (legacy `tonightActions` / schema v1 to current). */
 export function normalizeLearningCardBackend(card: LearningCardBackend): LearningCardBackend {
   return {
     ...card,
@@ -111,13 +111,13 @@ export function sampleLearningCardBackend(): LearningCardBackend {
     updatedAt: now,
     authorUserId: HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
     classId: null,
-    classLessonTitle: 'Week 14 — Sample',
+    classLessonTitle: 'Week 14 - Sample',
     grade: 'G9',
     subject: 'Math',
     topic: `Sample learning card · ${new Date().toLocaleString()}`,
     teacherNotes: '',
     gradeSubjectLine: 'G9 · Math',
-    parentSummary: '调试插入：家长摘要会出现在这里。',
+    parentSummary: 'Test insert: parent summary appears here.',
     tonightActions: normalizeTonightActions([
       { preset: 'quiz', include: true, text: '' },
       { preset: 'parent_led_practice', include: true, text: '' },
@@ -195,7 +195,7 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     title,
     subject,
     status: 'New',
-    summary: summary.length > 0 ? summary : '—',
+    summary: summary.length > 0 ? summary : '-',
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
     tonightActions: normalizeTonightActions(backend.tonightActions),

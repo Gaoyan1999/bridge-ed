@@ -25,13 +25,13 @@ export interface ThreadMessage {
   attachments?: ThreadMessageAttachment[];
 }
 
-/** Parent dashboard — children linked to mood check-ins (demo roster). */
+/** Parent dashboard children linked to mood check-ins (demo roster). */
 export type ParentMoodChildProfile = {
   studentId: string;
   displayName: string;
 };
 
-/** Fixed “tonight” options (not AI-generated); order is stable in storage. */
+/** Fixed "tonight" options (not AI-generated); order is stable in storage. */
 export const LEARNING_CARD_TONIGHT_ACTION_PRESETS = ['quiz', 'parent_led_practice', 'explain_to_parent'] as const;
 export type LearningCardTonightActionPreset = (typeof LEARNING_CARD_TONIGHT_ACTION_PRESETS)[number];
 
@@ -48,7 +48,7 @@ export interface LearningCardItem {
   subject: string;
   status: string;
   summary: string;
-  /** Unix ms — sort order and “Linked to …” line in `LearningCardTile`. */
+  /** Unix ms sort order and "Linked to ..." line in `LearningCardTile`. */
   at: number;
   threadId: string;
   /** Teacher-selected tonight tasks (3 fixed presets), from persisted card. */
@@ -76,13 +76,13 @@ export const LEARNING_CARD_TONIGHT_PRESET_LABELS: Record<
     description: 'Parent and child try a small activity or real-world application together.',
   },
   explain_to_parent: {
-    title: '“Teach-back” — child explains to parent',
-    description: 'The child walks you through the topic so you can tell they’ve understood.',
+    title: 'Teach-back - child explains to parent',
+    description: "The child walks you through the topic so you can tell they've understood.",
   },
 };
 
 /**
- * Full payload when the teacher confirms “Send learning card” (wizard — demo / future API body).
+ * Full payload when the teacher confirms "Send learning card" (wizard demo / future API body).
  */
 export type LearningCardCreatePayload = {
   sentAt: number;
@@ -102,7 +102,7 @@ export type LearningCardCreatePayload = {
   audience: {
     mode: 'class' | 'selected';
     recipientCount: number;
-    /** When `mode === 'selected'`, which roster students’ parents are included. */
+    /** When mode === 'selected', which roster students' parents are included. */
     selectedParentsByStudent?: Record<string, boolean>;
   };
 };
@@ -119,5 +119,5 @@ export type ModalState =
   | { type: 'broadcast' }
   | { type: 'report' }
   | { type: 'learningCard' }
-  /** Teacher dashboard — placeholder before opening parent Knowledge preview (content TBD). */
+  /** Teacher dashboard placeholder before opening parent Knowledge preview (content TBD). */
   | { type: 'teacherCardPreviewTodo'; card: LearningCardItem };

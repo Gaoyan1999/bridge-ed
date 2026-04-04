@@ -7,12 +7,12 @@ import {
   LEARNING_CARD_GRADE_OPTIONS,
   LEARNING_CARD_SUBJECT_OPTIONS,
 } from '@/bridge/mockData';
-import { mockGenerateLearningCard } from '@/bridge/mockLearningCardGenerate';
+import { useBridge } from '@/bridge/BridgeContext';
+import { generateLearningCardDraft } from '@/bridge/learningCardApi';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
-import { useBridge } from '@/bridge/BridgeContext';
 import { cx } from '@/bridge/cx';
 import type { LearningCardCreatePayload, LearningCardTonightAction } from '@/bridge/types';
 import {
@@ -97,6 +97,9 @@ export function LearningCardModal({
 
   const [phase, setPhase] = useState<Phase>('input');
   const [summary, setSummary] = useState('');
+  const [warning, setWarning] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [tonightActions, setTonightActions] = useState<LearningCardTonightAction[]>(() =>
     LEARNING_CARD_TONIGHT_ACTION_PRESETS.map((preset) => ({
       preset,
@@ -155,22 +158,47 @@ export function LearningCardModal({
       onClose();
     } catch (e) {
       console.error('[LearningCard] failed to persist', e, record);
+      throw e;
     }
   }
 
   const runGenerate = async () => {
     setPhase('generating');
+    setWarning(null);
     try {
-      const draft = await mockGenerateLearningCard({
+      const draft = await generateLearningCardDraft({
         classTitle: classLesson,
         topic: topic.trim(),
+        grade,
+        subject,
         gradeSubject: gradeSubjectLine,
         notes: notes.trim(),
       });
       setSummary(draft.summaryEn);
+      setWarning(draft.warning ?? null);
       setPhase('review');
-    } catch {
+    } catch (e) {
+      setWarning(e instanceof Error ? e.message : 'Generation failed.');
       setPhase('input');
+    }
+  };
+
+  const sendLearningCard = async () => {
+    const teacherSummary = summary.trim();
+    const selectedActionCount = tonightActions.filter((action) => action.include).length;
+    if (!teacherSummary || selectedActionCount === 0) {
+      setSaveError('Add a summary and select at least one action before sending.');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await confirmSendLearningCard();
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Failed to save learning card.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -210,7 +238,7 @@ export function LearningCardModal({
           New learning card
         </h3>
         <p className="modal__lede">
-          Draft a parent-friendly card from your class notes, then choose who receives it. (Demo: not saved to a server.)
+          Draft a parent-friendly card from your class notes, then choose who receives it.
         </p>
       </div>
 
@@ -227,6 +255,11 @@ export function LearningCardModal({
           }}
         >
           <div className="modal__scroll learning-card-main__scroll">
+            {warning && (
+              <p className="field__hint" role="alert">
+                {warning}
+              </p>
+            )}
             <div className="learning-card-field-row">
               <FieldSelect
                 id="lc-class-lesson"
@@ -273,7 +306,7 @@ export function LearningCardModal({
               value={notes}
               onChange={setNotes}
               rows={3}
-              placeholder="Anything the model should emphasize for families…"
+              placeholder="Anything the model should emphasize for families..."
             />
           </div>
           <div className="modal__footer">
@@ -295,7 +328,7 @@ export function LearningCardModal({
             <div className="learning-card-gen__orb" aria-hidden="true">
               <Sparkles className="learning-card-gen__sparkle" strokeWidth={2} size={28} />
             </div>
-            <p className="learning-card-gen__title">Generating parent summary…</p>
+            <p className="learning-card-gen__title">Generating parent summary...</p>
             <p className="learning-card-gen__hint">Drafting a short parent summary from your notes.</p>
             <div className="learning-card-gen__dots" aria-hidden="true">
               <span />
@@ -318,12 +351,17 @@ export function LearningCardModal({
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-review-summary">
               <p className="field__label">Parent summary</p>
+              {warning && (
+                <p className="field__hint" role="status">
+                  {warning}
+                </p>
+              )}
               <div className="learning-card-ai-hint" role="note">
                 <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
                   <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
                 </div>
                 <p className="learning-card-ai-hint__text">
-                  Families will see this in their preferred language — we translate the summary automatically for each
+                  Families will see this in their preferred language - we translate the summary automatically for each
                   parent.
                 </p>
               </div>
@@ -478,23 +516,28 @@ export function LearningCardModal({
         <div className="book-form learning-card-form">
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-confirm">
-              <p className="learning-card-confirm__lead">You’re about to send this learning card.</p>
+              <p className="learning-card-confirm__lead">You&apos;re about to send this learning card.</p>
               <p className="learning-card-confirm__count">
                 <strong>{recipientCount}</strong> {recipientCount === 1 ? 'family' : 'families'} will get a notification
                 under <strong>Knowledge</strong> powered by BridgeEd AI.
               </p>
               <ul className="learning-card-confirm__bullets">
                 <li>
-                  Summary: {summary.trim() ? 'Ready' : '—'}
+                  Summary: {summary.trim() ? 'Ready' : '-'}
                 </li>
                 <li>
-                  Tonight’s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
+                  Tonight&apos;s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
                   {LEARNING_CARD_TONIGHT_ACTION_PRESETS.length}
                 </li>
                 <li>
                   Audience: {audienceMode === 'class' ? 'Whole class' : 'Selected parents'}
                 </li>
               </ul>
+              {saveError && (
+                <p className="field__hint" role="alert">
+                  {saveError}
+                </p>
+              )}
             </div>
           </div>
           <div className="modal__footer">
@@ -502,8 +545,14 @@ export function LearningCardModal({
               <Button variant="text" type="button" onClick={() => setPhase('audience')}>
                 Back
               </Button>
-              <Button variant="primary" pill type="button" onClick={confirmSendLearningCard}>
-                Send learning card
+              <Button
+                variant="primary"
+                pill
+                type="button"
+                onClick={() => void sendLearningCard()}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Sending...' : 'Send learning card'}
               </Button>
             </div>
           </div>
