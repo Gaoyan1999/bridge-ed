@@ -8,6 +8,8 @@ import {
   STUDENT_MOOD_SCHEMA_VERSION,
   type StudentMoodBackend,
 } from '../entity/student-mood-backend';
+import type { UserBackend, UserRole } from '../entity/user-backend';
+import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
 export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 1 as const;
 
@@ -16,6 +18,7 @@ export type BridgeIndexedDbSnapshot = {
   exportedAt: string;
   learningCards: LearningCardBackend[];
   studentMoods: StudentMoodBackend[];
+  users: UserBackend[];
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -38,7 +41,23 @@ function isStudentMoodRow(v: unknown): v is StudentMoodBackend {
     typeof v.id === 'string' &&
     v.schemaVersion === STUDENT_MOOD_SCHEMA_VERSION &&
     typeof v.studentId === 'string' &&
-    typeof v.studentDisplayName === 'string' &&
+    typeof v.localDate === 'string' &&
+    typeof v.pleasant === 'number' &&
+    typeof v.mood === 'string' &&
+    (STUDENT_MOOD_KINDS as readonly string[]).includes(v.mood) &&
+    typeof v.note === 'string' &&
+    typeof v.createdAt === 'string' &&
+    typeof v.updatedAt === 'string'
+  );
+}
+
+/** Legacy snapshot export (schema v3) included redundant `authorUserId`. */
+function isLegacyStudentMoodRowV3(v: unknown): boolean {
+  if (!isRecord(v)) return false;
+  return (
+    v.schemaVersion === 3 &&
+    typeof v.id === 'string' &&
+    typeof v.studentId === 'string' &&
     typeof v.localDate === 'string' &&
     typeof v.pleasant === 'number' &&
     typeof v.mood === 'string' &&
@@ -50,14 +69,41 @@ function isStudentMoodRow(v: unknown): v is StudentMoodBackend {
   );
 }
 
+function parseStudentMoodImportRow(row: unknown, index: number): StudentMoodBackend {
+  if (isStudentMoodRow(row)) return row;
+  if (isLegacyStudentMoodRowV3(row)) {
+    return normalizeStudentMoodBackend(row);
+  }
+  throw new Error(
+    `Invalid studentMoods[${index}]: expected schema v${STUDENT_MOOD_SCHEMA_VERSION} (or legacy v3 with authorUserId).`,
+  );
+}
+
+function isUserRole(v: unknown): v is UserRole {
+  return v === 'teacher' || v === 'parent' || v === 'student';
+}
+
+function isUserRow(v: unknown): v is UserBackend {
+  if (!isRecord(v)) return false;
+  if (!isUserRole(v.role)) return false;
+  if (typeof v.id !== 'string' || typeof v.name !== 'string' || typeof v.email !== 'string') return false;
+  if (v.children !== undefined) {
+    if (!Array.isArray(v.children)) return false;
+    if (!v.children.every((c) => typeof c === 'string')) return false;
+  }
+  return true;
+}
+
 export async function exportIndexedDbSnapshot(): Promise<BridgeIndexedDbSnapshot> {
   const learningCards = await bridgeDb.learningCards.toArray();
   const studentMoods = await bridgeDb.studentMoods.toArray();
+  const users = await bridgeDb.users.toArray();
   return {
     snapshotVersion: BRIDGE_INDEXEDDB_SNAPSHOT_VERSION,
     exportedAt: new Date().toISOString(),
     learningCards,
     studentMoods,
+    users,
   };
 }
 
@@ -72,8 +118,8 @@ async function clearAllBridgeDbStores(): Promise<void> {
 }
 
 /**
- * Clears every object store in `bridge-ed`, then bulk-puts learning cards and student moods.
- * `learningCards` and `studentMoods` may be empty arrays; omit `studentMoods` only when importing legacy JSON (treated as `[]`).
+ * Clears every object store in `bridge-ed`, then bulk-puts learning cards, student moods, and users.
+ * `studentMoods` / `users` may be empty arrays; omit only when importing legacy JSON (treated as `[]`).
  */
 export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise<void> {
   if (!isRecord(data)) {
@@ -92,15 +138,21 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
     learningCards.push(row);
   }
 
-  const rawMoods = data.studentMoods;
-  const moodsRaw = Array.isArray(rawMoods) ? rawMoods : [];
+  const moodsRaw = Array.isArray(data.studentMoods) ? data.studentMoods : [];
   const studentMoods: StudentMoodBackend[] = [];
   for (let i = 0; i < moodsRaw.length; i++) {
     const row = moodsRaw[i];
-    if (!isStudentMoodRow(row)) {
-      throw new Error(`Invalid studentMoods[${i}]: expected a full StudentMoodBackend record.`);
+    studentMoods.push(parseStudentMoodImportRow(row, i));
+  }
+
+  const usersRaw = Array.isArray(data.users) ? data.users : [];
+  const users: UserBackend[] = [];
+  for (let i = 0; i < usersRaw.length; i++) {
+    const row = usersRaw[i];
+    if (!isUserRow(row)) {
+      throw new Error(`Invalid users[${i}]: expected a full UserBackend record.`);
     }
-    studentMoods.push(row);
+    users.push(row);
   }
 
   await clearAllBridgeDbStores();
@@ -109,5 +161,8 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
   }
   if (studentMoods.length > 0) {
     await bridgeDb.studentMoods.bulkPut(studentMoods);
+  }
+  if (users.length > 0) {
+    await bridgeDb.users.bulkPut(users);
   }
 }

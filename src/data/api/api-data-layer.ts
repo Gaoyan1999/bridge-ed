@@ -7,14 +7,26 @@
  * - DELETE /learning-cards/:id
  */
 import { ApiError, apiRequest } from './api-client';
-import type { DataLayer, LearningCardsRepository, StudentMoodsRepository } from '../repositories';
+import type { DataLayer, LearningCardsRepository, StudentMoodsRepository, UsersRepository } from '../repositories';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
+import type { UserBackend } from '../entity/user-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
-    const q = userId ? `?userId=${encodeURIComponent(userId)}` : '';
-    return apiRequest<LearningCardBackend[]>('GET', `/learning-cards${q}`);
+    if (!userId.trim()) return [];
+    return apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?authorUserId=${encodeURIComponent(userId)}`,
+    );
+  }
+
+  async listForParentUser(parentUserId: string): Promise<LearningCardBackend[]> {
+    if (!parentUserId.trim()) return [];
+    return apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?parentUserId=${encodeURIComponent(parentUserId)}`,
+    );
   }
 
   async get(id: string): Promise<LearningCardBackend | undefined> {
@@ -37,24 +49,46 @@ class ApiLearningCardsRepo implements LearningCardsRepository {
 
 /** Future: GET/PUT `/student-moods` — local demo uses IndexedDB only. */
 class ApiStudentMoodsRepo implements StudentMoodsRepository {
-  async get(_id: string): Promise<StudentMoodBackend | undefined> {
+  async get(id: string): Promise<StudentMoodBackend | undefined> {
+    void id;
     return undefined;
   }
 
-  async put(_entry: StudentMoodBackend): Promise<void> {
+  async put(entry: StudentMoodBackend): Promise<void> {
+    void entry;
     /* wire when API exists */
   }
 
-  async listInLocalDateRange(_start: string, _end: string): Promise<StudentMoodBackend[]> {
+  async listInLocalDateRange(start: string, end: string): Promise<StudentMoodBackend[]> {
+    void start;
+    void end;
     return [];
   }
 
-  async getChildrenMood(_parentUserId?: string): Promise<StudentMoodBackend[]> {
-    void _parentUserId;
+  async getChildrenMood(parentUserId?: string): Promise<StudentMoodBackend[]> {
+    void parentUserId;
     return [];
   }
 
-  async delete(_id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
+    void id;
+    /* wire when API exists */
+  }
+}
+
+/** Future: GET/PUT `/users` — local demo uses IndexedDB only. */
+class ApiUsersRepo implements UsersRepository {
+  async get(id: string): Promise<UserBackend | undefined> {
+    void id;
+    return undefined;
+  }
+
+  async list(): Promise<UserBackend[]> {
+    return [];
+  }
+
+  async put(user: UserBackend): Promise<void> {
+    void user;
     /* wire when API exists */
   }
 }
@@ -63,4 +97,5 @@ export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
   readonly studentMoods = new ApiStudentMoodsRepo();
+  readonly users = new ApiUsersRepo();
 }

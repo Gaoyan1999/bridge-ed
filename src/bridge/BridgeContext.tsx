@@ -10,6 +10,22 @@ import {
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES, ROLE_COPY } from '@/bridge/mockData';
 import type { InboxItem, LearningCardItem, ModalState, Module, Role, ThreadMessage } from '@/bridge/types';
+import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
+import { getDataLayer } from '@/data';
+import type { UserBackend } from '@/data/entity/user-backend';
+
+function pickDefaultUserId(list: UserBackend[]): string | null {
+  if (list.length === 0) return null;
+  try {
+    const fromLs = localStorage.getItem(VIEW_AS_USER_STORAGE_KEY);
+    if (fromLs && list.some((u) => u.id === fromLs)) return fromLs;
+  } catch {
+    /* ignore */
+  }
+  const t1 = list.find((u) => u.id === 'teacher-1');
+  if (t1) return t1.id;
+  return list[0]!.id;
+}
 
 function cloneInbox(initial: typeof INITIAL_INBOX) {
   return {
@@ -30,6 +46,11 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
 interface BridgeContextValue {
   role: Role;
   setRole: (r: Role) => void;
+  /** IndexedDB users (empty until loaded or if API mode). */
+  users: UserBackend[];
+  currentUserId: string | null;
+  currentUser: UserBackend | undefined;
+  setCurrentUserId: (id: string) => void;
   module: Module;
   setModule: (m: Module) => void;
   inboxByRole: Record<Role, InboxItem[]>;
@@ -63,7 +84,11 @@ function parseModuleFromHash(): Module {
 }
 
 export function BridgeProvider({ children }: { children: ReactNode }) {
-  const [role, setRoleState] = useState<Role>('teacher');
+  const [users, setUsers] = useState<UserBackend[]>([]);
+  const [currentUserId, setCurrentUserIdState] = useState<string | null>(null);
+  /** When IndexedDB has no `users` rows, fall back to picking a role only (legacy demo). */
+  const [roleWhenNoUsers, setRoleWhenNoUsers] = useState<Role>('teacher');
+
   const [module, setModuleState] = useState<Module>(() => parseModuleFromHash());
   const [inboxByRole, setInboxByRole] = useState(() => cloneInbox(INITIAL_INBOX));
   const [threads, setThreads] = useState(() => cloneThreads(INITIAL_THREADS));
@@ -79,7 +104,39 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .users.list()
+      .then((list) => {
+        if (cancelled) return;
+        setUsers(list);
+        setCurrentUserIdState((prev) => {
+          if (prev && list.some((u) => u.id === prev)) return prev;
+          return pickDefaultUserId(list);
+        });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setUsers([]);
+          setCurrentUserIdState(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const role: Role =
+    users.length > 0
+      ? ((users.find((u) => u.id === currentUserId)?.role ?? 'teacher') as Role)
+      : roleWhenNoUsers;
+
+  const currentUser: UserBackend | undefined =
+    users.length > 0 && currentUserId ? users.find((u) => u.id === currentUserId) : undefined;
+
+  useEffect(() => {
     if (role !== 'student' && module === 'mood') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync hash when role cannot use Mood (student-only)
       setModuleState('dashboard');
       if (typeof history !== 'undefined' && history.replaceState) {
         history.replaceState(null, '', '#dashboard');
@@ -95,8 +152,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const setRole = (r: Role) => {
-    setRoleState(r);
+  const applyRoleNavigation = (r: Role) => {
     if (r === 'teacher' || r === 'parent') {
       setModule('dashboard');
     } else {
@@ -108,6 +164,34 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         return 'ai';
       });
     }
+  };
+
+  const persistViewUserId = (id: string) => {
+    try {
+      localStorage.setItem(VIEW_AS_USER_STORAGE_KEY, id);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const setCurrentUserId = (id: string) => {
+    if (!users.some((u) => u.id === id)) return;
+    setCurrentUserIdState(id);
+    persistViewUserId(id);
+    const u = users.find((x) => x.id === id);
+    if (u) applyRoleNavigation(u.role as Role);
+  };
+
+  const setRole = (r: Role) => {
+    if (users.length > 0) {
+      const first = users.find((u) => u.role === r);
+      if (first) {
+        setCurrentUserId(first.id);
+      }
+      return;
+    }
+    setRoleWhenNoUsers(r);
+    applyRoleNavigation(r);
   };
 
   const getHints = () => {
@@ -188,7 +272,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         parent: [{ id, title: `[Card] ${card.title}`, date: dateStr, kind: 'card' }, ...prev.parent],
       };
     });
-    setRoleState('parent');
+    if (users.length > 0) {
+      const parent = users.find((u) => u.role === 'parent');
+      if (parent) {
+        setCurrentUserIdState(parent.id);
+        persistViewUserId(parent.id);
+      }
+    } else {
+      setRoleWhenNoUsers('parent');
+    }
     setModuleState('chat');
     if (typeof history !== 'undefined' && history.replaceState) {
       history.replaceState(null, '', '#chat');
@@ -218,6 +310,10 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const value: BridgeContextValue = {
     role,
     setRole,
+    users,
+    currentUserId,
+    currentUser,
+    setCurrentUserId,
     module,
     setModule,
     inboxByRole,

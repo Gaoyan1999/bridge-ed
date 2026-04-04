@@ -35,10 +35,7 @@ export interface LearningCardBackend {
   createdAt: string;
   updatedAt: string;
 
-  /**
-   * Owner teacher user id.
-   * TODO(auth): replace hardcoded demo id with authenticated user id from session / token.
-   */
+  /** Owner teacher user id (`UserBackend.id` with `role === 'teacher'`). */
   authorUserId: string;
 
   /** Roster / class entity; `null` when only free-text lesson title exists. */

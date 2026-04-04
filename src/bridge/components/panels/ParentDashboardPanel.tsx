@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
-import { PARENT_DASH_SCHEDULE, PARENT_MOOD_CHILDREN } from '@/bridge/mockData';
+import { DEMO_PARENT_USER_ID, PARENT_DASH_SCHEDULE } from '@/bridge/mockData';
 import { getDataLayer, getDebugMode } from '@/data';
+import { parentMoodChildrenFromUsers } from '@/data/parent-mood-children';
 import type { StudentMoodBackend } from '@/data/entity/student-mood-backend';
+import type { ParentMoodChildProfile } from '@/bridge/types';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { getCurrentWeekLocalDateRange } from '@/bridge/moodWeek';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
@@ -13,9 +15,12 @@ import { ParentMoodWeek } from '@/bridge/components/ParentMoodWeek';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch } = useBridge();
+  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
+    useBridge();
+  const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
   const [cards, setCards] = useState<LearningCardItem[]>([]);
   const [moodEntries, setMoodEntries] = useState<StudentMoodBackend[]>([]);
+  const [moodChildren, setMoodChildren] = useState<ParentMoodChildProfile[]>([]);
   const debugMode = getDebugMode();
 
   const onDebugDeleteLearningCard = useCallback(
@@ -34,7 +39,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
   useEffect(() => {
     let cancelled = false;
     void getDataLayer()
-      .learningCards.listByUserId('local')
+      .learningCards.listForParentUser(parentUserId)
       .then((rows) => {
         if (!cancelled) setCards(rows.map(learningCardBackendToItem));
       })
@@ -44,25 +49,28 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
     return () => {
       cancelled = true;
     };
-  }, [learningCardsEpoch]);
+  }, [learningCardsEpoch, parentUserId]);
 
   useEffect(() => {
     let cancelled = false;
     const { start, end } = getCurrentWeekLocalDateRange();
-    void getDataLayer()
-      .studentMoods.getChildrenMood()
-      .then((rows) => {
-        if (!cancelled) {
-          setMoodEntries(rows.filter((r) => r.localDate >= start && r.localDate <= end));
-        }
+    const layer = getDataLayer();
+    void Promise.all([layer.users.list(), layer.studentMoods.getChildrenMood(parentUserId)])
+      .then(([users, rows]) => {
+        if (cancelled) return;
+        setMoodChildren(parentMoodChildrenFromUsers(users, parentUserId));
+        setMoodEntries(rows.filter((r) => r.localDate >= start && r.localDate <= end));
       })
       .catch(() => {
-        if (!cancelled) setMoodEntries([]);
+        if (!cancelled) {
+          setMoodChildren([]);
+          setMoodEntries([]);
+        }
       });
     return () => {
       cancelled = true;
     };
-  }, [studentMoodsEpoch]);
+  }, [studentMoodsEpoch, parentUserId]);
 
   const sections = [
     <DashboardCard
@@ -116,7 +124,14 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       title="Your child’s mood"
       titleColor="warm"
     >
-      <ParentMoodWeek childrenProfiles={PARENT_MOOD_CHILDREN} entries={moodEntries} />
+      {moodChildren.length === 0 ? (
+        <p className="parent-cards__hint" id="parent-mood-empty">
+          No children linked for this parent in local data. Import a snapshot that includes a users array (e.g. reference/data.json)
+          from Debug → IndexedDB.
+        </p>
+      ) : (
+        <ParentMoodWeek childrenProfiles={moodChildren} entries={moodEntries} />
+      )}
     </DashboardCard>,
   ];
 

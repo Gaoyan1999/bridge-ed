@@ -5,10 +5,10 @@ import {
 } from '@/data/entity/learning-card-backend';
 
 /**
- * TODO(auth): replace with real user id from session (currently demo single user `"1"`).
- * Used as `LearningCardBackend.authorUserId` until auth exists.
+ * Fallback author when the wizard is opened without a teacher session (align with `reference/data.json` teachers).
+ * Prefer `currentUser.id` from `LearningCardModal` when role is teacher.
  */
-export const HARDCODED_LEARNING_CARD_AUTHOR_USER_ID = '1';
+export const HARDCODED_LEARNING_CARD_AUTHOR_USER_ID = 'teacher-1';
 
 export function newLearningCardIdPair(): { id: string; threadId: string } {
   const suffix =
@@ -22,7 +22,10 @@ export function newLearningCardIdPair(): { id: string; threadId: string } {
 }
 
 /** Build a **full** `LearningCardBackend` for IndexedDB / API from the wizard confirmation payload. */
-export function learningCardCreatePayloadToBackend(payload: LearningCardCreatePayload): LearningCardBackend {
+export function learningCardCreatePayloadToBackend(
+  payload: LearningCardCreatePayload,
+  authorUserId: string = HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
+): LearningCardBackend {
   const { id, threadId } = newLearningCardIdPair();
   const now = new Date().toISOString();
   const sentAtIso = new Date(payload.sentAt).toISOString();
@@ -39,7 +42,7 @@ export function learningCardCreatePayloadToBackend(payload: LearningCardCreatePa
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
     createdAt: now,
     updatedAt: now,
-    authorUserId: HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
+    authorUserId,
     classId: null,
     classLessonTitle: ci.classLesson,
     grade: ci.grade,

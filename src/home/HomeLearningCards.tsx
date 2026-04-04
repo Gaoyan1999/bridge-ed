@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
+import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
 import type { LearningCardBackend } from '@/data';
 import { sampleLearningCardBackend } from '@/data/learning-card-mappers';
 
+function viewAsUserIdFromStorage(): string {
+  try {
+    return localStorage.getItem(VIEW_AS_USER_STORAGE_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
 async function fetchLearningCards() {
   const layer = getDataLayer();
-  return layer.learningCards.listByUserId('local');
+  return layer.learningCards.listByUserId(viewAsUserIdFromStorage());
 }
 
 export function HomeLearningCards() {

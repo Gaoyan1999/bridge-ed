@@ -6,8 +6,6 @@ import {
   type StudentMoodKind,
 } from './entity/student-mood-backend';
 
-export const HARDCODED_STUDENT_MOOD_AUTHOR_ID = 'demo-student';
-
 /** Deterministic id per student + local day (upsert same day). */
 export function studentMoodStableId(studentId: string, localDate: string): string {
   return `sm:${studentId}:${localDate}`;
@@ -17,8 +15,19 @@ function isStudentMoodKind(v: unknown): v is StudentMoodKind {
   return typeof v === 'string' && (STUDENT_MOOD_KINDS as readonly string[]).includes(v);
 }
 
-/** Normalize legacy rows (v1 had `label` string) and ensure `mood` is set. */
-export function normalizeStudentMoodBackend(raw: Partial<StudentMoodBackend> & { label?: string }): StudentMoodBackend {
+type RawStudentMood = Partial<StudentMoodBackend> & {
+  label?: string;
+  /** Legacy v2 — ignored when normalizing. */
+  studentDisplayName?: string;
+  /** Legacy v3 — duplicate of `studentId`; ignored when normalizing. */
+  authorUserId?: string;
+};
+
+/**
+ * Normalize legacy rows (v1 had `label`; v2 had `studentDisplayName`; v3 had `authorUserId`).
+ * Strips deprecated fields; output is always current schema.
+ */
+export function normalizeStudentMoodBackend(raw: RawStudentMood): StudentMoodBackend {
   const pleasant = Math.max(0, Math.min(100, Math.round(raw.pleasant ?? 50)));
   const mood: StudentMoodKind = isStudentMoodKind(raw.mood) ? raw.mood : pleasantToStudentMoodKind(pleasant);
 
@@ -26,12 +35,10 @@ export function normalizeStudentMoodBackend(raw: Partial<StudentMoodBackend> & {
     id: raw.id!,
     schemaVersion: STUDENT_MOOD_SCHEMA_VERSION,
     studentId: raw.studentId!,
-    studentDisplayName: raw.studentDisplayName!,
     localDate: raw.localDate!,
     pleasant,
     mood,
     note: typeof raw.note === 'string' ? raw.note : '',
-    authorUserId: raw.authorUserId!,
     createdAt: raw.createdAt!,
     updatedAt: raw.updatedAt!,
   };
@@ -39,7 +46,6 @@ export function normalizeStudentMoodBackend(raw: Partial<StudentMoodBackend> & {
 
 export function buildStudentMoodFromCheckIn(params: {
   studentId: string;
-  studentDisplayName: string;
   pleasant: number;
   note: string;
   localDate: string;
@@ -51,12 +57,10 @@ export function buildStudentMoodFromCheckIn(params: {
     id,
     schemaVersion: STUDENT_MOOD_SCHEMA_VERSION,
     studentId: params.studentId,
-    studentDisplayName: params.studentDisplayName,
     localDate: params.localDate,
     pleasant,
     mood: pleasantToStudentMoodKind(pleasant),
     note: params.note.trim(),
-    authorUserId: HARDCODED_STUDENT_MOOD_AUTHOR_ID,
     createdAt: now,
     updatedAt: now,
   };
