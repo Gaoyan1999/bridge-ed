@@ -1,18 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-<<<<<<< Updated upstream
-import { useBridge } from '@/bridge/BridgeContext';
-import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
-import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
-import {
-  LEARNING_CARD_TONIGHT_PRESET_SHORT,
-=======
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
+import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import {
   LEARNING_CARD_TONIGHT_ACTION_PRESETS,
->>>>>>> Stashed changes
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
@@ -32,25 +25,24 @@ import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePend
 function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'status'>): {
   key: string;
   kind: 'subject' | 'status';
-  aria: string;
   text: string;
 }[] {
-  const out: { key: string; kind: 'subject' | 'status'; aria: string; text: string }[] = [];
+  const out: { key: string; kind: 'subject' | 'status'; text: string }[] = [];
   const line = card.subject.trim();
   if (line) {
     const parts = line.split(' · ').map((s) => s.trim()).filter(Boolean);
     if (parts.length <= 1) {
-      out.push({ key: 'subject', kind: 'subject', aria: 'Subject', text: parts[0] ?? line });
+      out.push({ key: 'subject', kind: 'subject', text: parts[0] ?? line });
     } else {
       const [first, ...rest] = parts;
       const gradeLike = Boolean(first && /^G\d+/i.test(first));
       const subjectText = gradeLike && rest.length ? rest.join(' · ') : line;
-      out.push({ key: 'subject', kind: 'subject', aria: 'Subject', text: subjectText });
+      out.push({ key: 'subject', kind: 'subject', text: subjectText });
     }
   }
   const st = card.status.trim();
   if (st && st !== '—') {
-    out.push({ key: 'status', kind: 'status', aria: 'Status', text: st });
+    out.push({ key: 'status', kind: 'status', text: st });
   }
   return out;
 }
@@ -63,21 +55,6 @@ function KnowledgeTonightTaskButtons({
   threadId,
 }: {
   card: Pick<LearningCardItem, 'tonightActions'>;
-<<<<<<< Updated upstream
-  /** Presets shown elsewhere (e.g. Practice as a primary button). */
-  omitPresets?: LearningCardTonightActionPreset[];
-}) {
-  const omit = new Set(omitPresets);
-  const tasks = card.tonightActions.filter((a) => a.include && !omit.has(a.preset));
-  if (!tasks.length) return null;
-  return (
-    <div className="knowledge-inbox__tasks" role="group" aria-label="Tonight’s suggested tasks">
-      {tasks.map((a) => (
-        <span key={a.preset} className="knowledge-inbox__task-chip">
-          {LEARNING_CARD_TONIGHT_PRESET_SHORT[a.preset]}
-        </span>
-      ))}
-=======
   onPresetClick: (preset: LearningCardTonightActionPreset) => void;
   practiceBusy: boolean;
   threadId: string | null | undefined;
@@ -105,37 +82,47 @@ function KnowledgeTonightTaskButtons({
           </Button>
         );
       })}
->>>>>>> Stashed changes
     </div>
   );
 }
 
 function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject' | 'status'> }) {
-  const tags = knowledgeLabelsFromCard(card);
+  const { t } = useTranslation();
+  const tags = knowledgeLabelsFromCard(card).map((row) => ({
+    ...row,
+    aria: row.kind === 'subject' ? t('common.subject') : t('common.status'),
+  }));
   if (!tags.length) return null;
   return (
-    <div className="knowledge-inbox__labels" role="group" aria-label="Subject and status">
-      {tags.map((t) => (
+    <div className="knowledge-inbox__labels" role="group" aria-label={t('knowledge.ariaSubjectStatus')}>
+      {tags.map((row) => (
         <span
-          key={t.key}
+          key={row.key}
           className={cx(
             'knowledge-inbox__label',
-            t.kind === 'subject' && 'knowledge-inbox__label--subject',
-            t.kind === 'status' && 'knowledge-inbox__label--status',
+            row.kind === 'subject' && 'knowledge-inbox__label--subject',
+            row.kind === 'status' && 'knowledge-inbox__label--status',
           )}
-          title={`${t.aria}: ${t.text}`}
+          title={`${row.aria}: ${row.text}`}
         >
           <span className="visually-hidden">
-            {t.aria}:{' '}
+            {row.aria}:{' '}
           </span>
-          {t.text}
+          {row.text}
         </span>
       ))}
     </div>
   );
 }
 
+function msgWhoLabel(who: string, t: (k: string) => string): string {
+  if (who === 'You') return t('common.you');
+  if (who === 'BridgeEd AI') return t('common.bridgedAi');
+  return who;
+}
+
 export function KnowledgePanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const {
     role,
     getHints,
@@ -290,10 +277,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     );
   }
 
-  const emptyHint =
-    role === 'student'
-      ? 'No learning cards yet. When your teacher sends a card to your class, it will show up here.'
-      : 'No learning cards yet. Open the dashboard to see cards your teacher shared.';
+  const emptyHint = role === 'student' ? t('knowledge.emptyStudent') : t('knowledge.emptyParent');
 
   return (
     <section
@@ -306,7 +290,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-knowledge-title"
-        title="Knowledge"
+        title={t('panels.knowledge')}
         hint={hints.knowledge ?? ''}
         hintId="knowledge-role-hint"
         split
@@ -338,27 +322,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           <div className="thread-header thread-header--knowledge">
             <div className="thread-header__main">
               <h3 className="thread-title" id="knowledge-thread-title">
-                {current?.title ?? 'Select a card'}
+                {current?.title ?? t('knowledge.selectCard')}
               </h3>
               {currentCard ? (
                 <div className="thread-header__knowledge-toolbar">
                   <div className="thread-header__knowledge-left">
                     <KnowledgeCardLabels card={currentCard} />
                   </div>
-<<<<<<< Updated upstream
-                  {showPracticeAction ? (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      pill
-                      className="btn--sm thread-header__practice-btn"
-                      id="btn-knowledge-practice"
-                      disabled={practiceBusy || !threadId}
-                      onClick={runPracticeFlow}
-                    >
-                      Practice
-                    </Button>
-=======
                   {showKnowledgeToolbarRight ? (
                     <div className="thread-header__knowledge-right">
                       <KnowledgeTonightTaskButtons
@@ -368,7 +338,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                         threadId={threadId}
                       />
                     </div>
->>>>>>> Stashed changes
                   ) : null}
                 </div>
               ) : null}
@@ -376,11 +345,11 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           </div>
           <div className="msg-thread" id="knowledge-msg-thread">
             {!msgs.length ? (
-              <p className="panel__hint">Open this card from the dashboard to start the AI thread (demo).</p>
+              <p className="panel__hint">{t('knowledge.demoThread')}</p>
             ) : (
               msgs.map((m, idx) => (
                 <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
-                  <div className="msg__who">{m.who}</div>
+                  <div className="msg__who">{msgWhoLabel(m.who, t)}</div>
                   {m.type === 'in' ? (
                     <>
                       <MessageAttachmentGrid attachments={m.attachments} />
@@ -419,16 +388,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           <Composer
             inputId="knowledge-input"
             className="chat-composer"
-            label="Message"
+            label={t('common.message')}
             value={input}
             onChange={setInput}
-<<<<<<< Updated upstream
-            placeholder="Ask about this card’s topic, or paste a homework question…"
-            actions={
-              <Button variant="primary" pill className="btn--sm" id="knowledge-send" onClick={send}>
-                Send
-              </Button>
-=======
             placeholder={t('knowledge.composerPlaceholder')}
             previewSlot={
               pending.length > 0 ? (
@@ -465,7 +427,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                   {t('common.send')}
                 </Button>
               </>
->>>>>>> Stashed changes
             }
           />
         </div>

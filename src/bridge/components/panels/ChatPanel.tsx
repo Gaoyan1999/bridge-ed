@@ -1,10 +1,6 @@
-<<<<<<< Updated upstream
-import { useEffect, useState } from 'react';
-=======
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
->>>>>>> Stashed changes
 import { useBridge } from '@/bridge/BridgeContext';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
@@ -14,6 +10,7 @@ import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
 export function ChatPanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const {
     role,
     getHints,
@@ -53,10 +50,10 @@ export function ChatPanel({ active }: { active: boolean }) {
 
   const placeholder =
     role === 'parent'
-      ? 'Type a message to your teacher…'
+      ? t('chat.placeholderParent')
       : role === 'teacher'
-        ? 'Type a message to this family or class…'
-        : 'Type a message…';
+        ? t('chat.placeholderTeacher')
+        : t('chat.placeholderStudent');
 
   const send = () => {
     const v = input.trim();
@@ -87,7 +84,7 @@ export function ChatPanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-chat-title"
-        title="Messages"
+        title={t('panels.messages')}
         hint={hints.chat}
         hintId="chat-role-hint"
         split
@@ -100,7 +97,7 @@ export function ChatPanel({ active }: { active: boolean }) {
             hidden={role !== 'teacher'}
             onClick={() => openModal({ type: 'broadcast' })}
           >
-            Broadcast
+            {t('chat.broadcast')}
           </Button>
         }
       />
@@ -109,7 +106,7 @@ export function ChatPanel({ active }: { active: boolean }) {
         <div className="inbox" id="inbox-list">
           {!items.length ? (
             <p className="panel__hint" style={{ padding: '1rem' }}>
-              No messages yet.
+              {t('chat.emptyInbox')}
             </p>
           ) : (
             items.map((item) => (
@@ -129,7 +126,7 @@ export function ChatPanel({ active }: { active: boolean }) {
         <div className="thread-pane">
           <div className="thread-header">
             <h3 className="thread-title" id="thread-title">
-              {current?.title ?? 'Select a thread'}
+              {current?.title ?? t('chat.selectThread')}
             </h3>
             <Button
               variant="secondary"
@@ -139,19 +136,15 @@ export function ChatPanel({ active }: { active: boolean }) {
               hidden={role !== 'parent'}
               onClick={() => openModal({ type: 'book' })}
             >
-              Book a time
+              {t('chat.bookTime')}
             </Button>
           </div>
           <div className="msg-thread" id="msg-thread">
             {!msgs.length ? (
-              <p className="panel__hint">No messages in this thread (demo).</p>
+              <p className="panel__hint">{t('chat.noMessagesInThread')}</p>
             ) : (
               msgs.map((m, idx) => (
                 <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
-<<<<<<< Updated upstream
-                  <div className="msg__who">{m.who}</div>
-                  <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
-=======
                   <div className="msg__who">
                     {m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who}
                   </div>
@@ -159,7 +152,6 @@ export function ChatPanel({ active }: { active: boolean }) {
                   {m.text?.trim() ? (
                     <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
                   ) : null}
->>>>>>> Stashed changes
                 </div>
               ))
             )}
@@ -181,7 +173,7 @@ export function ChatPanel({ active }: { active: boolean }) {
           <Composer
             inputId="chat-input"
             className="chat-composer"
-            label="Message"
+            label={t('common.message')}
             value={input}
             onChange={setInput}
             placeholder={placeholder}
@@ -205,11 +197,6 @@ export function ChatPanel({ active }: { active: boolean }) {
               ) : null
             }
             actions={
-<<<<<<< Updated upstream
-              <Button variant="primary" pill className="btn--sm" id="chat-send" onClick={send}>
-                Send
-              </Button>
-=======
               <>
                 <Button
                   type="button"
@@ -225,7 +212,6 @@ export function ChatPanel({ active }: { active: boolean }) {
                   {t('common.send')}
                 </Button>
               </>
->>>>>>> Stashed changes
             }
           />
         </div>
