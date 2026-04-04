@@ -45,7 +45,7 @@ const NAV_MODULES: {
   studentOnly?: boolean;
 }[] = [
   { module: 'dashboard', href: '#dashboard', Icon: LayoutDashboard, label: 'Dashboard', hideForStudent: true },
-  { module: 'chat', href: '#chat', Icon: MessageSquare, label: 'Chat' },
+  { module: 'chat', href: '#chat', Icon: MessageSquare, label: 'Messages' },
   { module: 'mood', href: '#mood', Icon: Smile, label: 'Mood', studentOnly: true },
 ];
 

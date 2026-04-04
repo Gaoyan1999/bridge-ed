@@ -166,7 +166,7 @@ function ReportModal({
           Create &amp; push report
         </h3>
         <p className="modal__lede">
-          Recipients get a copy in <strong>Chat</strong>.
+          Recipients get a copy in <strong>Messages</strong>.
         </p>
       </div>
       {!success ? (

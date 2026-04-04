@@ -93,7 +93,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
             <LearningCardTile
               key={c.id}
               card={c}
-              ctaLabel="Open in Chat"
+              ctaLabel="Open in Knowledge"
               onOpen={openCardThreadFromDashboard}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}

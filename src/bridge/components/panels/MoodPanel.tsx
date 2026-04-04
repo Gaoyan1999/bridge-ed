@@ -73,11 +73,11 @@ export function MoodPanel({ active }: { active: boolean }) {
           style={{ ['--pleasant' as string]: String(pleasant) }}
         >
           <header className="emotion-screen__top">
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-back" aria-label="Back" onClick={() => setModule('ai')}>
+            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-back" aria-label="Back" onClick={() => setModule('chat')}>
               <span aria-hidden="true">‹</span>
             </button>
             <h2 className="emotion-screen__heading">Emotion</h2>
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-close" aria-label="Close" onClick={() => setModule('ai')}>
+            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-close" aria-label="Close" onClick={() => setModule('chat')}>
               <span aria-hidden="true">×</span>
             </button>
           </header>
