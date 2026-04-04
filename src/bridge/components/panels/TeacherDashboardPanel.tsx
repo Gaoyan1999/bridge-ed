@@ -77,12 +77,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       titleColor="sky"
       subtitle={t('dashboard.teacher.learningCardsSubtitle')}
       headerActions={
-        <Button
-          variant="secondary"
-          pill
-          id="btn-teacher-create-card"
-          onClick={() => openModal({ type: 'learningCard' })}
-        >
+        <Button variant="primary" pill id="btn-teacher-create-card" onClick={() => openModal({ type: 'learningCard' })}>
           {t('dashboard.teacher.createCard')}
         </Button>
       }

@@ -70,7 +70,7 @@
     "student": {
       "chat": "Annonces de classe et messages de l’enseignant.",
       "knowledge": "Choisissez une fiche de cours et discutez avec BridgeEd IA — idées de pratique et explications courtes.",
-      "mood": "Déplacez le curseur de très désagréable à très agréable, puis appuyez sur Suivant pour enregistrer."
+      "mood": "Indiquez votre ressenti, les facteurs qui influencent votre humeur, puis envoyez — vos parents verront le résumé hebdomadaire sur le tableau de bord."
     },
     "teacher": {
       "dashboard": "Rédigez des rapports de classe et envoyez-les aux élèves et parents via Messages — tâches, publications et semaine.",
@@ -91,6 +91,10 @@
     "selectCard": "Choisir une fiche",
     "composerPlaceholder": "Posez une question sur le sujet de la fiche ou collez un exercice…",
     "demoThread": "Ouvrez cette fiche depuis le tableau de bord pour démarrer le fil IA.",
+    "lcStepsTitle": "Étapes vers la maîtrise",
+    "lcStepsEmpty": "Aucune étape suggérée sur cette fiche.",
+    "lcStatus": "Statut",
+    "lcDone": "Terminé",
     "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
     "ariaSubjectStatus": "Matière et statut",
     "taskShort": {
@@ -130,7 +134,34 @@
     "classOverview": "Aperçu de l’humeur de la classe",
     "colStudent": "Élève",
     "colDominant": "Humeur dominante",
-    "colNote": "Note"
+    "colNote": "Note",
+    "checkin": {
+      "toolbarTitle": "Point humeur",
+      "title": "Comment vous sentez-vous aujourd’hui ?",
+      "subtitle": "Prenez un instant pour faire le point. Vos ressentis comptent.",
+      "pleasantAria": "À quel point c’est agréable",
+      "level0": "Très désagréable",
+      "level1": "Désagréable",
+      "level2": "Neutre",
+      "level3": "Agréable",
+      "level4": "Très agréable",
+      "whatsOnMind": "À quoi pensez-vous ?",
+      "influencedAria": "Ce qui a influencé votre humeur",
+      "otherPlaceholder": "Précisez si « Autre »…",
+      "anythingToAdd": "Autre chose à ajouter ?",
+      "notePlaceholder": "Partagez vos pensées ici… elles restent privées dans votre journal.",
+      "submit": "Envoyer mon retour",
+      "submitSaving": "Enregistrement…",
+      "specifyOther": "Préciser autre",
+      "reasonTags": {
+        "exam_results": "Résultats d’examen",
+        "teacher": "Enseignant",
+        "classmates": "Camarades",
+        "knowledge": "Points de cours",
+        "efficiency": "Efficacité des apprentissages",
+        "other": "Autre"
+      }
+    }
   },
   "dashboard": {
     "parent": {
