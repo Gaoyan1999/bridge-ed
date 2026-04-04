@@ -144,6 +144,16 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     }
   }, [role, module]);
 
+  useEffect(() => {
+    if (role !== 'student') return;
+    if (module !== 'dashboard' && module !== 'ai') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- student shell is Chat + Mood only
+    setModuleState('chat');
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', '#chat');
+    }
+  }, [role, module]);
+
   const setModule = (m: Module) => {
     if (!MODULES.includes(m)) return;
     setModuleState(m);
@@ -156,12 +166,13 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     if (r === 'teacher' || r === 'parent') {
       setModule('dashboard');
     } else {
+      // Student home: Chat (+ Mood in nav), not AI assistant.
       setModuleState((cur) => {
         if (cur !== 'dashboard') return cur;
         if (typeof history !== 'undefined' && history.replaceState) {
-          history.replaceState(null, '', '#ai');
+          history.replaceState(null, '', '#chat');
         }
-        return 'ai';
+        return 'chat';
       });
     }
   };
