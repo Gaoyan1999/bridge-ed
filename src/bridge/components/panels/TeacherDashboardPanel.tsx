@@ -11,8 +11,7 @@ import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, showGeneric, openModal, learningCardsEpoch, bumpLearningCards, currentUser } =
-    useBridge();
+  const { showGeneric, openModal, learningCardsEpoch, bumpLearningCards, currentUser } = useBridge();
   const teacherAuthorId = currentUser?.role === 'teacher' ? currentUser.id : '';
   const [studentFilter, setStudentFilter] = useState('');
   const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
@@ -101,8 +100,8 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
             <LearningCardTile
               key={c.id}
               card={c}
-              ctaLabel="Open parent view"
-              onOpen={openCardThreadFromDashboard}
+              ctaLabel="Open"
+              onOpen={(card) => openModal({ type: 'teacherCardPreviewTodo', card })}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
             />

@@ -44,6 +44,21 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
     return filtered.sort(sortByCreatedAtDesc);
   }
 
+  async listForStudentUser(studentUserId: string): Promise<LearningCardBackend[]> {
+    const sid = studentUserId.trim();
+    if (!sid) return [];
+    const user = await bridgeDb.users.get(sid);
+    if (!user || user.role !== 'student') return [];
+
+    const rows = await bridgeDb.learningCards.toArray();
+    const filtered = rows.filter((card) => {
+      if (card.sendStatus !== 'sent') return false;
+      if (card.audience.mode === 'whole_class') return true;
+      return card.audience.selectedStudentIds.some((id) => id === sid);
+    });
+    return filtered.sort(sortByCreatedAtDesc);
+  }
+
   async get(id: string): Promise<LearningCardBackend | undefined> {
     return bridgeDb.learningCards.get(id);
   }

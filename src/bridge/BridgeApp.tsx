@@ -4,6 +4,7 @@ import { SkipLink } from '@/bridge/components/SkipLink';
 import { Sidebar } from '@/bridge/components/Sidebar';
 import { AiPanel } from '@/bridge/components/panels/AiPanel';
 import { ChatPanel } from '@/bridge/components/panels/ChatPanel';
+import { KnowledgePanel } from '@/bridge/components/panels/KnowledgePanel';
 import { DashboardPanel } from '@/bridge/components/panels/DashboardPanel';
 import { MoodPanel } from '@/bridge/components/panels/MoodPanel';
 import { useBridge } from '@/bridge/BridgeContext';
@@ -59,6 +60,7 @@ function BridgeShell() {
               <DashboardPanel active={module === 'dashboard'} />
               <AiPanel active={module === 'ai'} />
               <ChatPanel active={module === 'chat'} />
+              <KnowledgePanel active={module === 'knowledge'} />
               <MoodPanel key={`${module}-${role}`} active={module === 'mood'} />
             </div>
           </div>

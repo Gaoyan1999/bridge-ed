@@ -1,7 +1,7 @@
 import type { StudentMoodKind } from '@/data/entity/student-mood-backend';
 import type { InboxItem, LearningCardItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
 
-export const MODULES = ['dashboard', 'ai', 'chat', 'mood'] as const;
+export const MODULES = ['dashboard', 'ai', 'chat', 'knowledge', 'mood'] as const;
 
 export const ROLE_DISPLAY: Record<
   string,
@@ -280,17 +280,21 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 
 export const ROLE_COPY: Record<
   string,
-  { dashboard?: string; ai: string; chat: string; mood: string }
+  { dashboard?: string; ai: string; chat: string; knowledge?: string; mood: string }
 > = {
   parent: {
     dashboard: 'Learning cards, your child’s week, and mood snapshot (demo).',
     ai: 'Ask about homework, definitions, or paste a teacher note to get clear next steps.',
     chat: 'School notices, chat with the teacher, and book a one-to-one slot.',
+    knowledge:
+      'Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.',
     mood: 'See your child’s weekly mood summary and trends.',
   },
   student: {
     ai: 'Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.',
     chat: 'Class notices and messages from your teacher (demo).',
+    knowledge:
+      'Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.',
     mood: 'Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in.',
   },
   teacher: {

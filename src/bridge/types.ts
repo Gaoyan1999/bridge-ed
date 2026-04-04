@@ -1,6 +1,6 @@
 export type Role = 'parent' | 'student' | 'teacher';
 
-export type Module = 'dashboard' | 'ai' | 'chat' | 'mood';
+export type Module = 'dashboard' | 'ai' | 'chat' | 'knowledge' | 'mood';
 
 export type InboxKind = 'broadcast' | 'dm' | 'booking' | 'draft' | 'report' | 'card';
 
@@ -77,4 +77,6 @@ export type ModalState =
   | { type: 'book' }
   | { type: 'broadcast' }
   | { type: 'report' }
-  | { type: 'learningCard' };
+  | { type: 'learningCard' }
+  /** Teacher dashboard — placeholder before opening parent Knowledge preview (content TBD). */
+  | { type: 'teacherCardPreviewTodo'; card: LearningCardItem };

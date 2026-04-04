@@ -1668,6 +1668,61 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   border-left: 3px solid var(--link-blue);
 }
 
+/* Knowledge — subject / status chips (same blue system as Messages) */
+.knowledge-inbox__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.35rem;
+  margin: 0.35rem 0 0.25rem;
+  align-items: center;
+}
+
+.inbox-item--knowledge .inbox-item__title {
+  margin-bottom: 0.1rem;
+}
+
+.panel--knowledge .knowledge-inbox__label {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.18rem 0.45rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.25;
+  border: 1px solid rgba(11, 87, 208, 0.22);
+  background: var(--info-banner);
+  color: var(--link-blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel--knowledge .knowledge-inbox__label--subject {
+  border-color: rgba(11, 87, 208, 0.32);
+  background: var(--accent-soft);
+}
+
+.panel--knowledge .knowledge-inbox__label--status {
+  font-weight: 500;
+  border-color: var(--border-light);
+  background: var(--pill-bg);
+  color: var(--text-muted);
+}
+
+.thread-header--knowledge {
+  align-items: flex-start;
+}
+
+.thread-header--knowledge .thread-header__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.thread-header--knowledge .knowledge-inbox__labels {
+  margin: 0.4rem 0 0;
+}
+
 .inbox-item__title {
   font-weight: 600;
   font-size: 0.88rem;

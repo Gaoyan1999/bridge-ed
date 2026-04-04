@@ -29,6 +29,14 @@ class ApiLearningCardsRepo implements LearningCardsRepository {
     );
   }
 
+  async listForStudentUser(studentUserId: string): Promise<LearningCardBackend[]> {
+    if (!studentUserId.trim()) return [];
+    return apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?studentUserId=${encodeURIComponent(studentUserId)}`,
+    );
+  }
+
   async get(id: string): Promise<LearningCardBackend | undefined> {
     try {
       return await apiRequest<LearningCardBackend>('GET', `/learning-cards/${encodeURIComponent(id)}`);
