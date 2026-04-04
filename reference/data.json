@@ -1,6 +1,6 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-04T06:26:13.705Z",
+  "exportedAt": "2026-04-04T12:02:42.819Z",
   "learningCards": [
     {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
@@ -43,63 +43,23 @@
       "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
     },
     {
-      "id": "card-385c4db7-59a4-425b-861f-01584d247a5a",
+      "id": "card-55615594-c62e-41b5-86e1-93af028a1f8e",
       "schemaVersion": 2,
-      "createdAt": "2026-04-04T05:25:10.393Z",
-      "updatedAt": "2026-04-04T05:25:10.393Z",
+      "createdAt": "2026-04-04T06:55:19.608Z",
+      "updatedAt": "2026-04-04T06:55:19.608Z",
       "authorUserId": "teacher-2",
       "classId": null,
       "classLessonTitle": "Dept week — light homework & review",
-      "grade": "G9",
-      "subject": "English",
-      "topic": "Hello World",
-      "teacherNotes": "",
-      "gradeSubjectLine": "G9 · English",
-      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "grade": "G7",
+      "subject": "Art",
+      "topic": "Van Gogh's Style",
+      "teacherNotes": "Today the children learned what Van Gogh's style is. They looked at The Starry Night and Sunflowers",
+      "gradeSubjectLine": "G7 · Art",
+      "parentSummary": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
       "tonightActions": [
         {
           "preset": "quiz",
-          "include": true,
-          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sendStatus": "sent",
-      "sentAt": "2026-04-04T05:25:10.393Z",
-      "threadId": "card-thread-385c4db7-59a4-425b-861f-01584d247a5a"
-    },
-    {
-      "id": "card-443f4a10-eb80-4442-9598-cb08daf02962",
-      "schemaVersion": 2,
-      "createdAt": "2026-04-04T06:25:44.199Z",
-      "updatedAt": "2026-04-04T06:25:44.199Z",
-      "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "G9",
-      "subject": "English",
-      "topic": "Hello",
-      "teacherNotes": "",
-      "gradeSubjectLine": "G9 · English",
-      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
+          "include": false,
           "text": ""
         },
         {
@@ -114,17 +74,53 @@
         }
       ],
       "audience": {
-        "mode": "selected_parents",
-        "recipientCount": 3,
-        "selectedStudentIds": [
-          "student:Alex Wang",
-          "student:Betty Li",
-          "student:Carol Zhang"
-        ]
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
       },
       "sendStatus": "sent",
-      "sentAt": "2026-04-04T06:25:44.199Z",
-      "threadId": "card-thread-443f4a10-eb80-4442-9598-cb08daf02962"
+      "sentAt": "2026-04-04T06:55:19.608Z",
+      "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
+    },
+    {
+      "id": "card-6f78e588-38a2-4af8-8951-5071aac89ece",
+      "schemaVersion": 2,
+      "createdAt": "2026-04-04T11:49:58.169Z",
+      "updatedAt": "2026-04-04T11:49:58.169Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "G7",
+      "subject": "Math",
+      "topic": "1 + 1？",
+      "teacherNotes": "",
+      "gradeSubjectLine": "G7 · Math",
+      "parentSummary": "This week in Grade 7 Math, students will have light homework focusing on reviewing basic addition concepts like 1 + 1. It's a chance for them to strengthen their understanding with simple practice.",
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-04T11:49:58.169Z",
+      "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece"
     },
     {
       "id": "card-atmospheric-pressure",
@@ -205,46 +201,6 @@
       "sendStatus": "sent",
       "sentAt": "2026-03-30T23:50:00.000Z",
       "threadId": "card-thread-cells"
-    },
-    {
-      "id": "card-constitution",
-      "schemaVersion": 2,
-      "createdAt": "2026-03-29T22:15:00.000Z",
-      "updatedAt": "2026-03-29T22:15:00.000Z",
-      "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Week 13 — Quadratic equations intro",
-      "grade": "History",
-      "subject": "Civics",
-      "topic": "The Constitution — three branches",
-      "teacherNotes": "",
-      "gradeSubjectLine": "History · Civics",
-      "parentSummary": "Legislative, executive, judicial—checks and balances in one page.",
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": "Tonight: revisit “The Constitution — three branches” with one class or homework example."
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sendStatus": "sent",
-      "sentAt": "2026-03-29T22:15:00.000Z",
-      "threadId": "card-thread-constitution"
     },
     {
       "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",

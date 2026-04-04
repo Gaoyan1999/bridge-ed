@@ -22,8 +22,10 @@ pip install -r backend/requirements.txt
 From the repo root:
 
 ```bash
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8787
+python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8787
 ```
+
+(Using `python3 -m uvicorn` avoids “command not found” when the `uvicorn` executable is not on your `PATH`.)
 
 Or use:
 
