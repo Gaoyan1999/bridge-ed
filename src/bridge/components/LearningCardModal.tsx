@@ -120,8 +120,6 @@ export function LearningCardModal({
   const recipientCount =
     audienceMode === 'class' ? WHOLE_CLASS_RECIPIENTS : Object.values(selectedParents).filter(Boolean).length;
 
-  const gradeSubjectLine = [grade, subject].filter(Boolean).join(' · ');
-
   const canSubmitInput = Boolean(classLesson) && topic.trim().length > 0;
 
   async function confirmSendLearningCard() {
@@ -133,7 +131,6 @@ export function LearningCardModal({
         subject,
         topic: topic.trim(),
         notes: notes.trim(),
-        gradeSubjectLine,
       },
       generated: {
         parentSummary: summary,
@@ -171,7 +168,7 @@ export function LearningCardModal({
         topic: topic.trim(),
         grade,
         subject,
-        gradeSubject: gradeSubjectLine,
+        gradeSubject: [grade, subject].filter(Boolean).join(' · '),
         notes: notes.trim(),
       });
       setSummary(draft.summaryEn);

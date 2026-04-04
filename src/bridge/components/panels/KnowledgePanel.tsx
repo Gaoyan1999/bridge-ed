@@ -20,9 +20,7 @@ import { getDataLayer } from '@/data';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
-/**
- * Subject line from `learningCardBackendToItem` is often `G9 · Math` — we show **subject only** (drop grade).
- */
+/** Parent/student Knowledge inbox: subject chip only (grade is not shown here). */
 function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'status'>): {
   key: string;
   kind: 'subject' | 'status';
@@ -31,15 +29,7 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'statu
   const out: { key: string; kind: 'subject' | 'status'; text: string }[] = [];
   const line = card.subject.trim();
   if (line) {
-    const parts = line.split(' · ').map((s) => s.trim()).filter(Boolean);
-    if (parts.length <= 1) {
-      out.push({ key: 'subject', kind: 'subject', text: parts[0] ?? line });
-    } else {
-      const [first, ...rest] = parts;
-      const gradeLike = Boolean(first && /^G\d+/i.test(first));
-      const subjectText = gradeLike && rest.length ? rest.join(' · ') : line;
-      out.push({ key: 'subject', kind: 'subject', text: subjectText });
-    }
+    out.push({ key: 'subject', kind: 'subject', text: line });
   }
   const st = card.status.trim();
   if (st && st !== '—') {

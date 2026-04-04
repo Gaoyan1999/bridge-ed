@@ -95,7 +95,7 @@
     "ariaSubjectStatus": "Subject and status",
     "taskShort": {
       "quiz": "Quiz",
-      "parent_led_practice": "Practice",
+      "parent_led_practice": "Hands-on",
       "explain_to_parent": "Teach-back"
     },
     "practice": {

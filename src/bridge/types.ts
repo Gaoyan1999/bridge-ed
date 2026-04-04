@@ -45,6 +45,9 @@ export type LearningCardTonightAction = {
 export interface LearningCardItem {
   id: string;
   title: string;
+  /** Grade label (e.g. G7). Empty for parent-only demo fixtures. */
+  grade: string;
+  /** Subject line for listings (e.g. Math, or Math · Geometry). */
   subject: string;
   status: string;
   summary: string;
@@ -92,8 +95,6 @@ export type LearningCardCreatePayload = {
     subject: string;
     topic: string;
     notes: string;
-    /** Derived: `grade · subject` style line passed to the generator. */
-    gradeSubjectLine: string;
   };
   generated: {
     parentSummary: string;

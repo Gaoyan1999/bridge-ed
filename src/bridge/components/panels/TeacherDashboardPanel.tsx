@@ -97,6 +97,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
             <LearningCardTile
               key={c.id}
               card={c}
+              subjectPillScope="teacher"
               ctaLabel={t('dashboard.teacher.ctaOpen')}
               onOpen={(card) => openModal({ type: 'teacherCardPreviewTodo', card })}
               debugDelete={debugMode}
