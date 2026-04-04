@@ -1,0 +1,180 @@
+{
+  "app": {
+    "workspaceTitle": "BridgeEd 工作台"
+  },
+  "skipLink": {
+    "main": "跳到主内容"
+  },
+  "common": {
+    "send": "发送",
+    "cancel": "取消",
+    "subject": "科目",
+    "status": "状态",
+    "you": "你",
+    "bridgedAi": "BridgeEd AI",
+    "message": "消息",
+    "delete": "删除",
+    "attachImage": "添加图片",
+    "removeAttachment": "移除图片",
+    "imageTooLarge": "每张图片需小于 5 MB。",
+    "maxImages": "最多可附加 {{count}} 张图片。",
+    "imagesOnly": "仅支持图片文件。"
+  },
+  "roles": {
+    "parent": "家长",
+    "student": "学生",
+    "teacher": "教师"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "knowledge": "知识",
+    "chat": "消息",
+    "mood": "心情",
+    "ai": "AI 助手"
+  },
+  "sidebar": {
+    "viewAs": "视角",
+    "tools": "工具",
+    "expandSidebar": "展开侧栏",
+    "collapseSidebar": "收起侧栏",
+    "sidebarToggle": "打开或关闭侧栏",
+    "collapseExpand": "收起或展开侧栏",
+    "primaryNav": "主导航与工具",
+    "language": "语言",
+    "uploadReport": "上传报告",
+    "practiceTool": "练习",
+    "snippets": "短语",
+    "uploadTitle": "上传报告或成绩单（演示）",
+    "uploadDemoTitle": "上传报告",
+    "uploadDemoBody": "演示：上传周记、成绩单或 PDF，供 AI 在对话中引用。",
+    "practiceTitle": "生成练习（演示）",
+    "practiceDemoTitle": "生成练习",
+    "practiceDemoBody": "演示：根据当前学习卡主题生成 2–3 道小题供学生尝试。",
+    "snippetsTitle": "快捷短语（演示）",
+    "snippetsDemoTitle": "快捷短语",
+    "snippetsDemoBody": "演示：一键插入如「请简短解释」或「举个生活例子」到输入框。"
+  },
+  "hints": {
+    "parent": {
+      "dashboard": "学习卡、孩子一周安排与心情快照（演示）。",
+      "ai": "询问作业、概念释义，或粘贴老师留言以获得清晰下一步。",
+      "chat": "学校通知、与老师聊天，以及预约一对一时间。",
+      "knowledge": "选择一张学习卡，就该主题与 BridgeEd AI 对话——释义、练习思路与下一步。",
+      "mood": "查看孩子每周心情摘要与趋势。"
+    },
+    "student": {
+      "ai": "此处显示提示与练习思路（演示）。更深入辅导请使用家长视图。",
+      "chat": "班级通知与老师发来的消息（演示）。",
+      "knowledge": "选择班级学习卡，就该主题与 BridgeEd AI 对话——练习思路与简明讲解。",
+      "mood": "拖动滑块表示此刻感受，然后点「下一步」保存心情打卡。"
+    },
+    "teacher": {
+      "dashboard": "撰写班级报告并通过消息推送给学生与家长——以及任务、动态与本周安排。",
+      "ai": "预览面向家长的 AI 表述；通过消息与学习卡发布。",
+      "chat": "向班级或家长广播，并管理预约请求。",
+      "mood": "班级心情总览与学习反馈并列。"
+    },
+    "dashboardFallback": "班级报告、学习卡、任务、动态、班级脉搏、花名册与本周日程（演示）。"
+  },
+  "panels": {
+    "dashboard": "仪表盘",
+    "knowledge": "知识",
+    "messages": "消息",
+    "mood": "心情",
+    "ai": "AI 助手"
+  },
+  "knowledge": {
+    "emptyStudent": "还没有学习卡。老师发送到班级后会显示在这里。",
+    "emptyParent": "还没有学习卡。请在仪表盘查看老师分享的内容。",
+    "selectCard": "选择一张卡片",
+    "composerPlaceholder": "询问本卡主题，或粘贴作业问题…",
+    "demoThread": "从仪表盘打开此卡以开始 AI 对话（演示）。",
+    "ariaSuggestedTasks": "今晚建议任务",
+    "ariaSubjectStatus": "科目与状态",
+    "taskShort": {
+      "quiz": "测验",
+      "parent_led_practice": "练习",
+      "explain_to_parent": "讲给家长听"
+    },
+    "practice": {
+      "button": "练习",
+      "mockReply": "**小练习（演示）**\n\n我们用**梵高的画法**来做一个小练习：**画一朵向日葵**。\n\n- **笔触：** 厚涂与短笔触——像梵高一样留下清晰颜料痕迹，不必涂得很平。\n- **颜色：** 以明亮黄色为主，用少量深绿、赭石点缀花心与阴影。\n- **花盘与花瓣：** 先画扁圆花盘，再用放射状笔触勾出花瓣方向，可加一点旋转感。\n\n画完后可以说说你用的三种颜色、想改进的地方——或上传照片。"
+    }
+  },
+  "ai": {
+    "placeholder": "例如：解释判别式… 或粘贴本周老师评语",
+    "loadSample": "加载示例对话",
+    "demoReply": "（演示）收到。正式环境中，回复将遵循学校规则与安全策略。可补充年级或教材以获得更贴切帮助。"
+  },
+  "chat": {
+    "placeholderParent": "给老师发消息…",
+    "placeholderTeacher": "给该家庭或班级发消息…",
+    "placeholderStudent": "输入消息…",
+    "emptyInbox": "暂无消息。",
+    "broadcast": "广播",
+    "selectThread": "选择会话",
+    "bookTime": "预约时间",
+    "noMessagesInThread": "此会话暂无消息（演示）。"
+  },
+  "mood": {
+    "emotion": "情绪",
+    "back": "返回",
+    "close": "关闭",
+    "prompt": "选择你此刻的感受",
+    "sliderHelp": "愉悦程度（0–100）",
+    "veryUnpleasant": "非常不愉快",
+    "veryPleasant": "非常愉快",
+    "noteOptional": "备注（可选）",
+    "notePlaceholder": "还有想说的吗？",
+    "saving": "保存中…",
+    "next": "下一步",
+    "savedSuccess": "已保存。家长可在仪表盘查看本周打卡。",
+    "weekAtGlance": "本周一览",
+    "classOverview": "班级心情总览",
+    "colStudent": "学生",
+    "colDominant": "主要心情",
+    "colNote": "备注"
+  },
+  "dashboard": {
+    "parent": {
+      "cardsTitle": "学习卡",
+      "cardsSubtitle": "孩子正在学习的关键概念简介。",
+      "noCards": "还没有学习卡。请切换到教师角色并创建。",
+      "scheduleTitle": "孩子本周日程",
+      "moodTitle": "孩子的心情",
+      "moodEmpty": "本地数据未关联孩子。请导入包含 users 数组的快照（如 reference/data.json），路径：调试 → IndexedDB。",
+      "ctaOpenKnowledge": "在知识中打开"
+    },
+    "teacher": {
+      "classReport": "班级报告",
+      "classReportSubtitle": "撰写或生成简短报告，推送给学生、家长或双方。",
+      "createReport": "创建报告",
+      "learningCards": "学习卡",
+      "learningCardsSubtitle": "面向家庭的概念卡：释义、材料与简单计划。",
+      "createCard": "创建学习卡",
+      "noCards": "还没有学习卡。请点击「创建学习卡」添加。",
+      "ctaOpen": "打开",
+      "today": "今日",
+      "recentPosts": "最近动态",
+      "newLearningCard": "+ 新建学习卡",
+      "classPulse": "班级脉搏",
+      "studentDirectory": "学生目录",
+      "filterPlaceholder": "按姓名筛选…",
+      "filterAria": "筛选学生",
+      "colStudent": "学生",
+      "colGrade": "年级",
+      "colParent": "家长",
+      "colLastNote": "最近备注",
+      "view": "查看",
+      "studentDetailTitle": "学生详情",
+      "studentDetailBody": "演示：此处将显示联系方式、历史学习卡反馈与预约记录。",
+      "thisWeek": "本周"
+    }
+  },
+  "learningCard": {
+    "deleteConfirm": "删除「{{title}}」？",
+    "deleteAria": "删除学习卡：{{title}}",
+    "delete": "删除",
+    "linkedTo": "关联于 {{date}}"
+  }
+}

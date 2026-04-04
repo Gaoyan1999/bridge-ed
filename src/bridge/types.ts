@@ -11,10 +11,18 @@ export interface InboxItem {
   kind: InboxKind;
 }
 
+/** User-uploaded image in chat/Knowledge threads (demo: data URLs in memory). */
+export type ThreadMessageAttachment = {
+  kind: 'image';
+  url: string;
+  name?: string;
+};
+
 export interface ThreadMessage {
   who: string;
   type: 'in' | 'out';
   text: string;
+  attachments?: ThreadMessageAttachment[];
 }
 
 /** Parent dashboard — children linked to mood check-ins (demo roster). */

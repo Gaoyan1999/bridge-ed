@@ -16,6 +16,9 @@
   --link-blue-hover: #0842a0;
   --accent-primary: #0b57d0;
   --accent-soft: rgba(11, 87, 208, 0.08);
+  /* Secondary buttons — soft cool-gray fill + blue label (Knowledge chips, Book time, etc.) */
+  --btn-secondary-bg: #eef2f8;
+  --btn-secondary-bg-hover: #e4eaf4;
   --accent-warm: #c5221f;
   --heading-warm: #b06050;
   --heading-lavender: #7664a5;
@@ -1636,6 +1639,81 @@ html.theme-dark .learning-card-actions-group {
   flex-wrap: wrap;
 }
 
+.composer__attach-btn {
+  margin-right: auto;
+}
+
+.composer__preview {
+  margin-top: 0.5rem;
+}
+
+.composer__preview-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: flex-start;
+}
+
+.composer__preview-chip {
+  position: relative;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+  background: var(--pill-bg);
+}
+
+.composer__preview-chip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.composer__preview-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+
+.composer__preview-remove:hover {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.msg__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.msg__attachment-link {
+  display: block;
+  max-width: min(100%, 280px);
+}
+
+.msg__attachment-img {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+  background: var(--pill-bg);
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -1669,12 +1747,23 @@ html.theme-dark .learning-card-actions-group {
 }
 
 .btn--secondary {
-  background: var(--pill-bg);
-  color: var(--text);
+  background: var(--btn-secondary-bg);
+  color: var(--link-blue);
 }
 
 .btn--secondary:hover {
-  background: #e8edf3;
+  color: var(--link-blue);
+  background: var(--btn-secondary-bg-hover);
+}
+
+.btn--secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.btn--secondary:disabled:hover {
+  background: var(--btn-secondary-bg);
+  color: var(--link-blue);
 }
 
 .btn--ghost {
@@ -1812,19 +1901,6 @@ html.theme-dark .learning-card-actions-group {
   align-items: center;
 }
 
-.panel--knowledge .knowledge-inbox__task-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.18rem 0.5rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.25;
-  border: 1px solid rgba(11, 87, 208, 0.28);
-  background: var(--accent-soft);
-  color: var(--link-blue);
-}
-
 .thread-header--knowledge {
   align-items: flex-start;
 }
@@ -1857,12 +1933,19 @@ html.theme-dark .learning-card-actions-group {
   gap: 0.35rem 0.4rem;
 }
 
-.thread-header__practice-btn {
+.thread-header__knowledge-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.28rem 0.4rem;
   flex-shrink: 0;
-  font-weight: 600;
-  border-color: rgba(11, 87, 208, 0.45);
-  color: var(--link-blue);
-  background: var(--accent-soft);
+  max-width: 100%;
+}
+
+.thread-header__knowledge-right .knowledge-inbox__tasks {
+  margin: 0;
+  gap: 0.28rem 0.35rem;
 }
 
 .inbox-item__title {
@@ -2021,6 +2104,31 @@ html.theme-dark .learning-card-actions-group {
 
 .msg .markdown-content--msg-in pre {
   font-size: 0.82em;
+}
+
+/*
+ * Knowledge — assistant messages: flat transcript (no bubble), like ChatGPT / Gemini.
+ * User bubbles (.msg--out) unchanged.
+ */
+.panel--knowledge #knowledge-msg-thread .msg--in {
+  max-width: 100%;
+  align-self: stretch;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.panel--knowledge #knowledge-msg-thread .msg--in .msg__who {
+  margin-bottom: 0.35rem;
+}
+
+.panel--knowledge #knowledge-msg-thread .msg--in .msg__attachments {
+  margin-bottom: 0.5rem;
+}
+
+.panel--knowledge #knowledge-msg-thread .msg--in .markdown-content--msg-in {
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 /* Mood */
@@ -2560,6 +2668,8 @@ html.theme-dark {
   --border-light: #3c4043;
   --link-blue: #8ab4f8;
   --info-banner: rgba(138, 180, 248, 0.2);
+  --btn-secondary-bg: rgba(138, 180, 248, 0.12);
+  --btn-secondary-bg-hover: rgba(138, 180, 248, 0.2);
 }
 
 html.theme-dark .bubble--ai,
@@ -2570,4 +2680,8 @@ html.theme-dark .thread-pane {
 
 html.theme-dark .msg--in {
   background: #33333b;
+}
+
+html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
+  background: transparent;
 }

@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
-import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
+import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import {
-  LEARNING_CARD_TONIGHT_PRESET_SHORT,
+  LEARNING_CARD_TONIGHT_ACTION_PRESETS,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
 import { Markdown } from '@/bridge/components/Markdown';
+import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
+import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
 /**
  * Subject line from `learningCardBackendToItem` is often `G9 · Math` — we show **subject only** (drop grade).
@@ -21,77 +25,104 @@ import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'status'>): {
   key: string;
   kind: 'subject' | 'status';
-  aria: string;
   text: string;
 }[] {
-  const out: { key: string; kind: 'subject' | 'status'; aria: string; text: string }[] = [];
+  const out: { key: string; kind: 'subject' | 'status'; text: string }[] = [];
   const line = card.subject.trim();
   if (line) {
     const parts = line.split(' · ').map((s) => s.trim()).filter(Boolean);
     if (parts.length <= 1) {
-      out.push({ key: 'subject', kind: 'subject', aria: 'Subject', text: parts[0] ?? line });
+      out.push({ key: 'subject', kind: 'subject', text: parts[0] ?? line });
     } else {
       const [first, ...rest] = parts;
       const gradeLike = Boolean(first && /^G\d+/i.test(first));
       const subjectText = gradeLike && rest.length ? rest.join(' · ') : line;
-      out.push({ key: 'subject', kind: 'subject', aria: 'Subject', text: subjectText });
+      out.push({ key: 'subject', kind: 'subject', text: subjectText });
     }
   }
   const st = card.status.trim();
   if (st && st !== '—') {
-    out.push({ key: 'status', kind: 'status', aria: 'Status', text: st });
+    out.push({ key: 'status', kind: 'status', text: st });
   }
   return out;
 }
 
-function KnowledgeTonightTasks({
+/** One row of tonight actions: each enabled preset is a pill button (same component, stable order). */
+function KnowledgeTonightTaskButtons({
   card,
-  omitPresets = [],
+  onPresetClick,
+  practiceBusy,
+  threadId,
 }: {
   card: Pick<LearningCardItem, 'tonightActions'>;
-  /** Presets shown elsewhere (e.g. Practice as a primary button). */
-  omitPresets?: LearningCardTonightActionPreset[];
+  onPresetClick: (preset: LearningCardTonightActionPreset) => void;
+  practiceBusy: boolean;
+  threadId: string | null | undefined;
 }) {
-  const omit = new Set(omitPresets);
-  const tasks = card.tonightActions.filter((a) => a.include && !omit.has(a.preset));
-  if (!tasks.length) return null;
+  const { t } = useTranslation();
+  const byPreset = new Map(card.tonightActions.map((a) => [a.preset, a]));
+  const presets = LEARNING_CARD_TONIGHT_ACTION_PRESETS.filter((p) => byPreset.get(p)?.include);
+  if (!presets.length) return null;
   return (
-    <div className="knowledge-inbox__tasks" role="group" aria-label="Tonight’s suggested tasks">
-      {tasks.map((a) => (
-        <span key={a.preset} className="knowledge-inbox__task-chip">
-          {LEARNING_CARD_TONIGHT_PRESET_SHORT[a.preset]}
-        </span>
-      ))}
+    <div className="knowledge-inbox__tasks" role="group" aria-label={t('knowledge.ariaSuggestedTasks')}>
+      {presets.map((preset) => {
+        const label = t(`knowledge.taskShort.${preset}`);
+        const isPractice = preset === 'parent_led_practice';
+        return (
+          <Button
+            key={preset}
+            variant="secondary"
+            pill
+            sm
+            id={isPractice ? 'btn-knowledge-practice' : `btn-knowledge-tonight-${preset}`}
+            disabled={isPractice ? practiceBusy || !threadId : false}
+            onClick={() => onPresetClick(preset)}
+          >
+            {label}
+          </Button>
+        );
+      })}
     </div>
   );
 }
 
 function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject' | 'status'> }) {
-  const tags = knowledgeLabelsFromCard(card);
+  const { t } = useTranslation();
+  const tags = knowledgeLabelsFromCard(card).map((row) => ({
+    ...row,
+    aria: row.kind === 'subject' ? t('common.subject') : t('common.status'),
+  }));
   if (!tags.length) return null;
   return (
-    <div className="knowledge-inbox__labels" role="group" aria-label="Subject and status">
-      {tags.map((t) => (
+    <div className="knowledge-inbox__labels" role="group" aria-label={t('knowledge.ariaSubjectStatus')}>
+      {tags.map((row) => (
         <span
-          key={t.key}
+          key={row.key}
           className={cx(
             'knowledge-inbox__label',
-            t.kind === 'subject' && 'knowledge-inbox__label--subject',
-            t.kind === 'status' && 'knowledge-inbox__label--status',
+            row.kind === 'subject' && 'knowledge-inbox__label--subject',
+            row.kind === 'status' && 'knowledge-inbox__label--status',
           )}
-          title={`${t.aria}: ${t.text}`}
+          title={`${row.aria}: ${row.text}`}
         >
           <span className="visually-hidden">
-            {t.aria}:{' '}
+            {row.aria}:{' '}
           </span>
-          {t.text}
+          {row.text}
         </span>
       ))}
     </div>
   );
 }
 
+function msgWhoLabel(who: string, t: (k: string) => string): string {
+  if (who === 'You') return t('common.you');
+  if (who === 'BridgeEd AI') return t('common.bridgedAi');
+  return who;
+}
+
 export function KnowledgePanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const {
     role,
     getHints,
@@ -108,6 +139,14 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const [practiceBusy, setPracticeBusy] = useState(false);
   const [cards, setCards] = useState<LearningCardItem[]>([]);
   const practiceReplyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const knowledgeFileInputRef = useRef<HTMLInputElement>(null);
+  const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
+    onReject: (reason) => {
+      if (reason === 'size') window.alert(t('common.imageTooLarge'));
+      else if (reason === 'max') window.alert(t('common.maxImages', { count: MAX_MESSAGE_IMAGES }));
+      else if (reason === 'type') window.alert(t('common.imagesOnly'));
+    },
+  });
 
   const canUseKnowledge = role === 'parent' || role === 'student';
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
@@ -178,9 +217,20 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
   const send = () => {
     const v = input.trim();
-    if (!v || !threadId) return;
-    appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: v });
+    const attachments =
+      pending.length > 0
+        ? pending.map((p) => ({ kind: 'image' as const, url: p.dataUrl, name: p.name }))
+        : undefined;
+    if ((!v && !attachments?.length) || !threadId) return;
+    appendKnowledgeMessage(threadId, {
+      who: 'You',
+      type: 'out',
+      text: v,
+      ...(attachments ? { attachments } : {}),
+    });
     setInput('');
+    clear();
+    if (knowledgeFileInputRef.current) knowledgeFileInputRef.current.value = '';
   };
 
   useEffect(() => {
@@ -189,9 +239,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     };
   }, []);
 
-  const showPracticeAction = Boolean(
-    currentCard?.tonightActions.some((a) => a.preset === 'parent_led_practice' && a.include),
-  );
+  const showKnowledgeToolbarRight = Boolean(currentCard?.tonightActions.some((a) => a.include));
 
   const runPracticeFlow = useCallback(() => {
     if (!threadId || practiceBusy) return;
@@ -209,6 +257,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     }, 450);
   }, [threadId, practiceBusy, appendKnowledgeMessage]);
 
+  const handleTonightPresetClick = useCallback(
+    (preset: LearningCardTonightActionPreset) => {
+      if (preset === 'parent_led_practice') runPracticeFlow();
+    },
+    [runPracticeFlow],
+  );
+
   if (!canUseKnowledge) {
     return (
       <section
@@ -222,10 +277,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     );
   }
 
-  const emptyHint =
-    role === 'student'
-      ? 'No learning cards yet. When your teacher sends a card to your class, it will show up here.'
-      : 'No learning cards yet. Open the dashboard to see cards your teacher shared.';
+  const emptyHint = role === 'student' ? t('knowledge.emptyStudent') : t('knowledge.emptyParent');
 
   return (
     <section
@@ -238,7 +290,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-knowledge-title"
-        title="Knowledge"
+        title={t('panels.knowledge')}
         hint={hints.knowledge ?? ''}
         hintId="knowledge-role-hint"
         split
@@ -270,29 +322,22 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           <div className="thread-header thread-header--knowledge">
             <div className="thread-header__main">
               <h3 className="thread-title" id="knowledge-thread-title">
-                {current?.title ?? 'Select a card'}
+                {current?.title ?? t('knowledge.selectCard')}
               </h3>
               {currentCard ? (
                 <div className="thread-header__knowledge-toolbar">
                   <div className="thread-header__knowledge-left">
                     <KnowledgeCardLabels card={currentCard} />
-                    <KnowledgeTonightTasks
-                      card={currentCard}
-                      omitPresets={showPracticeAction ? ['parent_led_practice'] : []}
-                    />
                   </div>
-                  {showPracticeAction ? (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      pill
-                      className="btn--sm thread-header__practice-btn"
-                      id="btn-knowledge-practice"
-                      disabled={practiceBusy || !threadId}
-                      onClick={runPracticeFlow}
-                    >
-                      Practice
-                    </Button>
+                  {showKnowledgeToolbarRight ? (
+                    <div className="thread-header__knowledge-right">
+                      <KnowledgeTonightTaskButtons
+                        card={currentCard}
+                        onPresetClick={handleTonightPresetClick}
+                        practiceBusy={practiceBusy}
+                        threadId={threadId}
+                      />
+                    </div>
                   ) : null}
                 </div>
               ) : null}
@@ -300,33 +345,88 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           </div>
           <div className="msg-thread" id="knowledge-msg-thread">
             {!msgs.length ? (
-              <p className="panel__hint">Open this card from the dashboard to start the AI thread (demo).</p>
+              <p className="panel__hint">{t('knowledge.demoThread')}</p>
             ) : (
               msgs.map((m, idx) => (
                 <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
-                  <div className="msg__who">{m.who}</div>
+                  <div className="msg__who">{msgWhoLabel(m.who, t)}</div>
                   {m.type === 'in' ? (
-                    <Markdown className="markdown-content--msg-in">{m.text || ''}</Markdown>
+                    <>
+                      <MessageAttachmentGrid attachments={m.attachments} />
+                      {m.text?.trim() ? (
+                        <Markdown className="markdown-content--msg-in">{m.text}</Markdown>
+                      ) : null}
+                    </>
                   ) : (
-                    <div className="msg__body msg__body--plain" style={{ whiteSpace: 'pre-wrap' }}>
-                      {m.text}
-                    </div>
+                    <>
+                      <MessageAttachmentGrid attachments={m.attachments} />
+                      {m.text?.trim() ? (
+                        <div className="msg__body msg__body--plain" style={{ whiteSpace: 'pre-wrap' }}>
+                          {m.text}
+                        </div>
+                      ) : null}
+                    </>
                   )}
                 </div>
               ))
             )}
           </div>
+          <input
+            ref={knowledgeFileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            id="knowledge-file-input"
+            aria-hidden
+            tabIndex={-1}
+            onChange={(e) => {
+              void addFromFileList(e.target.files);
+              e.target.value = '';
+            }}
+          />
           <Composer
             inputId="knowledge-input"
             className="chat-composer"
-            label="Message"
+            label={t('common.message')}
             value={input}
             onChange={setInput}
-            placeholder="Ask about this card’s topic, or paste a homework question…"
+            placeholder={t('knowledge.composerPlaceholder')}
+            previewSlot={
+              pending.length > 0 ? (
+                <div className="composer__preview-strip">
+                  {pending.map((p) => (
+                    <div key={p.id} className="composer__preview-chip">
+                      <img src={p.dataUrl} alt="" />
+                      <button
+                        type="button"
+                        className="composer__preview-remove"
+                        aria-label={t('common.removeAttachment')}
+                        onClick={() => remove(p.id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            }
             actions={
-              <Button variant="primary" pill className="btn--sm" id="knowledge-send" onClick={send}>
-                Send
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="text"
+                  className="btn--sm composer__attach-btn"
+                  id="knowledge-attach-image"
+                  aria-label={t('common.attachImage')}
+                  onClick={() => knowledgeFileInputRef.current?.click()}
+                >
+                  <ImagePlus strokeWidth={2} size={20} aria-hidden />
+                </Button>
+                <Button variant="primary" pill className="btn--sm" id="knowledge-send" onClick={send}>
+                  {t('common.send')}
+                </Button>
+              </>
             }
           />
         </div>

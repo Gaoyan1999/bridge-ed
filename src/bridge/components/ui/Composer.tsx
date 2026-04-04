@@ -1,4 +1,4 @@
-import type { TextareaHTMLAttributes } from 'react';
+import type { ReactNode, TextareaHTMLAttributes } from 'react';
 import { cx } from '@/bridge/cx';
 
 interface ComposerProps {
@@ -9,7 +9,9 @@ interface ComposerProps {
   placeholder?: string;
   value: string;
   onChange: (v: string) => void;
-  actions: React.ReactNode;
+  /** Shown between the textarea and the action row (e.g. image previews). */
+  previewSlot?: ReactNode;
+  actions: ReactNode;
   label?: string;
 }
 
@@ -21,6 +23,7 @@ export function Composer({
   placeholder,
   value,
   onChange,
+  previewSlot,
   actions,
   label = 'Message',
 }: ComposerProps) {
@@ -39,6 +42,7 @@ export function Composer({
         {label}
       </label>
       <textarea {...taProps} />
+      {previewSlot ? <div className="composer__preview">{previewSlot}</div> : null}
       <div className="composer__actions">{actions}</div>
     </div>
   );
