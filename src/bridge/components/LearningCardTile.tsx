@@ -15,6 +15,8 @@ function formatCardLinkDate(at: number, locale: string): string {
 
 interface LearningCardTileProps {
   card: LearningCardItem;
+  /** Teacher dashboard: show `grade · subject`; parent: subject only. */
+  subjectPillScope?: 'teacher' | 'parent';
   ctaLabel: string;
   onOpen: (card: LearningCardItem) => void;
   /** When `VITE_DEBUG` is on — show a delete control (wired by parent). */
@@ -24,6 +26,7 @@ interface LearningCardTileProps {
 
 export function LearningCardTile({
   card,
+  subjectPillScope = 'parent',
   ctaLabel,
   onOpen,
   debugDelete,
@@ -33,6 +36,10 @@ export function LearningCardTile({
   const showDelete = Boolean(debugDelete && onDebugDelete);
   const statusLabel = t(`learningCard.status.${card.status}`, { defaultValue: card.status });
   const linkDate = formatCardLinkDate(card.at, i18n.language);
+  const subjectPillText =
+    subjectPillScope === 'teacher' && card.grade.trim()
+      ? [card.grade.trim(), card.subject.trim()].filter(Boolean).join(' · ')
+      : card.subject.trim();
 
   return (
     <article className={showDelete ? 'parent-card parent-card--debug' : 'parent-card'} data-thread-id={card.threadId}>
@@ -52,7 +59,7 @@ export function LearningCardTile({
       <button type="button" className="parent-card__main" onClick={() => onOpen(card)}>
         <h4 className="parent-card__title">{card.title}</h4>
         <div className="parent-card__meta">
-          <span className="parent-card__subject-pill">{card.subject}</span>
+          <span className="parent-card__subject-pill">{subjectPillText}</span>
           <span className="parent-card__status">{statusLabel}</span>
         </div>
         <p className="parent-card__summary">{card.summary}</p>

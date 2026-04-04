@@ -82,6 +82,7 @@ export const DASH_SCHEDULE: ScheduleDay[] = [
 /** Parent dashboard demo cards — also used to build IndexedDB import fixtures. */
 export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
   {
+    grade: '',
     id: 'card-pythagoras',
     title: 'Pythagorean theorem',
     subject: 'Math · Geometry',
@@ -92,6 +93,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-calculus',
     title: 'What is calculus?',
     subject: 'Math · Calculus',
@@ -102,6 +104,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-fractions',
     title: 'What is a fraction?',
     subject: 'Math · Arithmetic',
@@ -112,6 +115,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-shakespeare',
     title: 'Who is Shakespeare?',
     subject: 'Literature',
@@ -122,6 +126,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-atmospheric-pressure',
     title: 'What is atmospheric pressure?',
     subject: 'Science',
@@ -132,6 +137,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-water-cycle',
     title: 'What is the water cycle?',
     subject: 'Science · Earth',
@@ -142,6 +148,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-quadratic-equations',
     title: 'Quadratic equations in standard form',
     subject: 'Math · Algebra',
@@ -152,6 +159,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-photosynthesis',
     title: 'What is photosynthesis?',
     subject: 'Science · Biology',
@@ -162,6 +170,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-metaphor',
     title: 'What is a metaphor?',
     subject: 'English · Writing',
@@ -172,6 +181,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-periodic-table',
     title: 'Reading the periodic table',
     subject: 'Science · Chemistry',
@@ -182,6 +192,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-linear-graphs',
     title: 'Linear functions on a graph',
     subject: 'Math · Algebra',
@@ -192,6 +203,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-civil-war',
     title: 'The U.S. Civil War — big picture',
     subject: 'History · U.S.',
@@ -202,6 +214,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-cells',
     title: 'Plant vs animal cells',
     subject: 'Science · Biology',
@@ -212,6 +225,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-persuasive-essay',
     title: 'Building a persuasive paragraph',
     subject: 'English',
@@ -222,6 +236,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-renaissance',
     title: 'What was the Renaissance?',
     subject: 'History · World',
@@ -232,6 +247,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-probability',
     title: 'Probability in everyday situations',
     subject: 'Math · Statistics',
@@ -242,6 +258,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-constitution',
     title: 'The Constitution — three branches',
     subject: 'History · Civics',
@@ -252,6 +269,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     tonightActions: DEMO_TONIGHT_ALL,
   },
   {
+    grade: '',
     id: 'card-art-perspective',
     title: 'One-point perspective in drawing',
     subject: 'Art',

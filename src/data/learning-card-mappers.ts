@@ -82,7 +82,6 @@ export function learningCardCreatePayloadToBackend(
     subject: ci.subject,
     topic: ci.topic,
     teacherNotes: ci.notes,
-    gradeSubjectLine: ci.gradeSubjectLine,
     parentSummary: payload.generated.parentSummary,
     tonightActions: payload.generated.tonightActions.map((a) => ({
       preset: a.preset,
@@ -116,7 +115,6 @@ export function sampleLearningCardBackend(): LearningCardBackend {
     subject: 'Math',
     topic: `Sample learning card · ${new Date().toLocaleString()}`,
     teacherNotes: '',
-    gradeSubjectLine: 'G9 · Math',
     parentSummary: 'Test insert: parent summary appears here.',
     tonightActions: normalizeTonightActions([
       { preset: 'quiz', include: true, text: '' },
@@ -135,28 +133,13 @@ export function sampleLearningCardBackend(): LearningCardBackend {
 }
 
 /**
- * Parse `LearningCardItem.subject` (e.g. `Math · Geometry`, or `Literature`) into backend `grade` + `subject`
- * so `learningCardBackendToItem` round-trips for list display.
- */
-function parseGradeSubjectFromParentDashSubject(line: string): { grade: string; subject: string } {
-  const sep = ' · ';
-  const i = line.indexOf(sep);
-  if (i === -1) {
-    return { grade: '', subject: line };
-  }
-  return { grade: line.slice(0, i), subject: line.slice(i + sep.length) };
-}
-
-/**
  * Build a full `LearningCardBackend` row from parent-dashboard mock data (fixtures / IndexedDB import).
  */
 export function learningCardItemToBackendSnapshot(
   item: LearningCardItem,
   classLessonTitle: string,
 ): LearningCardBackend {
-  const { grade, subject } = parseGradeSubjectFromParentDashSubject(item.subject);
   const ts = new Date(item.at).toISOString();
-  const gradeSubjectLine = [grade, subject].filter(Boolean).join(' · ') || subject;
 
   return {
     id: item.id,
@@ -166,11 +149,10 @@ export function learningCardItemToBackendSnapshot(
     authorUserId: HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
     classId: null,
     classLessonTitle,
-    grade,
-    subject,
+    grade: item.grade,
+    subject: item.subject,
     topic: item.title,
     teacherNotes: '',
-    gradeSubjectLine,
     parentSummary: item.summary,
     tonightActions: normalizeTonightActions(item.tonightActions),
     audience: {
@@ -186,13 +168,14 @@ export function learningCardItemToBackendSnapshot(
 
 export function learningCardBackendToItem(backend: LearningCardBackend): LearningCardItem {
   const title = backend.topic.trim() || backend.classLessonTitle.trim() || 'Learning card';
-  const subject =
-    [backend.grade, backend.subject].filter(Boolean).join(' · ') || backend.subject;
+  const grade = (backend.grade ?? '').trim();
+  const subject = (backend.subject ?? '').trim() || '-';
   const summary = backend.parentSummary.trim();
   const atMs = Date.parse(backend.sentAt ?? backend.createdAt);
   return {
     id: backend.id,
     title,
+    grade,
     subject,
     status: 'New',
     summary: summary.length > 0 ? summary : '-',

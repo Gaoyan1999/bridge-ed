@@ -49,8 +49,6 @@ export interface LearningCardBackend {
   topic: string;
   /** Optional notes passed to the generator. */
   teacherNotes: string;
-  /** Denormalized: e.g. `G9 · Math` - same as wizard `gradeSubjectLine`. */
-  gradeSubjectLine: string;
 
   /** AI / teacher-edited parent-facing summary. */
   parentSummary: string;
