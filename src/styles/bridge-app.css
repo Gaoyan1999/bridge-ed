@@ -1838,6 +1838,33 @@ html.theme-dark .learning-card-actions-group {
   margin: 0.4rem 0 0;
 }
 
+.thread-header__knowledge-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.thread-header__knowledge-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.4rem;
+}
+
+.thread-header__practice-btn {
+  flex-shrink: 0;
+  font-weight: 600;
+  border-color: rgba(11, 87, 208, 0.45);
+  color: var(--link-blue);
+  background: var(--accent-soft);
+}
+
 .inbox-item__title {
   font-weight: 600;
   font-size: 0.88rem;
@@ -1875,6 +1902,42 @@ html.theme-dark .learning-card-actions-group {
   font-weight: 600;
 }
 
+/*
+ * Markdown — lists (Tailwind preflight sets ul/ol { list-style: none }).
+ * Restore markers for rendered GFM everywhere `.markdown-content` is used.
+ */
+.markdown-content ul,
+.markdown-content ol {
+  list-style-position: outside;
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  display: list-item;
+}
+
+.markdown-content ul ul {
+  list-style-type: circle;
+  margin-top: 0.25em;
+}
+
+.markdown-content ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-content li > p {
+  margin: 0.25em 0;
+}
+
 .msg-thread {
   flex: 1 1 auto;
   min-height: 0;
@@ -1910,6 +1973,54 @@ html.theme-dark .learning-card-actions-group {
   color: var(--text-muted);
   margin-bottom: 0.25rem;
   font-weight: 500;
+}
+
+/* Knowledge — AI bubbles: Markdown (GFM); keep typography compact inside chat */
+.msg .markdown-content--msg-in {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.msg .markdown-content--msg-in > :first-child {
+  margin-top: 0;
+}
+
+.msg .markdown-content--msg-in > :last-child {
+  margin-bottom: 0;
+}
+
+.msg .markdown-content--msg-in p {
+  margin: 0.45em 0;
+}
+
+.msg .markdown-content--msg-in h1,
+.msg .markdown-content--msg-in h2,
+.msg .markdown-content--msg-in h3,
+.msg .markdown-content--msg-in h4 {
+  font-size: 0.95em;
+  margin: 0.65em 0 0.35em;
+}
+
+.msg .markdown-content--msg-in h1:first-child,
+.msg .markdown-content--msg-in h2:first-child,
+.msg .markdown-content--msg-in h3:first-child {
+  margin-top: 0;
+}
+
+.msg .markdown-content--msg-in ul,
+.msg .markdown-content--msg-in ol {
+  margin: 0.4em 0;
+  padding-left: 1.35em;
+}
+
+.msg .markdown-content--msg-in li {
+  margin: 0.2em 0;
+  display: list-item;
+}
+
+.msg .markdown-content--msg-in pre {
+  font-size: 0.82em;
 }
 
 /* Mood */

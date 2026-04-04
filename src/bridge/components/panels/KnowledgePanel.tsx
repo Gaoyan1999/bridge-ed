@@ -1,7 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
-import { LEARNING_CARD_TONIGHT_PRESET_SHORT, type LearningCardItem } from '@/bridge/types';
+import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
+import {
+  LEARNING_CARD_TONIGHT_PRESET_SHORT,
+  type LearningCardItem,
+  type LearningCardTonightActionPreset,
+} from '@/bridge/types';
+import { Markdown } from '@/bridge/components/Markdown';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
@@ -38,8 +44,16 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'statu
   return out;
 }
 
-function KnowledgeTonightTasks({ card }: { card: Pick<LearningCardItem, 'tonightActions'> }) {
-  const tasks = card.tonightActions.filter((a) => a.include);
+function KnowledgeTonightTasks({
+  card,
+  omitPresets = [],
+}: {
+  card: Pick<LearningCardItem, 'tonightActions'>;
+  /** Presets shown elsewhere (e.g. Practice as a primary button). */
+  omitPresets?: LearningCardTonightActionPreset[];
+}) {
+  const omit = new Set(omitPresets);
+  const tasks = card.tonightActions.filter((a) => a.include && !omit.has(a.preset));
   if (!tasks.length) return null;
   return (
     <div className="knowledge-inbox__tasks" role="group" aria-label="Tonight’s suggested tasks">
@@ -91,7 +105,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   } = useBridge();
   const hints = getHints();
   const [input, setInput] = useState('');
+  const [practiceBusy, setPracticeBusy] = useState(false);
   const [cards, setCards] = useState<LearningCardItem[]>([]);
+  const practiceReplyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const canUseKnowledge = role === 'parent' || role === 'student';
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
@@ -167,6 +183,32 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     setInput('');
   };
 
+  useEffect(() => {
+    return () => {
+      if (practiceReplyTimerRef.current) clearTimeout(practiceReplyTimerRef.current);
+    };
+  }, []);
+
+  const showPracticeAction = Boolean(
+    currentCard?.tonightActions.some((a) => a.preset === 'parent_led_practice' && a.include),
+  );
+
+  const runPracticeFlow = useCallback(() => {
+    if (!threadId || practiceBusy) return;
+    setPracticeBusy(true);
+    appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: '/practice' });
+    if (practiceReplyTimerRef.current) clearTimeout(practiceReplyTimerRef.current);
+    practiceReplyTimerRef.current = setTimeout(() => {
+      practiceReplyTimerRef.current = null;
+      appendKnowledgeMessage(threadId, {
+        who: 'BridgeEd AI',
+        type: 'in',
+        text: MOCK_PRACTICE_AI_REPLY,
+      });
+      setPracticeBusy(false);
+    }, 450);
+  }, [threadId, practiceBusy, appendKnowledgeMessage]);
+
   if (!canUseKnowledge) {
     return (
       <section
@@ -231,9 +273,27 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 {current?.title ?? 'Select a card'}
               </h3>
               {currentCard ? (
-                <div className="flex justify-between">
-                  <KnowledgeCardLabels card={currentCard} />
-                  <KnowledgeTonightTasks card={currentCard} />
+                <div className="thread-header__knowledge-toolbar">
+                  <div className="thread-header__knowledge-left">
+                    <KnowledgeCardLabels card={currentCard} />
+                    <KnowledgeTonightTasks
+                      card={currentCard}
+                      omitPresets={showPracticeAction ? ['parent_led_practice'] : []}
+                    />
+                  </div>
+                  {showPracticeAction ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      pill
+                      className="btn--sm thread-header__practice-btn"
+                      id="btn-knowledge-practice"
+                      disabled={practiceBusy || !threadId}
+                      onClick={runPracticeFlow}
+                    >
+                      Practice
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -245,7 +305,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
               msgs.map((m, idx) => (
                 <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
                   <div className="msg__who">{m.who}</div>
-                  <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+                  {m.type === 'in' ? (
+                    <Markdown className="markdown-content--msg-in">{m.text || ''}</Markdown>
+                  ) : (
+                    <div className="msg__body msg__body--plain" style={{ whiteSpace: 'pre-wrap' }}>
+                      {m.text}
+                    </div>
+                  )}
                 </div>
               ))
             )}

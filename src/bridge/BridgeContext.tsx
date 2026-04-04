@@ -45,13 +45,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
 }
 
 function initialKnowledgeMessagesForCard(card: LearningCardItem): ThreadMessage[] {
-  const body =
-    `${card.summary}\n\n` +
-    'In this card we:\n' +
-    '• Explain the idea in parent‑friendly language.\n' +
-    '• Suggest 1–2 materials to use at home.\n' +
-    '• List a short plan for tonight or this week.\n\n' +
-    'Ask me anything about this card’s topic. (Demo — connect a model for live answers.)';
+  const body = `${card.summary}`;
   return [{ who: 'BridgeEd AI', type: 'in', text: body }];
 }
 
