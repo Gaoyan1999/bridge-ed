@@ -52,6 +52,11 @@ export interface LearningCardBackend {
 
   /** AI / teacher-edited parent-facing summary. */
   parentSummary: string;
+  translatedSummaries?: {
+    zh?: string;
+    en?: string;
+    fr?: string;
+  };
   tonightActions: LearningCardTonightActionBackend[];
 
   audience: {

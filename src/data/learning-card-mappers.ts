@@ -83,6 +83,9 @@ export function learningCardCreatePayloadToBackend(
     topic: ci.topic,
     teacherNotes: ci.notes,
     parentSummary: payload.generated.parentSummary,
+    ...(payload.generated.translatedSummaries
+      ? { translatedSummaries: payload.generated.translatedSummaries }
+      : {}),
     tonightActions: payload.generated.tonightActions.map((a) => ({
       preset: a.preset,
       include: a.include,
@@ -154,6 +157,7 @@ export function learningCardItemToBackendSnapshot(
     topic: item.title,
     teacherNotes: '',
     parentSummary: item.summary,
+    ...(item.translatedSummaries ? { translatedSummaries: { ...item.translatedSummaries } } : {}),
     tonightActions: normalizeTonightActions(item.tonightActions),
     audience: {
       mode: 'whole_class',
@@ -179,6 +183,7 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     subject,
     status: 'New',
     summary: summary.length > 0 ? summary : '-',
+    ...(backend.translatedSummaries ? { translatedSummaries: { ...backend.translatedSummaries } } : {}),
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
     tonightActions: normalizeTonightActions(backend.tonightActions),

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, ListChecks, Sparkles, Users } from 'lucide-react';
 import { Checkbox, Label, Radio, RadioGroup } from 'react-aria-components';
 import {
@@ -8,18 +9,22 @@ import {
   LEARNING_CARD_SUBJECT_OPTIONS,
 } from '@/bridge/mockData';
 import { useBridge } from '@/bridge/BridgeContext';
-import { generateLearningCardDraft } from '@/bridge/learningCardApi';
+import { getDataLayer, getLlmApi } from '@/data';
+import { resolveParentSummaryForDisplay, uiLangFromI18n } from '@/data';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 import { cx } from '@/bridge/cx';
-import type { LearningCardCreatePayload, LearningCardTonightAction } from '@/bridge/types';
+import type {
+  LearningCardCreatePayload,
+  LearningCardTonightAction,
+  LearningCardTranslatedSummaries,
+} from '@/bridge/types';
 import {
   LEARNING_CARD_TONIGHT_ACTION_PRESETS,
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
 } from '@/bridge/types';
-import { getDataLayer } from '@/data';
 import {
   HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
   learningCardCreatePayloadToBackend,
@@ -27,9 +32,11 @@ import {
 
 const WHOLE_CLASS_RECIPIENTS = 28;
 
-const LS_KEY_CLASS = 'bridge-ed:learning-card:class-lesson';
 const LS_KEY_GRADE = 'bridge-ed:learning-card:grade';
 const LS_KEY_SUBJECT = 'bridge-ed:learning-card:subject';
+
+/** Class / lesson title UI is commented out — backend still expects `classLesson` / `classTitle`. */
+const DEFAULT_CLASS_LESSON = LEARNING_CARD_CLASS_OPTIONS[0] ?? 'Class session';
 
 function readStoredOption<T extends readonly string[]>(key: string, allowed: T, fallback: T[number]): T[number] {
   if (typeof window === 'undefined') return fallback;
@@ -82,10 +89,9 @@ export function LearningCardModal({
   /** Called after a card is persisted. */
   onSaved?: () => void;
 }) {
+  const { i18n } = useTranslation();
   const { currentUser } = useBridge();
-  const [classLesson, setClassLesson] = useState<string>(() =>
-    readStoredOption(LS_KEY_CLASS, LEARNING_CARD_CLASS_OPTIONS, LEARNING_CARD_CLASS_OPTIONS[0]),
-  );
+  const classLesson = DEFAULT_CLASS_LESSON;
   const [grade, setGrade] = useState<string>(() =>
     readStoredOption(LS_KEY_GRADE, LEARNING_CARD_GRADE_OPTIONS, 'G9'),
   );
@@ -97,6 +103,8 @@ export function LearningCardModal({
 
   const [phase, setPhase] = useState<Phase>('input');
   const [summary, setSummary] = useState('');
+  /** LLM output per locale; teacher edits apply to `summary` (stored as `en` + `parentSummary`). */
+  const [translatedDraft, setTranslatedDraft] = useState<LearningCardTranslatedSummaries | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -120,7 +128,8 @@ export function LearningCardModal({
   const recipientCount =
     audienceMode === 'class' ? WHOLE_CLASS_RECIPIENTS : Object.values(selectedParents).filter(Boolean).length;
 
-  const canSubmitInput = Boolean(classLesson) && topic.trim().length > 0;
+  const canSubmitInput =
+    topic.trim().length > 0 && grade.trim().length > 0 && subject.trim().length > 0;
 
   async function confirmSendLearningCard() {
     const payload: LearningCardCreatePayload = {
@@ -133,7 +142,15 @@ export function LearningCardModal({
         notes: notes.trim(),
       },
       generated: {
-        parentSummary: summary,
+        parentSummary: summary.trim(),
+        ...(translatedDraft
+          ? {
+              translatedSummaries: {
+                ...translatedDraft,
+                en: summary.trim(),
+              },
+            }
+          : {}),
         tonightActions: tonightActions.map((a) => ({
           preset: a.preset,
           include: a.include,
@@ -163,15 +180,18 @@ export function LearningCardModal({
     setPhase('generating');
     setWarning(null);
     try {
-      const draft = await generateLearningCardDraft({
+      const draft = await getLlmApi().explainTerminologyToParents({
         classTitle: classLesson,
         topic: topic.trim(),
         grade,
         subject,
-        gradeSubject: [grade, subject].filter(Boolean).join(' · '),
         notes: notes.trim(),
       });
-      setSummary(draft.summaryEn);
+      const ts = draft.translatedSummaries;
+      setTranslatedDraft(ts);
+      setSummary(
+        resolveParentSummaryForDisplay('', ts, uiLangFromI18n(i18n.language)),
+      );
       setWarning(draft.warning ?? null);
       setPhase('review');
     } catch (e) {
@@ -258,7 +278,7 @@ export function LearningCardModal({
               </p>
             )}
             <div className="learning-card-field-row">
-              <FieldSelect
+              {/* <FieldSelect
                 id="lc-class-lesson"
                 label="Class / lesson title"
                 value={classLesson}
@@ -267,7 +287,7 @@ export function LearningCardModal({
                   persistSelect(LS_KEY_CLASS, v);
                 }}
                 options={LEARNING_CARD_CLASS_OPTIONS}
-              />
+              /> */}
               <FieldSelect
                 id="lc-grade"
                 label="Grade"
@@ -278,17 +298,17 @@ export function LearningCardModal({
                 }}
                 options={LEARNING_CARD_GRADE_OPTIONS}
               />
+              <FieldSelect
+                id="lc-subject"
+                label="Subject"
+                value={subject}
+                onValueChange={(v) => {
+                  setSubject(v);
+                  persistSelect(LS_KEY_SUBJECT, v);
+                }}
+                options={LEARNING_CARD_SUBJECT_OPTIONS}
+              />
             </div>
-            <FieldSelect
-              id="lc-subject"
-              label="Subject"
-              value={subject}
-              onValueChange={(v) => {
-                setSubject(v);
-                persistSelect(LS_KEY_SUBJECT, v);
-              }}
-              options={LEARNING_CARD_SUBJECT_OPTIONS}
-            />
             <FieldTextInput
               id="lc-topic"
               label="Topic & focus"

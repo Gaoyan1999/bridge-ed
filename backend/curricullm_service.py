@@ -11,14 +11,15 @@ from .models import (
     ChatRespondResponse,
     LearningCardGenerateRequest,
     LearningCardGenerateResponse,
+    TranslatedSummaries,
 )
 
 
 def build_demo_draft(input_data: LearningCardGenerateRequest) -> LearningCardGenerateResponse:
     topic = input_data.topic.strip() or "this topic"
     class_title = input_data.classTitle.strip() or "this lesson"
-    grade = input_data.grade.strip() or "this year level"
-    subject = input_data.subject.strip() or input_data.gradeSubject.strip() or "the subject"
+    grade = input_data.grade.strip()
+    subject = input_data.subject.strip()
     notes = input_data.notes.strip()
 
     note_line = (
@@ -27,17 +28,24 @@ def build_demo_draft(input_data: LearningCardGenerateRequest) -> LearningCardGen
         else "The teacher wants families to focus on confidence and steady practice, not perfection."
     )
 
+    en = (
+        f"In {class_title}, students worked on {topic} in {subject} ({grade}). "
+        f"Parents can help best by checking understanding in simple language and keeping practice short and specific. "
+        f"{note_line}"
+    )
+    zh = (
+        f"In {class_title}, students learned {topic}. "
+        f"At home, the key is to review the idea in simple parent-friendly language and keep practice short and manageable. "
+        f"{f'Teacher note: {notes}.' if notes else 'Focus on understanding the process rather than finishing everything in one sitting.'}"
+    )
+    fr = (
+        f"Dans {class_title}, les élèves ont travaillé sur {topic} en {subject} ({grade}). "
+        f"Les familles peuvent aider en vérifiant la compréhension avec des mots simples et en gardant des séances courtes. "
+        f"{note_line}"
+    )
+
     return LearningCardGenerateResponse(
-        summaryEn=(
-            f"In {class_title}, students worked on {topic} in {subject} ({grade}). "
-            f"Parents can help best by checking understanding in simple language and keeping practice short and specific. "
-            f"{note_line}"
-        ),
-        summaryZh=(
-            f"In {class_title}, students learned {topic}. "
-            f"At home, the key is to review the idea in simple parent-friendly language and keep practice short and manageable. "
-            f"{f'Teacher note: {notes}.' if notes else 'Focus on understanding the process rather than finishing everything in one sitting.'}"
-        ),
+        translated_summaries=TranslatedSummaries(zh=zh, en=en, fr=fr),
         actions=[
             f"Ask your child to explain {topic} in one or two sentences without reading from the worksheet.",
             "Spend 10 minutes on one example only, and focus on the first step rather than the full solution.",
@@ -60,6 +68,33 @@ def extract_json_block(text: str) -> str:
     return text
 
 
+def _coalesce_translated_from_payload(
+    payload: dict[str, Any],
+    fallback: LearningCardGenerateResponse,
+) -> TranslatedSummaries:
+    ts = payload.get("translatedSummaries")
+    if isinstance(ts, dict):
+        zh = str(ts.get("zh", "") or "").strip()
+        en = str(ts.get("en", "") or "").strip()
+        fr = str(ts.get("fr", "") or "").strip()
+        return TranslatedSummaries(
+            zh=zh or fallback.translated_summaries.zh,
+            en=en or fallback.translated_summaries.en,
+            fr=fr or fallback.translated_summaries.fr,
+        )
+    # Legacy keys from older prompts
+    en = str(payload.get("summaryEn", "") or "").strip()
+    zh = str(payload.get("summaryZh", "") or "").strip()
+    fr = str(payload.get("summaryFr", "") or "").strip()
+    if en or zh or fr:
+        return TranslatedSummaries(
+            zh=zh or fallback.translated_summaries.zh,
+            en=en or fallback.translated_summaries.en,
+            fr=fr or fallback.translated_summaries.fr,
+        )
+    return fallback.translated_summaries
+
+
 def normalize_generated_draft(
     payload: dict[str, Any],
     fallback_input: LearningCardGenerateRequest,
@@ -74,8 +109,7 @@ def normalize_generated_draft(
         normalized_actions = fallback.actions
 
     return LearningCardGenerateResponse(
-        summaryEn=str(payload.get("summaryEn", "")).strip() or fallback.summaryEn,
-        summaryZh=str(payload.get("summaryZh", "")).strip() or fallback.summaryZh,
+        translated_summaries=_coalesce_translated_from_payload(payload, fallback),
         actions=normalized_actions,
         source="curricullm",
     )
@@ -86,15 +120,16 @@ def build_prompt(input_data: LearningCardGenerateRequest) -> str:
         [
             "You are CurricuLLM working for BridgeEd, a school-home communication tool.",
             "Rewrite classroom information into parent-friendly, actionable support.",
-            'Respond with valid JSON only using this schema:',
-            '{"summaryEn":"string","summaryZh":"string","actions":["string","string","string"]}',
+            "Respond with valid JSON only using this schema:",
+            '{"translatedSummaries":{"zh":"string","en":"string","fr":"string"},"actions":["string","string","string"]}',
             "Requirements:",
+            "- Provide complete parent-facing summary text in zh, en, and fr.",
             "- Use plain language for parents.",
             "- Keep the advice practical and realistic for busy families.",
             "- Make actions specific, short, and supportive.",
             "- Avoid jargon where possible.",
             f"Class / lesson: {input_data.classTitle}",
-            f"Grade: {input_data.grade or input_data.gradeSubject}",
+            f"Grade: {input_data.grade}",
             f"Subject: {input_data.subject}",
             f"Topic: {input_data.topic}",
             f"Teacher notes: {input_data.notes}",

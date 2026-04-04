@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { LearningCardItem } from '@/bridge/types';
+import { resolveParentSummaryFromLearningCardItem } from '@/data';
 
 function formatCardLinkDate(at: number, locale: string): string {
   try {
@@ -36,6 +37,7 @@ export function LearningCardTile({
   const showDelete = Boolean(debugDelete && onDebugDelete);
   const statusLabel = t(`learningCard.status.${card.status}`, { defaultValue: card.status });
   const linkDate = formatCardLinkDate(card.at, i18n.language);
+  const summaryText = resolveParentSummaryFromLearningCardItem(card);
   const subjectPillText =
     subjectPillScope === 'teacher' && card.grade.trim()
       ? [card.grade.trim(), card.subject.trim()].filter(Boolean).join(' · ')
@@ -62,7 +64,7 @@ export function LearningCardTile({
           <span className="parent-card__subject-pill">{subjectPillText}</span>
           <span className="parent-card__status">{statusLabel}</span>
         </div>
-        <p className="parent-card__summary">{card.summary}</p>
+        <p className="parent-card__summary">{summaryText}</p>
         <div className="parent-card__footer">
           <span className="parent-card__cta">{ctaLabel}</span>
           <span className="parent-card__linked">{t('learningCard.linkedTo', { date: linkDate })}</span>

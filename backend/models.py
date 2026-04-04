@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class TranslatedSummaries(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    zh: str = ""
+    en: str = ""
+    fr: str = ""
 
 
 class LearningCardCreate(BaseModel):
@@ -20,15 +28,15 @@ class LearningCard(LearningCardCreate):
 class LearningCardGenerateRequest(BaseModel):
     classTitle: str = Field(min_length=1)
     topic: str = Field(min_length=1)
-    gradeSubject: str = ""
+    grade: str = Field(min_length=1)
+    subject: str = Field(min_length=1)
     notes: str = ""
-    grade: str = ""
-    subject: str = ""
 
 
 class LearningCardGenerateResponse(BaseModel):
-    summaryEn: str
-    summaryZh: str
+    model_config = ConfigDict(populate_by_name=True)
+
+    translated_summaries: TranslatedSummaries = Field(alias="translatedSummaries")
     actions: list[str] = Field(min_length=3, max_length=3)
     source: Literal["curricullm", "demo-fallback"]
     warning: Optional[str] = None

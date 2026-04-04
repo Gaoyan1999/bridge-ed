@@ -1,6 +1,6 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-04T12:02:42.819Z",
+  "exportedAt": "2026-04-04T14:54:53.867Z",
   "learningCards": [
     {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
@@ -15,6 +15,11 @@
       "topic": "Plus and Minus in two-digital number",
       "teacherNotes": "",
       "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "translatedSummaries": {
+        "zh": "课堂上我们复习了因式分解：先提公因式，再尝试分组或简单情形。回家只需两道课本例题，并把中间步骤写清楚即可——不必一次做完整组作业。",
+        "en": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+        "fr": "En classe nous avons revu la factorisation : d’abord extraire le PGCD, puis essayer le regroupement ou les cas simples. À la maison, deux exemples du manuel avec les étapes intermédiaires suffisent — pas besoin de finir toute la série en une fois."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -54,6 +59,11 @@
       "topic": "Van Gogh's Style",
       "teacherNotes": "Today the children learned what Van Gogh's style is. They looked at The Starry Night and Sunflowers",
       "parentSummary": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
+      "translatedSummaries": {
+        "zh": "这代表什么？\n今天孩子们学习了著名画家文森特·梵高的创作方式：不只是看画，还了解他让作品显得特别的“手法”。\n\n什么是梵高的“风格”？用孩子能懂的话说，主要有三点：\n\n- 厚涂与笔触：画面不追求光滑，颜料涂得厚，能看见笔刷的痕迹，像许多小色条。\n\n- 鲜艳色彩：喜欢用很亮的黄、很深的蓝等，即使和实物不完全一样。\n\n- 旋涡与动感：画里的一切都像在动：星星像在旋转，草叶像在风中摇摆。\n\n总之：孩子们学着用鲜艳、厚重、卷曲的线条，让画面充满力量与情感。",
+        "en": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
+        "fr": "Qu’est-ce que cela veut dire ?\nAujourd’hui, les enfants ont découvert comment le peintre Vincent van Gogh créait : pas seulement regarder des tableaux, mais les « astuces » qui rendent son art particulier.\n\nQu’est-ce que son « style » ? En termes simples, trois grands traits :\n\n- Peinture épaisse et coups de pinceau visibles, comme de petits traits de couleur.\n\n- Couleurs vives (jaunes audacieux, bleus profonds), même si ce n’est pas le réel au détail près.\n\n- Tourbillons et mouvement : les étoiles semblent tourner, l’herbe ondule au vent.\n\nEn bref : peindre avec des couleurs vives et des lignes épaisses et ondulées pour donner de l’énergie et de l’émotion."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -93,6 +103,11 @@
       "topic": "1 + 1？",
       "teacherNotes": "",
       "parentSummary": "This week in Grade 7 Math, students will have light homework focusing on reviewing basic addition concepts like 1 + 1. It's a chance for them to strengthen their understanding with simple practice.",
+      "translatedSummaries": {
+        "zh": "本周七年级数学家庭作业较轻，重点是复习基础加法（如 1+1）。这是巩固理解、做简单练习的好机会。",
+        "en": "This week in Grade 7 Math, students will have light homework focusing on reviewing basic addition concepts like 1 + 1. It's a chance for them to strengthen their understanding with simple practice.",
+        "fr": "Cette semaine en maths (6e/5e), les devoirs sont légers et portent sur la révision de l’addition de base (comme 1 + 1). C’est l’occasion de renforcer la compréhension avec de la pratique simple."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -132,6 +147,11 @@
       "topic": "What is atmospheric pressure?",
       "teacherNotes": "",
       "parentSummary": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
+      "translatedSummaries": {
+        "zh": "空气会挤压我们周围的一切；我们如何感受到它，以及一个简单的“空气柱”画面。",
+        "en": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
+        "fr": "L’air exerce une pression sur tout ce qui nous entoure ; comment on le ressent et une image simple de « colonne d’air »."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -171,6 +191,11 @@
       "topic": "Plant vs animal cells",
       "teacherNotes": "",
       "parentSummary": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
+      "translatedSummaries": {
+        "zh": "细胞壁、叶绿体、细胞核——示意图标注单上要记住的重点。",
+        "en": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
+        "fr": "Paroi cellulaire, chloroplastes, noyau — ce qu’il faut retenir pour la feuille d’étiquetage du schéma."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -198,6 +223,50 @@
       "threadId": "card-thread-cells"
     },
     {
+      "id": "card-ec3591c8-b5c4-4da8-80a7-29e363682a04",
+      "schemaVersion": 2,
+      "createdAt": "2026-04-04T14:46:04.951Z",
+      "updatedAt": "2026-04-04T14:46:04.951Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Science",
+      "topic": "barometric pressure",
+      "teacherNotes": "",
+      "parentSummary": "This week in science, your child is reviewing the concept of barometric pressure, which is about understanding how air pressure works in the atmosphere. This helps them learn about weather and how it changes.",
+      "translatedSummaries": {
+        "zh": "本周科学课复习气压概念，帮助孩子理解大气中的压力如何运作，从而更好地认识天气与天气变化。",
+        "en": "This week in science, your child is reviewing the concept of barometric pressure, which is about understanding how air pressure works in the atmosphere. This helps them learn about weather and how it changes.",
+        "fr": "Cette semaine en sciences, votre enfant révise la pression barométrique : comprendre comment la pression de l’air fonctionne dans l’atmosphère, pour mieux saisir la météo et ses changements."
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-04T14:46:04.951Z",
+      "threadId": "card-thread-ec3591c8-b5c4-4da8-80a7-29e363682a04"
+    },
+    {
       "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
       "schemaVersion": 2,
       "createdAt": "2026-04-04T03:48:48.238Z",
@@ -210,6 +279,11 @@
       "topic": "Draw a sunflower",
       "teacherNotes": "",
       "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "translatedSummaries": {
+        "zh": "课堂上我们复习了因式分解：先提公因式，再尝试分组或简单情形。回家只需两道课本例题，并把中间步骤写清楚即可——不必一次做完整组作业。",
+        "en": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+        "fr": "En classe nous avons revu la factorisation : d’abord extraire le PGCD, puis essayer le regroupement ou les cas simples. À la maison, deux exemples du manuel avec les étapes intermédiaires suffisent — pas besoin de finir toute la série en une fois."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -249,6 +323,11 @@
       "topic": "What is a metaphor?",
       "teacherNotes": "",
       "parentSummary": "Not literal comparison—how metaphors work in poems and everyday speech.",
+      "translatedSummaries": {
+        "zh": "不是字面比较——隐喻在诗歌和日常表达里如何运作。",
+        "en": "Not literal comparison—how metaphors work in poems and everyday speech.",
+        "fr": "Pas une comparaison littérale — comment fonctionnent les métaphores dans les poèmes et le langage courant."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -288,6 +367,11 @@
       "topic": "What was the Renaissance?",
       "teacherNotes": "",
       "parentSummary": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
+      "translatedSummaries": {
+        "zh": "艺术、思想与“复兴”——晚餐时怎么聊，而不像背课本。",
+        "en": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
+        "fr": "Art, idées et « renaissance » — comment en parler au dîner sans ton de manuel."
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -327,6 +411,11 @@
       "topic": "Who is Shakespeare?",
       "teacherNotes": "",
       "parentSummary": "Why we still read Shakespeare and how to help with reading at home.",
+      "translatedSummaries": {
+        "zh": "我们为什么仍读莎士比亚，以及如何在家协助阅读。",
+        "en": "Why we still read Shakespeare and how to help with reading at home.",
+        "fr": "Pourquoi on lit encore Shakespeare et comment aider à la lecture à la maison."
+      },
       "tonightActions": [
         {
           "preset": "quiz",

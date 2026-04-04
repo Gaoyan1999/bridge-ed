@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import type { InboxItem, LearningCardItem, ModalState, Module, Role, ThreadMessage } from '@/bridge/types';
+import { resolveParentSummaryFromLearningCardItem } from '@/data';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
 import type { UserBackend } from '@/data/entity/user-backend';
@@ -48,7 +49,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
 }
 
 function initialKnowledgeMessagesForCard(card: LearningCardItem): ThreadMessage[] {
-  const body = `${card.summary}`;
+  const body = resolveParentSummaryFromLearningCardItem(card);
   return [{ who: 'BridgeEd AI', type: 'in', text: body }];
 }
 
