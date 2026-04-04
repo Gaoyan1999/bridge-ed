@@ -37,9 +37,12 @@ export const DASH_STUDENTS = [
 
 /** Parent mood week: one row per child. Student mood save uses the first entry (TODO: auth). */
 export const PARENT_MOOD_CHILDREN: ParentMoodChildProfile[] = [
-  { studentId: 'student-alex-wang', displayName: 'Alex Wang' },
-  { studentId: 'student-betty-li', displayName: 'Betty Li' },
+  { studentId: 'student-1', displayName: 'Alex Wang' },
+  { studentId: 'student-2', displayName: 'Betty Li' },
 ];
+
+/** Demo parent user id — matches `reference/data.json` until session auth exists. */
+export const DEMO_PARENT_USER_ID = 'parent-1';
 
 export const DEMO_STUDENT_MOOD_PROFILE = PARENT_MOOD_CHILDREN[0]!;
 

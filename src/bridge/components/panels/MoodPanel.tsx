@@ -29,7 +29,6 @@ export function MoodPanel({ active }: { active: boolean }) {
       const existing = await layer.studentMoods.get(id);
       const built = buildStudentMoodFromCheckIn({
         studentId: profile.studentId,
-        studentDisplayName: profile.displayName,
         pleasant: slider,
         note,
         localDate,

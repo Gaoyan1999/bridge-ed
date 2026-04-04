@@ -1,6 +1,7 @@
 import type { DataSourceMode } from './config';
 import type { LearningCardBackend } from './entity/learning-card-backend';
 import type { StudentMoodBackend } from './entity/student-mood-backend';
+import type { UserBackend } from './entity/user-backend';
 
 export interface LearningCardsRepository {
   /** Future: filter by author; currently returns all records (demo hack). */
@@ -23,9 +24,16 @@ export interface StudentMoodsRepository {
   delete(id: string): Promise<void>;
 }
 
+export interface UsersRepository {
+  get(id: string): Promise<UserBackend | undefined>;
+  list(): Promise<UserBackend[]>;
+  put(user: UserBackend): Promise<void>;
+}
+
 /** App data — swap implementation via `VITE_DATA_SOURCE`. */
 export interface DataLayer {
   readonly mode: DataSourceMode;
   readonly learningCards: LearningCardsRepository;
   readonly studentMoods: StudentMoodsRepository;
+  readonly users: UsersRepository;
 }
