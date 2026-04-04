@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -31,7 +31,7 @@ class LearningCardGenerateResponse(BaseModel):
     summaryZh: str
     actions: list[str] = Field(min_length=3, max_length=3)
     source: Literal["curricullm", "demo-fallback"]
-    warning: str | None = None
+    warning: Optional[str] = None
 
 
 class ChatMessage(BaseModel):
@@ -51,4 +51,4 @@ class ChatRespondRequest(BaseModel):
 class ChatRespondResponse(BaseModel):
     reply: str
     source: Literal["curricullm", "demo-fallback"]
-    warning: str | None = None
+    warning: Optional[str] = None

@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:backend": "uvicorn backend.main:app --reload --host 0.0.0.0 --port 8787",
-    "start:backend": "uvicorn backend.main:app --host 0.0.0.0 --port 8787",
+    "dev:backend": "python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8787",
+    "start:backend": "python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8787",
     "build": "tsc -b && vite build",
     "format": "prettier --write .",
     "lint": "eslint .",
