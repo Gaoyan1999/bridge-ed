@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import {
+  BookOpen,
   ChevronDown,
   ChevronLeft,
   ClipboardList,
@@ -43,8 +44,10 @@ const NAV_MODULES: {
   label: string;
   hideForStudent?: boolean;
   studentOnly?: boolean;
+  hideForTeacher?: boolean;
 }[] = [
   { module: 'dashboard', href: '#dashboard', Icon: LayoutDashboard, label: 'Dashboard', hideForStudent: true },
+  { module: 'knowledge', href: '#knowledge', Icon: BookOpen, label: 'Knowledge', hideForTeacher: true },
   { module: 'chat', href: '#chat', Icon: MessageSquare, label: 'Messages' },
   { module: 'mood', href: '#mood', Icon: Smile, label: 'Mood', studentOnly: true },
 ];
@@ -295,7 +298,9 @@ export function Sidebar({
         <nav className="flex flex-col gap-0.5" aria-label="Modules">
           {NAV_MODULES.map((n) => {
             const hidden =
-              (n.hideForStudent && role === 'student') || (n.studentOnly && role !== 'student');
+              (n.hideForStudent && role === 'student') ||
+              (n.studentOnly && role !== 'student') ||
+              (n.hideForTeacher && role === 'teacher');
             if (hidden) return null;
             const NavIcon = n.Icon;
             const isActive = module === n.module;

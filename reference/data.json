@@ -1,10 +1,10 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-04T04:17:00.989Z",
+  "exportedAt": "2026-04-04T06:26:13.705Z",
   "learningCards": [
     {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-04-02T17:21:22.032Z",
       "updatedAt": "2026-04-02T17:21:22.032Z",
       "authorUserId": "1",
@@ -18,16 +18,19 @@
       "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
       "tonightActions": [
         {
-          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
         },
         {
-          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern).",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
         },
         {
-          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
         }
       ],
       "audience": {
@@ -40,31 +43,34 @@
       "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
     },
     {
-      "id": "card-art-perspective",
-      "schemaVersion": 1,
-      "createdAt": "2026-03-28T04:40:00.000Z",
-      "updatedAt": "2026-03-28T04:40:00.000Z",
-      "authorUserId": "teacher-1",
+      "id": "card-385c4db7-59a4-425b-861f-01584d247a5a",
+      "schemaVersion": 2,
+      "createdAt": "2026-04-04T05:25:10.393Z",
+      "updatedAt": "2026-04-04T05:25:10.393Z",
+      "authorUserId": "teacher-2",
       "classId": null,
-      "classLessonTitle": "Week 12 — Pythagorean theorem & applications",
-      "grade": "",
-      "subject": "Art",
-      "topic": "One-point perspective in drawing",
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "G9",
+      "subject": "English",
+      "topic": "Hello World",
       "teacherNotes": "",
-      "gradeSubjectLine": "Art",
-      "parentSummary": "Horizon line and vanishing point—why hallways “feel” deep on paper.",
+      "gradeSubjectLine": "G9 · English",
+      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “One-point perspective in drawing” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
         }
       ],
       "audience": {
@@ -73,12 +79,56 @@
         "selectedStudentIds": []
       },
       "sendStatus": "sent",
-      "sentAt": "2026-03-28T04:40:00.000Z",
-      "threadId": "card-thread-art-perspective"
+      "sentAt": "2026-04-04T05:25:10.393Z",
+      "threadId": "card-thread-385c4db7-59a4-425b-861f-01584d247a5a"
+    },
+    {
+      "id": "card-443f4a10-eb80-4442-9598-cb08daf02962",
+      "schemaVersion": 2,
+      "createdAt": "2026-04-04T06:25:44.199Z",
+      "updatedAt": "2026-04-04T06:25:44.199Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "G9",
+      "subject": "English",
+      "topic": "Hello",
+      "teacherNotes": "",
+      "gradeSubjectLine": "G9 · English",
+      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": false,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "selected_parents",
+        "recipientCount": 3,
+        "selectedStudentIds": [
+          "student:Alex Wang",
+          "student:Betty Li",
+          "student:Carol Zhang"
+        ]
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-04T06:25:44.199Z",
+      "threadId": "card-thread-443f4a10-eb80-4442-9598-cb08daf02962"
     },
     {
       "id": "card-atmospheric-pressure",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-04-01T22:20:00.000Z",
       "updatedAt": "2026-04-01T22:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -92,16 +142,19 @@
       "parentSummary": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “What is atmospheric pressure?” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “What is atmospheric pressure?” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -115,7 +168,7 @@
     },
     {
       "id": "card-cells",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-03-30T23:50:00.000Z",
       "updatedAt": "2026-03-30T23:50:00.000Z",
       "authorUserId": "teacher-1",
@@ -129,16 +182,19 @@
       "parentSummary": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “Plant vs animal cells” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “Plant vs animal cells” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -152,7 +208,7 @@
     },
     {
       "id": "card-constitution",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-03-29T22:15:00.000Z",
       "updatedAt": "2026-03-29T22:15:00.000Z",
       "authorUserId": "teacher-1",
@@ -166,16 +222,19 @@
       "parentSummary": "Legislative, executive, judicial—checks and balances in one page.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “The Constitution — three branches” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “The Constitution — three branches” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -189,7 +248,7 @@
     },
     {
       "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-04-04T03:48:48.238Z",
       "updatedAt": "2026-04-04T03:48:48.238Z",
       "authorUserId": "teacher-1",
@@ -203,16 +262,19 @@
       "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
       "tonightActions": [
         {
-          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
         },
         {
-          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern).",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
         },
         {
-          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
         }
       ],
       "audience": {
@@ -226,7 +288,7 @@
     },
     {
       "id": "card-metaphor",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-03-31T00:20:00.000Z",
       "updatedAt": "2026-03-31T00:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -240,16 +302,19 @@
       "parentSummary": "Not literal comparison—how metaphors work in poems and everyday speech.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “What is a metaphor?” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “What is a metaphor?” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -263,7 +328,7 @@
     },
     {
       "id": "card-renaissance",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-03-29T00:05:00.000Z",
       "updatedAt": "2026-03-29T00:05:00.000Z",
       "authorUserId": "teacher-1",
@@ -277,16 +342,19 @@
       "parentSummary": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “What was the Renaissance?” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “What was the Renaissance?” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -300,7 +368,7 @@
     },
     {
       "id": "card-shakespeare",
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "createdAt": "2026-04-02T23:15:00.000Z",
       "updatedAt": "2026-04-02T23:15:00.000Z",
       "authorUserId": "teacher-1",
@@ -314,16 +382,19 @@
       "parentSummary": "Why we still read Shakespeare and how to help with reading at home.",
       "tonightActions": [
         {
-          "text": "Tonight: revisit “Who is Shakespeare?” with one class or homework example.",
-          "include": true
+          "preset": "quiz",
+          "include": true,
+          "text": "Tonight: revisit “Who is Shakespeare?” with one class or homework example."
         },
         {
-          "text": "Ask your child to explain the main idea in their own words.",
-          "include": true
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Ask your child to explain the main idea in their own words."
         },
         {
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
-          "include": true
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
         }
       ],
       "audience": {
@@ -386,11 +457,11 @@
       "schemaVersion": 4,
       "studentId": "student-1",
       "localDate": "2026-04-04",
-      "pleasant": 88,
-      "mood": "excited",
-      "note": "",
+      "pleasant": 79,
+      "mood": "happy",
+      "note": "sadasd",
       "createdAt": "2026-04-04T10:00:00.000Z",
-      "updatedAt": "2026-04-04T10:00:00.000Z"
+      "updatedAt": "2026-04-04T05:01:14.755Z"
     },
     {
       "id": "sm:student-2:2026-03-31",
@@ -415,6 +486,17 @@
       "updatedAt": "2026-04-02T15:00:00.000Z"
     },
     {
+      "id": "sm:student-2:2026-04-04",
+      "schemaVersion": 4,
+      "studentId": "student-2",
+      "localDate": "2026-04-04",
+      "pleasant": 91,
+      "mood": "excited",
+      "note": "DDD",
+      "createdAt": "2026-04-04T04:44:06.020Z",
+      "updatedAt": "2026-04-04T04:44:06.020Z"
+    },
+    {
       "id": "sm:student-2:2026-04-05",
       "schemaVersion": 4,
       "studentId": "student-2",
@@ -427,18 +509,6 @@
     }
   ],
   "users": [
-    {
-      "id": "teacher-1",
-      "name": "Mr. Wang",
-      "email": "mr.wang@example.com",
-      "role": "teacher"
-    },
-    {
-      "id": "teacher-2",
-      "name": "Mr. Li",
-      "email": "mr.li@example.com",
-      "role": "teacher"
-    },
     {
       "id": "parent-1",
       "name": "Alice Adams",
@@ -460,6 +530,18 @@
       "name": "Betty Li",
       "email": "betty.li@example.com",
       "role": "student"
+    },
+    {
+      "id": "teacher-1",
+      "name": "Mr. Wang",
+      "email": "mr.wang@example.com",
+      "role": "teacher"
+    },
+    {
+      "id": "teacher-2",
+      "name": "Mr. Li",
+      "email": "mr.li@example.com",
+      "role": "teacher"
     }
   ]
 }

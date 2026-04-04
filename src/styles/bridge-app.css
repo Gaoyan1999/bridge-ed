@@ -983,6 +983,37 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   margin: 0 0 0.5rem;
 }
 
+.field--actions-pick--grouped {
+  margin-top: 1.35rem;
+}
+
+.learning-card-actions-section__kicker {
+  margin: 0 0 0.35rem;
+  padding: 0 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.learning-card-actions-section__hint {
+  margin: 0 0 0.65rem;
+  padding: 0 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  max-width: 52ch;
+}
+
+.learning-card-actions-group {
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.06);
+}
+
 .learning-card-actions {
   list-style: none;
   margin: 0.35rem 0 0;
@@ -992,6 +1023,11 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   gap: 4px;
 }
 
+.learning-card-actions--presets {
+  gap: 0;
+  margin: 0;
+}
+
 .learning-card-actions__row {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -999,8 +1035,25 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   align-items: start;
 }
 
+.learning-card-actions--presets .learning-card-actions__row--preset {
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  margin: 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.learning-card-actions--presets .learning-card-actions__row--preset.learning-card-actions__row--last {
+  border-bottom: none;
+}
+
 .learning-card-actions__check {
   padding-top: 0.5rem;
+}
+
+.learning-card-actions--presets .learning-card-actions__check {
+  padding-top: 0;
+  align-self: center;
 }
 
 .learning-card-actions__check.learning-card-checkbox {
@@ -1009,6 +1062,11 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   justify-content: center;
   min-width: 1.5rem;
   min-height: 2.25rem;
+}
+
+.learning-card-actions--presets .learning-card-actions__check.learning-card-checkbox {
+  min-height: auto;
+  min-width: 1.35rem;
 }
 
 /* React Aria hides the real input (VisuallyHidden); draw a visible checkbox. */
@@ -1023,6 +1081,13 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   box-sizing: border-box;
 }
 
+/* iOS-style circular check for “Tonight’s actions” preset list */
+.learning-card-checkbox--round.learning-card-checkbox::before {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+}
+
 .learning-card-actions__check.learning-card-checkbox[data-selected]::before {
   border-color: var(--link-blue);
   background-color: var(--link-blue);
@@ -1032,9 +1097,37 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   background-size: 0.65rem;
 }
 
+.learning-card-checkbox--round.learning-card-checkbox[data-selected]::before {
+  background-size: 0.72rem;
+}
+
 .learning-card-actions__text {
   min-height: 3rem;
   resize: vertical;
+}
+
+.learning-card-actions__preset-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.learning-card-actions__preset-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.learning-card-actions__preset-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+html.theme-dark .learning-card-actions-group {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .field--audience-mode {
@@ -1666,6 +1759,83 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
 .inbox-item.is-active {
   background: var(--info-banner);
   border-left: 3px solid var(--link-blue);
+}
+
+/* Knowledge — subject / status chips (same blue system as Messages) */
+.knowledge-inbox__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.35rem;
+  margin: 0.35rem 0 0.25rem;
+  align-items: center;
+}
+
+.inbox-item--knowledge .inbox-item__title {
+  margin-bottom: 0.1rem;
+}
+
+.panel--knowledge .knowledge-inbox__label {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.18rem 0.45rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.25;
+  border: 1px solid rgba(11, 87, 208, 0.22);
+  background: var(--info-banner);
+  color: var(--link-blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel--knowledge .knowledge-inbox__label--subject {
+  border-color: rgba(11, 87, 208, 0.32);
+  background: var(--accent-soft);
+}
+
+.panel--knowledge .knowledge-inbox__label--status {
+  font-weight: 500;
+  border-color: var(--border-light);
+  background: var(--pill-bg);
+  color: var(--text-muted);
+}
+
+/* Knowledge — teacher-selected tonight tasks (quiz / practice / explain) */
+.knowledge-inbox__tasks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.35rem;
+  margin: 0.45rem 0 0;
+  align-items: center;
+}
+
+.panel--knowledge .knowledge-inbox__task-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.25;
+  border: 1px solid rgba(11, 87, 208, 0.28);
+  background: var(--accent-soft);
+  color: var(--link-blue);
+}
+
+.thread-header--knowledge {
+  align-items: flex-start;
+}
+
+.thread-header--knowledge .thread-header__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.thread-header--knowledge .knowledge-inbox__labels {
+  margin: 0.4rem 0 0;
 }
 
 .inbox-item__title {

@@ -8,6 +8,8 @@ export interface LearningCardsRepository {
   listByUserId(userId: string): Promise<LearningCardBackend[]>;
   /** Sent cards visible to this parent: `whole_class`, or `selected_parents` when `selectedStudentIds` intersects the parent’s `children`. */
   listForParentUser(parentUserId: string): Promise<LearningCardBackend[]>;
+  /** Sent cards visible to this student: `whole_class`, or `selected_parents` when `selectedStudentIds` includes them. */
+  listForStudentUser(studentUserId: string): Promise<LearningCardBackend[]>;
   get(id: string): Promise<LearningCardBackend | undefined>;
   put(card: LearningCardBackend): Promise<void>;
   delete(id: string): Promise<void>;

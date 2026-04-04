@@ -14,7 +14,11 @@ import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 import { useBridge } from '@/bridge/BridgeContext';
 import { cx } from '@/bridge/cx';
-import type { LearningCardCreatePayload } from '@/bridge/types';
+import type { LearningCardCreatePayload, LearningCardTonightAction } from '@/bridge/types';
+import {
+  LEARNING_CARD_TONIGHT_ACTION_PRESETS,
+  LEARNING_CARD_TONIGHT_PRESET_LABELS,
+} from '@/bridge/types';
 import { getDataLayer } from '@/data';
 import {
   HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
@@ -93,11 +97,13 @@ export function LearningCardModal({
 
   const [phase, setPhase] = useState<Phase>('input');
   const [summary, setSummary] = useState('');
-  const [actions, setActions] = useState<{ text: string; include: boolean }[]>([
-    { text: '', include: true },
-    { text: '', include: true },
-    { text: '', include: true },
-  ]);
+  const [tonightActions, setTonightActions] = useState<LearningCardTonightAction[]>(() =>
+    LEARNING_CARD_TONIGHT_ACTION_PRESETS.map((preset) => ({
+      preset,
+      include: true,
+      text: '',
+    })),
+  );
 
   const [audienceMode, setAudienceMode] = useState<'class' | 'selected'>('class');
   const [selectedParents, setSelectedParents] = useState<Record<string, boolean>>(() => {
@@ -128,7 +134,11 @@ export function LearningCardModal({
       },
       generated: {
         parentSummary: summary,
-        tonightActions: actions.map((a) => ({ text: a.text, include: a.include })),
+        tonightActions: tonightActions.map((a) => ({
+          preset: a.preset,
+          include: a.include,
+          text: a.text,
+        })),
       },
       audience: {
         mode: audienceMode,
@@ -158,12 +168,6 @@ export function LearningCardModal({
         notes: notes.trim(),
       });
       setSummary(draft.summaryEn);
-      setActions(
-        draft.actions.map((text) => ({
-          text,
-          include: true,
-        })),
-      );
       setPhase('review');
     } catch {
       setPhase('input');
@@ -292,7 +296,7 @@ export function LearningCardModal({
               <Sparkles className="learning-card-gen__sparkle" strokeWidth={2} size={28} />
             </div>
             <p className="learning-card-gen__title">Generating parent summary…</p>
-            <p className="learning-card-gen__hint">Drafting a short summary and tonight’s actions from your notes.</p>
+            <p className="learning-card-gen__hint">Drafting a short parent summary from your notes.</p>
             <div className="learning-card-gen__dots" aria-hidden="true">
               <span />
               <span />
@@ -319,7 +323,7 @@ export function LearningCardModal({
                   <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
                 </div>
                 <p className="learning-card-ai-hint__text">
-                  Families will see this in their preferred language—we translate the summary automatically for each
+                  Families will see this in their preferred language — we translate the summary automatically for each
                   parent.
                 </p>
               </div>
@@ -332,33 +336,43 @@ export function LearningCardModal({
                 rows={5}
               />
             </div>
-            <fieldset className="field field--actions-pick">
-              <legend className="field__label">Tonight’s actions (toggle what to include)</legend>
-              <ul className="learning-card-actions">
-                {actions.map((a, i) => (
-                  <li key={i} className="learning-card-actions__row">
-                    <Checkbox
-                      isSelected={a.include}
-                      onChange={(v) => {
-                        setActions((prev) => prev.map((x, j) => (j === i ? { ...x, include: v } : x)));
-                      }}
-                      className="learning-card-actions__check learning-card-checkbox"
-                      aria-label={`Include action ${i + 1}`}
-                    />
-                    <FieldTextArea
-                      id={`lc-action-${i}`}
-                      label={`Tonight action ${i + 1}`}
-                      labelHidden
-                      value={a.text}
-                      onChange={(v) => {
-                        setActions((prev) => prev.map((x, j) => (j === i ? { ...x, text: v } : x)));
-                      }}
-                      rows={2}
-                      inputClassName="learning-card-actions__text"
-                    />
-                  </li>
-                ))}
-              </ul>
+            <fieldset className="field field--actions-pick field--actions-pick--grouped" aria-labelledby="lc-tonight-heading">
+              <p id="lc-tonight-heading" className="learning-card-actions-section__kicker">
+                Tonight&apos;s actions
+              </p>              
+              <div className="learning-card-actions-group">
+                <ul className="learning-card-actions learning-card-actions--presets">
+                  {tonightActions.map((row, idx) => {
+                    const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
+                    const isLast = idx === tonightActions.length - 1;
+                    return (
+                      <li
+                        key={row.preset}
+                        className={cx(
+                          'learning-card-actions__row',
+                          'learning-card-actions__row--preset',
+                          isLast && 'learning-card-actions__row--last',
+                        )}
+                      >
+                        <Checkbox
+                          isSelected={row.include}
+                          onChange={(v) => {
+                            setTonightActions((prev) =>
+                              prev.map((x) => (x.preset === row.preset ? { ...x, include: v } : x)),
+                            );
+                          }}
+                          className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
+                          aria-label={`Include: ${copy.title}`}
+                        />
+                        <div className="learning-card-actions__preset-body">
+                          <span className="learning-card-actions__preset-title">{copy.title}</span>
+                          <span className="learning-card-actions__preset-desc">{copy.description}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </fieldset>
           </div>
           <div className="modal__footer">
@@ -474,7 +488,8 @@ export function LearningCardModal({
                   Summary: {summary.trim() ? 'Ready' : '—'}
                 </li>
                 <li>
-                  Actions included: {actions.filter((a) => a.include && a.text.trim()).length} / {actions.length}
+                  Tonight’s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
+                  {LEARNING_CARD_TONIGHT_ACTION_PRESETS.length}
                 </li>
                 <li>
                   Audience: {audienceMode === 'class' ? 'Whole class' : 'Selected parents'}

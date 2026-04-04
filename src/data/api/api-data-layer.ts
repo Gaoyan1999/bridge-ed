@@ -9,29 +9,42 @@
 import { ApiError, apiRequest } from './api-client';
 import type { DataLayer, LearningCardsRepository, StudentMoodsRepository, UsersRepository } from '../repositories';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
+import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { UserBackend } from '../entity/user-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
     if (!userId.trim()) return [];
-    return apiRequest<LearningCardBackend[]>(
+    const rows = await apiRequest<LearningCardBackend[]>(
       'GET',
       `/learning-cards?authorUserId=${encodeURIComponent(userId)}`,
     );
+    return rows.map((r) => normalizeLearningCardBackend(r));
   }
 
   async listForParentUser(parentUserId: string): Promise<LearningCardBackend[]> {
     if (!parentUserId.trim()) return [];
-    return apiRequest<LearningCardBackend[]>(
+    const rows = await apiRequest<LearningCardBackend[]>(
       'GET',
       `/learning-cards?parentUserId=${encodeURIComponent(parentUserId)}`,
     );
+    return rows.map((r) => normalizeLearningCardBackend(r));
+  }
+
+  async listForStudentUser(studentUserId: string): Promise<LearningCardBackend[]> {
+    if (!studentUserId.trim()) return [];
+    const rows = await apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?studentUserId=${encodeURIComponent(studentUserId)}`,
+    );
+    return rows.map((r) => normalizeLearningCardBackend(r));
   }
 
   async get(id: string): Promise<LearningCardBackend | undefined> {
     try {
-      return await apiRequest<LearningCardBackend>('GET', `/learning-cards/${encodeURIComponent(id)}`);
+      const raw = await apiRequest<LearningCardBackend>('GET', `/learning-cards/${encodeURIComponent(id)}`);
+      return normalizeLearningCardBackend(raw);
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) return undefined;
       throw e;

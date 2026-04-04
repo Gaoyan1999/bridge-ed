@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- BridgeProvider + useBridge hook */
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -43,6 +44,17 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
   return out;
 }
 
+function initialKnowledgeMessagesForCard(card: LearningCardItem): ThreadMessage[] {
+  const body =
+    `${card.summary}\n\n` +
+    'In this card we:\n' +
+    '• Explain the idea in parent‑friendly language.\n' +
+    '• Suggest 1–2 materials to use at home.\n' +
+    '• List a short plan for tonight or this week.\n\n' +
+    'Ask me anything about this card’s topic. (Demo — connect a model for live answers.)';
+  return [{ who: 'BridgeEd AI', type: 'in', text: body }];
+}
+
 interface BridgeContextValue {
   role: Role;
   setRole: (r: Role) => void;
@@ -58,14 +70,22 @@ interface BridgeContextValue {
   selectedInboxId: string | null;
   setSelectedInboxId: Dispatch<SetStateAction<string | null>>;
   pushTeacherReport: (title: string, body: string, toStudents: boolean, toParents: boolean) => void;
-  openCardThreadFromDashboard: (card: LearningCardItem) => void;
+  /** Parent (or teacher “preview as parent”): open AI chat for a learning card in Knowledge. */
+  openKnowledgeFromCard: (card: LearningCardItem) => void;
   appendChatMessage: (threadId: string, msg: ThreadMessage) => void;
+  /** Per–learning-card AI threads (key = card `threadId`). */
+  knowledgeThreads: Record<string, ThreadMessage[]>;
+  selectedKnowledgeThreadId: string | null;
+  setSelectedKnowledgeThreadId: Dispatch<SetStateAction<string | null>>;
+  appendKnowledgeMessage: (threadId: string, msg: ThreadMessage) => void;
+  /** First visit to a card’s AI thread: seed the intro message if empty. */
+  seedKnowledgeThreadIfEmpty: (card: LearningCardItem) => void;
   modal: ModalState;
   openModal: (m: ModalState) => void;
   closeModal: () => void;
   showToolDemo: (title: string, body: string) => void;
   showGeneric: (title: string, body: string) => void;
-  getHints: () => { ai: string; chat: string; mood: string; dashboard?: string };
+  getHints: () => { ai: string; chat: string; mood: string; dashboard?: string; knowledge?: string };
   /** Bump when learning cards change in storage so dashboards refetch. */
   learningCardsEpoch: number;
   bumpLearningCards: () => void;
@@ -92,7 +112,9 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [module, setModuleState] = useState<Module>(() => parseModuleFromHash());
   const [inboxByRole, setInboxByRole] = useState(() => cloneInbox(INITIAL_INBOX));
   const [threads, setThreads] = useState(() => cloneThreads(INITIAL_THREADS));
+  const [knowledgeThreads, setKnowledgeThreads] = useState<Record<string, ThreadMessage[]>>({});
   const [selectedInboxId, setSelectedInboxId] = useState<string | null>(null);
+  const [selectedKnowledgeThreadId, setSelectedKnowledgeThreadId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
   const [studentMoodsEpoch, setStudentMoodsEpoch] = useState(0);
@@ -154,6 +176,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     }
   }, [role, module]);
 
+  useEffect(() => {
+    if (module !== 'knowledge' || role !== 'teacher') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Knowledge is for parents & students only
+    setModuleState('dashboard');
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', '#dashboard');
+    }
+  }, [role, module]);
+
   const setModule = (m: Module) => {
     if (!MODULES.includes(m)) return;
     setModuleState(m);
@@ -212,6 +243,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       chat: c?.chat ?? '',
       mood: c?.mood ?? '',
       dashboard: c?.dashboard,
+      knowledge: c?.knowledge,
     };
   };
 
@@ -259,30 +291,17 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const openCardThreadFromDashboard = (card: LearningCardItem) => {
+  const seedKnowledgeThreadIfEmpty = useCallback((card: LearningCardItem) => {
     const id = card.threadId;
-    const dateStr = new Date().toISOString().slice(0, 10);
-    setThreads((prev) => {
-      if (prev[id]) return prev;
-      const body =
-        `${card.summary}\n\n` +
-        'In this card we:\n' +
-        '• Explain the idea in parent‑friendly language.\n' +
-        '• Suggest 1–2 materials to use at home.\n' +
-        '• List a short plan for tonight or this week.\n\n' +
-        '(Demo content only.)';
-      return {
-        ...prev,
-        [id]: [{ who: 'BridgeEd', type: 'in', text: body }],
-      };
+    setKnowledgeThreads((prev) => {
+      if (prev[id]?.length) return prev;
+      return { ...prev, [id]: initialKnowledgeMessagesForCard(card) };
     });
-    setInboxByRole((prev) => {
-      if (prev.parent.some((m) => m.id === id)) return prev;
-      return {
-        ...prev,
-        parent: [{ id, title: `[Card] ${card.title}`, date: dateStr, kind: 'card' }, ...prev.parent],
-      };
-    });
+  }, []);
+
+  const openKnowledgeFromCard = (card: LearningCardItem) => {
+    const id = card.threadId;
+    seedKnowledgeThreadIfEmpty(card);
     if (users.length > 0) {
       const parent = users.find((u) => u.role === 'parent');
       if (parent) {
@@ -292,15 +311,22 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     } else {
       setRoleWhenNoUsers('parent');
     }
-    setModuleState('chat');
+    setSelectedKnowledgeThreadId(id);
+    setModuleState('knowledge');
     if (typeof history !== 'undefined' && history.replaceState) {
-      history.replaceState(null, '', '#chat');
+      history.replaceState(null, '', '#knowledge');
     }
-    setSelectedInboxId(id);
   };
 
   const appendChatMessage = (threadId: string, msg: ThreadMessage) => {
     setThreads((prev) => ({
+      ...prev,
+      [threadId]: [...(prev[threadId] ?? []), msg],
+    }));
+  };
+
+  const appendKnowledgeMessage = (threadId: string, msg: ThreadMessage) => {
+    setKnowledgeThreads((prev) => ({
       ...prev,
       [threadId]: [...(prev[threadId] ?? []), msg],
     }));
@@ -329,11 +355,16 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     setModule,
     inboxByRole,
     threads,
+    knowledgeThreads,
     selectedInboxId,
     setSelectedInboxId,
+    selectedKnowledgeThreadId,
+    setSelectedKnowledgeThreadId,
     pushTeacherReport,
-    openCardThreadFromDashboard,
+    openKnowledgeFromCard,
     appendChatMessage,
+    appendKnowledgeMessage,
+    seedKnowledgeThreadIfEmpty,
     modal,
     openModal,
     closeModal,

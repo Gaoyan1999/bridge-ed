@@ -1,7 +1,11 @@
 import type { StudentMoodKind } from '@/data/entity/student-mood-backend';
 import type { InboxItem, LearningCardItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
+import { normalizeTonightActions } from '@/data/learning-card-mappers';
 
-export const MODULES = ['dashboard', 'ai', 'chat', 'mood'] as const;
+/** Demo fixtures: teacher “tonight” presets (IndexedDB import uses full `LearningCardItem`). */
+const DEMO_TONIGHT_ALL = normalizeTonightActions([]);
+
+export const MODULES = ['dashboard', 'ai', 'chat', 'knowledge', 'mood'] as const;
 
 export const ROLE_DISPLAY: Record<
   string,
@@ -85,6 +89,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'What right triangles have in common, and why a² + b² = c².',
     at: Date.parse('2026-04-01T09:30:00'),
     threadId: 'card-thread-pythagoras',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-calculus',
@@ -94,6 +99,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Derivatives as “how fast something is changing” with everyday examples.',
     at: Date.parse('2026-04-02T11:00:00'),
     threadId: 'card-thread-calculus',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-fractions',
@@ -103,6 +109,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Parts of a whole in plain language—numerator, denominator, and a pizza-slice mental model.',
     at: Date.parse('2026-04-03T16:45:00'),
     threadId: 'card-thread-fractions',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-shakespeare',
@@ -112,6 +119,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Why we still read Shakespeare and how to help with reading at home.',
     at: Date.parse('2026-04-04T10:15:00'),
     threadId: 'card-thread-shakespeare',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-atmospheric-pressure',
@@ -121,6 +129,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Air pushes on everything around us; how we feel it and a simple “column of air” picture.',
     at: Date.parse('2026-04-05T08:20:00'),
     threadId: 'card-thread-atmospheric-pressure',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-water-cycle',
@@ -130,6 +139,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Evaporation, clouds, and rain in one easy loop—no jargon overload.',
     at: Date.parse('2026-04-06T13:00:00'),
     threadId: 'card-thread-water-cycle',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-quadratic-equations',
@@ -139,6 +149,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'From ax² + bx + c = 0 to factoring and the quadratic formula—when to use which.',
     at: Date.parse('2026-04-07T09:00:00'),
     threadId: 'card-thread-quadratic-equations',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-photosynthesis',
@@ -148,6 +159,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'How plants turn light, water, and CO₂ into sugar and oxygen—simple words, one diagram.',
     at: Date.parse('2026-04-07T15:30:00'),
     threadId: 'card-thread-photosynthesis',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-metaphor',
@@ -157,6 +169,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Not literal comparison—how metaphors work in poems and everyday speech.',
     at: Date.parse('2026-04-08T10:20:00'),
     threadId: 'card-thread-metaphor',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-periodic-table',
@@ -166,6 +179,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Groups, periods, and atomic number—why the table’s shape is not random.',
     at: Date.parse('2026-04-09T08:45:00'),
     threadId: 'card-thread-periodic-table',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-linear-graphs',
@@ -175,6 +189,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Slope and y-intercept in context: “rise over run” without the stress.',
     at: Date.parse('2026-04-09T14:10:00'),
     threadId: 'card-thread-linear-graphs',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-civil-war',
@@ -184,6 +199,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Causes, turning points, and why we study it—without a 50-name quiz.',
     at: Date.parse('2026-04-10T11:00:00'),
     threadId: 'card-thread-civil-war',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-cells',
@@ -193,6 +209,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.',
     at: Date.parse('2026-04-11T09:50:00'),
     threadId: 'card-thread-cells',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-persuasive-essay',
@@ -202,6 +219,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Claim, evidence, reasoning—one paragraph at a time before the full essay.',
     at: Date.parse('2026-04-12T16:00:00'),
     threadId: 'card-thread-persuasive-essay',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-renaissance',
@@ -211,6 +229,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.',
     at: Date.parse('2026-04-13T10:05:00'),
     threadId: 'card-thread-renaissance',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-probability',
@@ -220,6 +239,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Simple events, “and” vs “or,” and why a coin flip is still 50–50.',
     at: Date.parse('2026-04-14T13:25:00'),
     threadId: 'card-thread-probability',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-constitution',
@@ -229,6 +249,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Legislative, executive, judicial—checks and balances in one page.',
     at: Date.parse('2026-04-15T08:15:00'),
     threadId: 'card-thread-constitution',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
   {
     id: 'card-art-perspective',
@@ -238,6 +259,7 @@ export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
     summary: 'Horizon line and vanishing point—why hallways “feel” deep on paper.',
     at: Date.parse('2026-04-16T14:40:00'),
     threadId: 'card-thread-art-perspective',
+    tonightActions: DEMO_TONIGHT_ALL,
   },
 ];
 
@@ -280,17 +302,21 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 
 export const ROLE_COPY: Record<
   string,
-  { dashboard?: string; ai: string; chat: string; mood: string }
+  { dashboard?: string; ai: string; chat: string; knowledge?: string; mood: string }
 > = {
   parent: {
     dashboard: 'Learning cards, your child’s week, and mood snapshot (demo).',
     ai: 'Ask about homework, definitions, or paste a teacher note to get clear next steps.',
     chat: 'School notices, chat with the teacher, and book a one-to-one slot.',
+    knowledge:
+      'Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.',
     mood: 'See your child’s weekly mood summary and trends.',
   },
   student: {
     ai: 'Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.',
     chat: 'Class notices and messages from your teacher (demo).',
+    knowledge:
+      'Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.',
     mood: 'Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in.',
   },
   teacher: {

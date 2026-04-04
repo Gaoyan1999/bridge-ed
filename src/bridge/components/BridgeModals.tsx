@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import { Checkbox } from 'react-aria-components';
 import { useBridge } from '@/bridge/BridgeContext';
 import { REPORT_DRAFT_BODY, REPORT_DRAFT_TITLE } from '@/bridge/mockData';
+import type { LearningCardItem } from '@/bridge/types';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
@@ -79,6 +80,41 @@ function BookModal({ onClose }: { onClose: () => void }) {
           </p>
         </div>
       )}
+    </>
+  );
+}
+
+function TeacherCardPreviewTodoModal({
+  card,
+  onClose,
+  onContinue,
+}: {
+  card: LearningCardItem;
+  onClose: () => void;
+  onContinue: () => void;
+}) {
+  return (
+    <>
+      <div className="modal__header">
+        <h3 id="modal-teacher-card-preview-title" className="modal__title">
+          {card.title}
+        </h3>
+      </div>
+      <div className="modal__scroll">
+        <p className="modal__body" style={{ color: 'var(--text-muted)' }}>
+          TODO: Placeholder — content for this step is not decided yet.
+        </p>
+      </div>
+      <div className="modal__footer">
+        <div className="modal__actions">
+          <Button variant="text" type="button" onClick={onClose}>
+            Close
+          </Button>
+          <Button variant="primary" pill type="button" onClick={onContinue}>
+            Open parent view
+          </Button>
+        </div>
+      </div>
     </>
   );
 }
@@ -255,7 +291,7 @@ function ReportModal({
 }
 
 export function BridgeModals() {
-  const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
+  const { modal, closeModal, pushTeacherReport, bumpLearningCards, openKnowledgeFromCard } = useBridge();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -341,6 +377,31 @@ export function BridgeModals() {
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded modal__box--wide">
           <ReportModal onClose={onBackdropClose} pushTeacherReport={pushTeacherReport} />
+        </div>
+      </div>
+    );
+  }
+
+  if (modal.type === 'teacherCardPreviewTodo') {
+    const { card } = modal;
+    return (
+      <div
+        className="modal"
+        id="modal-teacher-card-preview"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-teacher-card-preview-title"
+      >
+        <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
+        <div className="modal__box modal__box--rounded">
+          <TeacherCardPreviewTodoModal
+            card={card}
+            onClose={onBackdropClose}
+            onContinue={() => {
+              onBackdropClose();
+              openKnowledgeFromCard(card);
+            }}
+          />
         </div>
       </div>
     );

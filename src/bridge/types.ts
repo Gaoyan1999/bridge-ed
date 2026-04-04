@@ -1,6 +1,6 @@
 export type Role = 'parent' | 'student' | 'teacher';
 
-export type Module = 'dashboard' | 'ai' | 'chat' | 'mood';
+export type Module = 'dashboard' | 'ai' | 'chat' | 'knowledge' | 'mood';
 
 export type InboxKind = 'broadcast' | 'dm' | 'booking' | 'draft' | 'report' | 'card';
 
@@ -17,6 +17,23 @@ export interface ThreadMessage {
   text: string;
 }
 
+/** Parent dashboard — children linked to mood check-ins (demo roster). */
+export type ParentMoodChildProfile = {
+  studentId: string;
+  displayName: string;
+};
+
+/** Fixed “tonight” options (not AI-generated); order is stable in storage. */
+export const LEARNING_CARD_TONIGHT_ACTION_PRESETS = ['quiz', 'parent_led_practice', 'explain_to_parent'] as const;
+export type LearningCardTonightActionPreset = (typeof LEARNING_CARD_TONIGHT_ACTION_PRESETS)[number];
+
+/** One row per preset; `text` is optional teacher notes (stored, not shown in UI yet). */
+export type LearningCardTonightAction = {
+  preset: LearningCardTonightActionPreset;
+  include: boolean;
+  text: string;
+};
+
 export interface LearningCardItem {
   id: string;
   title: string;
@@ -26,18 +43,34 @@ export interface LearningCardItem {
   /** Unix ms — sort order and “Linked to …” line in `LearningCardTile`. */
   at: number;
   threadId: string;
+  /** Teacher-selected tonight tasks (3 fixed presets), from persisted card. */
+  tonightActions: LearningCardTonightAction[];
 }
 
-/** Parent dashboard — children linked to mood check-ins (demo roster). */
-export type ParentMoodChildProfile = {
-  studentId: string;
-  displayName: string;
+/** Short chip labels for Knowledge / compact UI. */
+export const LEARNING_CARD_TONIGHT_PRESET_SHORT: Record<LearningCardTonightActionPreset, string> = {
+  quiz: 'Quiz',
+  parent_led_practice: 'Practice',
+  explain_to_parent: 'Teach-back',
 };
 
-/** One “tonight’s action” row after generate / edit in the wizard. */
-export type LearningCardTonightAction = {
-  text: string;
-  include: boolean;
+/** Fixed copy for each preset (wizard + any list UI). */
+export const LEARNING_CARD_TONIGHT_PRESET_LABELS: Record<
+  LearningCardTonightActionPreset,
+  { title: string; description: string }
+> = {
+  quiz: {
+    title: 'Do a short quiz or practice check',
+    description: 'A few quick questions to see if the idea has clicked.',
+  },
+  parent_led_practice: {
+    title: 'Design a hands-on mini task or experiment',
+    description: 'Parent and child try a small activity or real-world application together.',
+  },
+  explain_to_parent: {
+    title: '“Teach-back” — child explains to parent',
+    description: 'The child walks you through the topic so you can tell they’ve understood.',
+  },
 };
 
 /**
@@ -77,4 +110,6 @@ export type ModalState =
   | { type: 'book' }
   | { type: 'broadcast' }
   | { type: 'report' }
-  | { type: 'learningCard' };
+  | { type: 'learningCard' }
+  /** Teacher dashboard — placeholder before opening parent Knowledge preview (content TBD). */
+  | { type: 'teacherCardPreviewTodo'; card: LearningCardItem };

@@ -15,7 +15,7 @@ import { ParentMoodWeek } from '@/bridge/components/ParentMoodWeek';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
+  const { openKnowledgeFromCard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
     useBridge();
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
   const [cards, setCards] = useState<LearningCardItem[]>([]);
@@ -94,7 +94,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
               key={c.id}
               card={c}
               ctaLabel="Open in Knowledge"
-              onOpen={openCardThreadFromDashboard}
+              onOpen={openKnowledgeFromCard}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
             />
