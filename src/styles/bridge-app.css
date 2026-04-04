@@ -271,7 +271,7 @@ body {
 
 .parent-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   align-items: stretch;
 }
@@ -287,11 +287,11 @@ body {
 }
 
 .parent-card {
+  position: relative;
   border-radius: var(--radius);
   background: var(--surface);
   padding: 0.85rem 1rem;
   box-shadow: var(--shadow);
-  cursor: pointer;
   border: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
@@ -304,6 +304,50 @@ body {
 .parent-card:hover {
   border-color: var(--link-blue);
   box-shadow: 0 6px 18px rgba(11, 87, 208, 0.18);
+}
+
+.parent-card__main {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+/* Delete is out of flow; only the title row gets end padding so ellipsis clears the button. */
+.parent-card--debug .parent-card__title {
+  padding-inline-end: 3.5rem;
+}
+
+.parent-card__debug-delete {
+  position: absolute;
+  inset-block-start: 0.85rem;
+  inset-inline-end: 1rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--surface);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--danger);
+  cursor: pointer;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.parent-card__debug-delete:hover {
+  border-color: var(--danger);
+  background: rgba(197, 34, 31, 0.06);
 }
 
 .parent-card__title {

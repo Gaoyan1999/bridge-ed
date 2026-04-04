@@ -1,13 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
-import {
-  DASH_PUBLISH,
-  DASH_SCHEDULE,
-  DASH_STATS,
-  DASH_STUDENTS,
-  DASH_TODOS,
-  PARENT_DASH_CARDS,
-} from '@/bridge/mockData';
+import type { LearningCardItem } from '@/bridge/types';
+import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS, DASH_TODOS } from '@/bridge/mockData';
+import { getDataLayer, getDataSourceMode, getDebugMode } from '@/data';
+import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
 import { LearningCardTile } from '@/bridge/components/LearningCardTile';
@@ -15,8 +11,39 @@ import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, showGeneric, openModal } = useBridge();
+  const { openCardThreadFromDashboard, showGeneric, openModal, learningCardsEpoch, bumpLearningCards } = useBridge();
   const [studentFilter, setStudentFilter] = useState('');
+  const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
+  const dataSourceMode = getDataSourceMode();
+  const debugMode = getDebugMode();
+
+  const onDebugDeleteLearningCard = useCallback(
+    async (card: LearningCardItem) => {
+      if (!window.confirm(`Delete “${card.title}”?`)) return;
+      try {
+        await getDataLayer().learningCards.delete(card.id);
+        bumpLearningCards();
+      } catch (e) {
+        console.error('[LearningCard] delete failed', e);
+      }
+    },
+    [bumpLearningCards],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .learningCards.listByUserId('local')
+      .then((rows) => {
+        if (!cancelled) setLearningCards(rows.map(learningCardBackendToItem));
+      })
+      .catch(() => {
+        if (!cancelled) setLearningCards([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [learningCardsEpoch]);
 
   const q = studentFilter.trim().toLowerCase();
   const filteredStudents = !q
@@ -64,14 +91,24 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       }
     >
       <div className="parent-cards-grid mt-2" id="teacher-cards">
-        {PARENT_DASH_CARDS.map((c) => (
-          <LearningCardTile
-            key={c.id}
-            card={c}
-            ctaLabel="Open parent view"
-            onOpen={openCardThreadFromDashboard}
-          />
-        ))}
+        {learningCards.length === 0 ? (
+          <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
+            {dataSourceMode === 'api'
+              ? 'No cards from API. Set VITE_DATA_SOURCE=indexeddb for local Dexie, or wire POST/GET /learning-cards.'
+              : 'No learning cards yet. Use Create card — stored in this browser (IndexedDB) as a full LearningCardBackend row.'}
+          </p>
+        ) : (
+          learningCards.map((c) => (
+            <LearningCardTile
+              key={c.id}
+              card={c}
+              ctaLabel="Open parent view"
+              onOpen={openCardThreadFromDashboard}
+              debugDelete={debugMode}
+              onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
+            />
+          ))
+        )}
       </div>
     </DashboardCard>,
 

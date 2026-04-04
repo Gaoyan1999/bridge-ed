@@ -1,11 +1,11 @@
 import type { DataSourceMode } from './config';
-import type { LearningCard, NewLearningCard } from './types';
+import type { LearningCardBackend } from './entity/learning-card-backend';
 
 export interface LearningCardsRepository {
-  list(): Promise<LearningCard[]>;
-  get(id: string): Promise<LearningCard | undefined>;
-  create(input: NewLearningCard): Promise<LearningCard>;
-  update(card: LearningCard): Promise<void>;
+  /** Future: filter by author; currently returns all records (demo hack). */
+  listByUserId(userId: string): Promise<LearningCardBackend[]>;
+  get(id: string): Promise<LearningCardBackend | undefined>;
+  put(card: LearningCardBackend): Promise<void>;
   delete(id: string): Promise<void>;
 }
 

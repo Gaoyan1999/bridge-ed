@@ -8,27 +8,24 @@
  */
 import { ApiError, apiRequest } from './api-client';
 import type { DataLayer, LearningCardsRepository } from '../repositories';
-import type { LearningCard, NewLearningCard } from '../types';
+import type { LearningCardBackend } from '../entity/learning-card-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
-  async list(): Promise<LearningCard[]> {
-    return apiRequest<LearningCard[]>('GET', '/learning-cards');
+  async listByUserId(userId: string): Promise<LearningCardBackend[]> {
+    const q = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+    return apiRequest<LearningCardBackend[]>('GET', `/learning-cards${q}`);
   }
 
-  async get(id: string): Promise<LearningCard | undefined> {
+  async get(id: string): Promise<LearningCardBackend | undefined> {
     try {
-      return await apiRequest<LearningCard>('GET', `/learning-cards/${encodeURIComponent(id)}`);
+      return await apiRequest<LearningCardBackend>('GET', `/learning-cards/${encodeURIComponent(id)}`);
     } catch (e) {
       if (e instanceof ApiError && e.status === 404) return undefined;
       throw e;
     }
   }
 
-  async create(input: NewLearningCard): Promise<LearningCard> {
-    return apiRequest<LearningCard>('POST', '/learning-cards', input);
-  }
-
-  async update(card: LearningCard): Promise<void> {
+  async put(card: LearningCardBackend): Promise<void> {
     await apiRequest<void>('PUT', `/learning-cards/${encodeURIComponent(card.id)}`, card);
   }
 

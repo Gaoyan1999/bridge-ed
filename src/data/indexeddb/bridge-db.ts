@@ -1,8 +1,8 @@
 import Dexie, { type Table } from 'dexie';
-import type { LearningCard } from '../types';
+import type { LearningCardBackend } from '../entity/learning-card-backend';
 
 export class BridgeEdDB extends Dexie {
-  learningCards!: Table<LearningCard, string>;
+  learningCards!: Table<LearningCardBackend, string>;
 
   constructor() {
     super('bridge-ed');
@@ -13,6 +13,12 @@ export class BridgeEdDB extends Dexie {
     });
     this.version(2).stores({
       learningCards: 'id, createdAt',
+    });
+    this.version(3).stores({
+      learningCards: 'id, authorUserId, createdAt, sendStatus',
+    });
+    this.version(4).stores({
+      learningCards: 'id, authorUserId, classId, createdAt, updatedAt, sentAt, sendStatus',
     });
   }
 }

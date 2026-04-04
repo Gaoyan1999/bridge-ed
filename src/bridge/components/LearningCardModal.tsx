@@ -13,6 +13,9 @@ import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 import { cx } from '@/bridge/cx';
+import type { LearningCardCreatePayload } from '@/bridge/types';
+import { getDataLayer } from '@/data';
+import { learningCardCreatePayloadToBackend } from '@/data/learning-card-mappers';
 
 const WHOLE_CLASS_RECIPIENTS = 28;
 
@@ -63,7 +66,14 @@ function stepIndex(phase: Phase): number {
   }
 }
 
-export function LearningCardModal({ onClose }: { onClose: () => void }) {
+export function LearningCardModal({
+  onClose,
+  onSaved,
+}: {
+  onClose: () => void;
+  /** Called after a card is persisted (IndexedDB / API). */
+  onSaved?: () => void;
+}) {
   const [classLesson, setClassLesson] = useState<string>(() =>
     readStoredOption(LS_KEY_CLASS, LEARNING_CARD_CLASS_OPTIONS, LEARNING_CARD_CLASS_OPTIONS[0]),
   );
@@ -99,6 +109,37 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
   const gradeSubjectLine = [grade, subject].filter(Boolean).join(' · ');
 
   const canSubmitInput = Boolean(classLesson) && topic.trim().length > 0;
+
+  async function confirmSendLearningCard() {
+    const payload: LearningCardCreatePayload = {
+      sentAt: Date.now(),
+      classInput: {
+        classLesson,
+        grade,
+        subject,
+        topic: topic.trim(),
+        notes: notes.trim(),
+        gradeSubjectLine,
+      },
+      generated: {
+        parentSummary: summary,
+        tonightActions: actions.map((a) => ({ text: a.text, include: a.include })),
+      },
+      audience: {
+        mode: audienceMode,
+        recipientCount,
+        ...(audienceMode === 'selected' ? { selectedParentsByStudent: { ...selectedParents } } : {}),
+      },
+    };
+    const record = learningCardCreatePayloadToBackend(payload);
+    try {
+      await getDataLayer().learningCards.put(record);
+      onSaved?.();
+      onClose();
+    } catch (e) {
+      console.error('[LearningCard] failed to persist', e, record);
+    }
+  }
 
   const runGenerate = async () => {
     setPhase('generating');
@@ -439,7 +480,7 @@ export function LearningCardModal({ onClose }: { onClose: () => void }) {
               <Button variant="text" type="button" onClick={() => setPhase('audience')}>
                 Back
               </Button>
-              <Button variant="primary" pill type="button" onClick={onClose}>
+              <Button variant="primary" pill type="button" onClick={confirmSendLearningCard}>
                 Send learning card
               </Button>
             </div>

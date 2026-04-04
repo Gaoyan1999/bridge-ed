@@ -1,0 +1,302 @@
+{
+  "snapshotVersion": 1,
+  "exportedAt": "2026-04-03T12:00:00.000Z",
+  "learningCards": [
+    {
+      "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-02T17:21:22.032Z",
+      "updatedAt": "2026-04-02T17:21:22.032Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "G9",
+      "subject": "Math",
+      "topic": "Plus and Minus in two-digital number",
+      "teacherNotes": "",
+      "gradeSubjectLine": "G9 · Math",
+      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "tonightActions": [
+        {
+          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown.",
+          "include": true
+        },
+        {
+          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern).",
+          "include": true
+        },
+        {
+          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-02T17:21:22.031Z",
+      "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
+    },
+    {
+      "id": "card-art-perspective",
+      "schemaVersion": 1,
+      "createdAt": "2026-03-28T04:40:00.000Z",
+      "updatedAt": "2026-03-28T04:40:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Week 12 — Pythagorean theorem & applications",
+      "grade": "",
+      "subject": "Art",
+      "topic": "One-point perspective in drawing",
+      "teacherNotes": "",
+      "gradeSubjectLine": "Art",
+      "parentSummary": "Horizon line and vanishing point—why hallways “feel” deep on paper.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “One-point perspective in drawing” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-03-28T04:40:00.000Z",
+      "threadId": "card-thread-art-perspective"
+    },
+    {
+      "id": "card-atmospheric-pressure",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-01T22:20:00.000Z",
+      "updatedAt": "2026-04-01T22:20:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "",
+      "subject": "Science",
+      "topic": "What is atmospheric pressure?",
+      "teacherNotes": "",
+      "gradeSubjectLine": "Science",
+      "parentSummary": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “What is atmospheric pressure?” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-01T22:20:00.000Z",
+      "threadId": "card-thread-atmospheric-pressure"
+    },
+    {
+      "id": "card-cells",
+      "schemaVersion": 1,
+      "createdAt": "2026-03-30T23:50:00.000Z",
+      "updatedAt": "2026-03-30T23:50:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Week 12 — Pythagorean theorem & applications",
+      "grade": "Science",
+      "subject": "Biology",
+      "topic": "Plant vs animal cells",
+      "teacherNotes": "",
+      "gradeSubjectLine": "Science · Biology",
+      "parentSummary": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “Plant vs animal cells” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-03-30T23:50:00.000Z",
+      "threadId": "card-thread-cells"
+    },
+    {
+      "id": "card-constitution",
+      "schemaVersion": 1,
+      "createdAt": "2026-03-29T22:15:00.000Z",
+      "updatedAt": "2026-03-29T22:15:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Week 13 — Quadratic equations intro",
+      "grade": "History",
+      "subject": "Civics",
+      "topic": "The Constitution — three branches",
+      "teacherNotes": "",
+      "gradeSubjectLine": "History · Civics",
+      "parentSummary": "Legislative, executive, judicial—checks and balances in one page.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “The Constitution — three branches” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-03-29T22:15:00.000Z",
+      "threadId": "card-thread-constitution"
+    },
+    {
+      "id": "card-metaphor",
+      "schemaVersion": 1,
+      "createdAt": "2026-03-31T00:20:00.000Z",
+      "updatedAt": "2026-03-31T00:20:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Shakespeare — Reading workshop",
+      "grade": "English",
+      "subject": "Writing",
+      "topic": "What is a metaphor?",
+      "teacherNotes": "",
+      "gradeSubjectLine": "English · Writing",
+      "parentSummary": "Not literal comparison—how metaphors work in poems and everyday speech.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “What is a metaphor?” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-03-31T00:20:00.000Z",
+      "threadId": "card-thread-metaphor"
+    },
+    {
+      "id": "card-renaissance",
+      "schemaVersion": 1,
+      "createdAt": "2026-03-29T00:05:00.000Z",
+      "updatedAt": "2026-03-29T00:05:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Dept week — light homework & review",
+      "grade": "History",
+      "subject": "World",
+      "topic": "What was the Renaissance?",
+      "teacherNotes": "",
+      "gradeSubjectLine": "History · World",
+      "parentSummary": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “What was the Renaissance?” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-03-29T00:05:00.000Z",
+      "threadId": "card-thread-renaissance"
+    },
+    {
+      "id": "card-shakespeare",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-02T23:15:00.000Z",
+      "updatedAt": "2026-04-02T23:15:00.000Z",
+      "authorUserId": "1",
+      "classId": null,
+      "classLessonTitle": "Shakespeare — Reading workshop",
+      "grade": "",
+      "subject": "Literature",
+      "topic": "Who is Shakespeare?",
+      "teacherNotes": "",
+      "gradeSubjectLine": "Literature",
+      "parentSummary": "Why we still read Shakespeare and how to help with reading at home.",
+      "tonightActions": [
+        {
+          "text": "Tonight: revisit “Who is Shakespeare?” with one class or homework example.",
+          "include": true
+        },
+        {
+          "text": "Ask your child to explain the main idea in their own words.",
+          "include": true
+        },
+        {
+          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher.",
+          "include": true
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sendStatus": "sent",
+      "sentAt": "2026-04-02T23:15:00.000Z",
+      "threadId": "card-thread-shakespeare"
+    }
+  ]
+}
