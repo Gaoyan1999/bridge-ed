@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import { formatLocalYmd } from '@/bridge/moodWeek';
 import { moodSpectrumLabel } from '@/bridge/moodUtils';
@@ -9,6 +10,7 @@ import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
 export function MoodPanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const { role, currentUser, getHints, setModule, bumpStudentMoods } = useBridge();
   const hints = getHints();
   const [slider, setSlider] = useState(50);
@@ -60,7 +62,7 @@ export function MoodPanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-mood-title"
-        title="Mood"
+        title={t('panels.mood')}
         hint={hints.mood}
         hintId="mood-role-hint"
         hidden={role === 'student'}
@@ -73,16 +75,16 @@ export function MoodPanel({ active }: { active: boolean }) {
           style={{ ['--pleasant' as string]: String(pleasant) }}
         >
           <header className="emotion-screen__top">
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-back" aria-label="Back" onClick={() => setModule('chat')}>
+            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-back" aria-label={t('mood.back')} onClick={() => setModule('chat')}>
               <span aria-hidden="true">‹</span>
             </button>
-            <h2 className="emotion-screen__heading">Emotion</h2>
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-close" aria-label="Close" onClick={() => setModule('chat')}>
+            <h2 className="emotion-screen__heading">{t('mood.emotion')}</h2>
+            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-close" aria-label={t('mood.close')} onClick={() => setModule('chat')}>
               <span aria-hidden="true">×</span>
             </button>
           </header>
 
-          <p className="emotion-screen__prompt">Choose how you’re feeling right now</p>
+          <p className="emotion-screen__prompt">{t('mood.prompt')}</p>
 
           <div
             className="emotion-ripple"
@@ -102,7 +104,7 @@ export function MoodPanel({ active }: { active: boolean }) {
 
           <div className="emotion-slider-wrap">
             <label className="visually-hidden" htmlFor="mood-slider">
-              How pleasant does it feel (0–100)
+              {t('mood.sliderHelp')}
             </label>
             <input
               type="range"
@@ -116,19 +118,19 @@ export function MoodPanel({ active }: { active: boolean }) {
               onChange={(e) => setSlider(Number(e.target.value))}
             />
             <div className="emotion-slider__ends">
-              <span>VERY UNPLEASANT</span>
-              <span>VERY PLEASANT</span>
+              <span>{t('mood.veryUnpleasant')}</span>
+              <span>{t('mood.veryPleasant')}</span>
             </div>
           </div>
 
           <label className="emotion-screen__note-field">
-            <span className="emotion-screen__note-label">Note (optional)</span>
+            <span className="emotion-screen__note-label">{t('mood.noteOptional')}</span>
             <input
               type="text"
               className="emotion-screen__note-input"
               id="mood-note"
               maxLength={200}
-              placeholder="Anything to add?"
+              placeholder={t('mood.notePlaceholder')}
               autoComplete="off"
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -142,16 +144,16 @@ export function MoodPanel({ active }: { active: boolean }) {
             disabled={saving}
             onClick={() => void submitStudentMood()}
           >
-            {saving ? 'Saving…' : 'Next'}
+            {saving ? t('mood.saving') : t('mood.next')}
           </button>
           <p className="emotion-screen__success" id="mood-success" role="status" hidden={!success}>
-            Saved. Your parent can see this week’s check-in on the dashboard.
+            {t('mood.savedSuccess')}
           </p>
         </div>
       </div>
 
       <div id="mood-parent" className="mood-block" hidden={role !== 'parent'}>
-        <h3 className="mood-block__title dash-card__title--sky">This week at a glance</h3>
+        <h3 className="mood-block__title dash-card__title--sky">{t('mood.weekAtGlance')}</h3>
         <div className="report-cards" id="parent-mood-report">
           {PARENT_REPORT.map((r) => (
             <div key={r.label} className="report-card">
@@ -164,14 +166,14 @@ export function MoodPanel({ active }: { active: boolean }) {
       </div>
 
       <div id="mood-teacher" className="mood-block" hidden={role !== 'teacher'}>
-        <h3 className="mood-block__title dash-card__title--lavender">Class mood overview</h3>
+        <h3 className="mood-block__title dash-card__title--lavender">{t('mood.classOverview')}</h3>
         <div className="table-wrap">
           <table className="data-table" id="teacher-mood-table">
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Dominant mood</th>
-                <th>Note</th>
+                <th>{t('mood.colStudent')}</th>
+                <th>{t('mood.colDominant')}</th>
+                <th>{t('mood.colNote')}</th>
               </tr>
             </thead>
             <tbody>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import { AI_DEMO } from '@/bridge/mockData';
 import { cx } from '@/bridge/cx';
@@ -7,6 +8,7 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 
 export function AiPanel({ active }: { active: boolean }) {
+  const { t } = useTranslation();
   const { getHints } = useBridge();
   const [aiMessages, setAiMessages] = useState(() =>
     AI_DEMO.map((m) => ({ role: m.role, text: m.text })),
@@ -33,8 +35,7 @@ export function AiPanel({ active }: { active: boolean }) {
         ...prev,
         {
           role: 'ai',
-          text:
-            '(Demo) Got it. In production, replies follow your school’s rules and safety policies. Add grade level or textbook if you want tighter help.',
+          text: t('ai.demoReply'),
         },
       ]);
     }, 400);
@@ -49,11 +50,11 @@ export function AiPanel({ active }: { active: boolean }) {
       aria-labelledby="panel-ai-title"
       hidden={!active}
     >
-      <PanelHeader titleId="panel-ai-title" title="AI assistant" hint={hints.ai} hintId="ai-role-hint" />
+      <PanelHeader titleId="panel-ai-title" title={t('panels.ai')} hint={hints.ai} hintId="ai-role-hint" />
       <div className="chat-thread" id="ai-thread" ref={threadRef} aria-live="polite">
         {aiMessages.map((m, i) => (
           <div key={`${i}-${m.role}`} className={`bubble ${m.role === 'user' ? 'bubble--user' : 'bubble--ai'}`}>
-            <div className="bubble__meta">{m.role === 'user' ? 'You' : 'BridgeEd AI'}</div>
+            <div className="bubble__meta">{m.role === 'user' ? t('common.you') : t('common.bridgedAi')}</div>
             <div className="numbered" style={{ whiteSpace: 'pre-wrap' }}>
               {m.text}
             </div>
@@ -62,17 +63,17 @@ export function AiPanel({ active }: { active: boolean }) {
       </div>
       <Composer
         inputId="ai-input"
-        label="Message"
+        label={t('common.message')}
         value={input}
         onChange={setInput}
-        placeholder="e.g. explain the discriminant… or paste this week’s teacher comment"
+        placeholder={t('ai.placeholder')}
         actions={
           <>
             <Button variant="text" id="ai-load-demo" onClick={loadAiDemo}>
-              Load sample chat
+              {t('ai.loadSample')}
             </Button>
             <Button variant="primary" pill id="ai-send" onClick={send}>
-              Send
+              {t('common.send')}
             </Button>
           </>
         }

@@ -300,34 +300,6 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
   { day: 'Sun', kind: 'excited' },
 ];
 
-export const ROLE_COPY: Record<
-  string,
-  { dashboard?: string; ai: string; chat: string; knowledge?: string; mood: string }
-> = {
-  parent: {
-    dashboard: 'Learning cards, your child’s week, and mood snapshot (demo).',
-    ai: 'Ask about homework, definitions, or paste a teacher note to get clear next steps.',
-    chat: 'School notices, chat with the teacher, and book a one-to-one slot.',
-    knowledge:
-      'Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.',
-    mood: 'See your child’s weekly mood summary and trends.',
-  },
-  student: {
-    ai: 'Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.',
-    chat: 'Class notices and messages from your teacher (demo).',
-    knowledge:
-      'Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.',
-    mood: 'Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in.',
-  },
-  teacher: {
-    dashboard:
-      'Create class reports and push them to students and parents under Messages—plus tasks, posts, and your week.',
-    ai: 'Preview how AI might read to parents; publish through Messages and learning cards.',
-    chat: 'Broadcast to class or parents and manage booking requests.',
-    mood: 'Class mood overview alongside learning feedback.',
-  },
-};
-
 export const AI_DEMO = [
   {
     role: 'user' as const,

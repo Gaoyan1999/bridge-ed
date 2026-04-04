@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BridgeModals } from '@/bridge/components/BridgeModals';
 import { SkipLink } from '@/bridge/components/SkipLink';
 import { Sidebar } from '@/bridge/components/Sidebar';
@@ -20,6 +21,7 @@ function readSidebarCollapsedFromStorage(): boolean {
 }
 
 function BridgeShell() {
+  const { t } = useTranslation();
   const { module, role } = useBridge();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsedFromStorage);
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
@@ -55,7 +57,7 @@ function BridgeShell() {
           <div className="main__canvas-inner">
             <div className="main__canvas-pad">
               <h1 className="visually-hidden" id="main-heading">
-                BridgeEd workspace
+                {t('app.workspaceTitle')}
               </h1>
               <DashboardPanel active={module === 'dashboard'} />
               <AiPanel active={module === 'ai'} />

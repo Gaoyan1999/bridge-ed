@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { LearningCardItem } from '@/bridge/types';
 
 function formatLinkedDay(at: number): string {
@@ -22,6 +23,7 @@ export function LearningCardTile({
   debugDelete,
   onDebugDelete,
 }: LearningCardTileProps) {
+  const { t } = useTranslation();
   const showDelete = Boolean(debugDelete && onDebugDelete);
 
   return (
@@ -30,13 +32,13 @@ export function LearningCardTile({
         <button
           type="button"
           className="parent-card__debug-delete"
-          aria-label={`Delete learning card: ${card.title}`}
+          aria-label={t('learningCard.deleteAria', { title: card.title })}
           onClick={(e) => {
             e.stopPropagation();
             void onDebugDelete!(card);
           }}
         >
-          Delete
+          {t('learningCard.delete')}
         </button>
       )}
       <button type="button" className="parent-card__main" onClick={() => onOpen(card)}>
@@ -48,7 +50,7 @@ export function LearningCardTile({
         <p className="parent-card__summary">{card.summary}</p>
         <div className="parent-card__footer">
           <span className="parent-card__cta">{ctaLabel}</span>
-          <span className="parent-card__linked">Linked to {formatLinkedDay(card.at)}</span>
+          <span className="parent-card__linked">{t('learningCard.linkedTo', { date: formatLinkedDay(card.at) })}</span>
         </div>
       </button>
     </article>

@@ -73,7 +73,7 @@ function isLegacyStudentMoodRowV3(v: unknown): boolean {
 function parseStudentMoodImportRow(row: unknown, index: number): StudentMoodBackend {
   if (isStudentMoodRow(row)) return row;
   if (isLegacyStudentMoodRowV3(row)) {
-    return normalizeStudentMoodBackend(row);
+    return normalizeStudentMoodBackend(row as Partial<StudentMoodBackend>);
   }
   throw new Error(
     `Invalid studentMoods[${index}]: expected schema v${STUDENT_MOOD_SCHEMA_VERSION} (or legacy v3 with authorUserId).`,

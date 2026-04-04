@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
 import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS, DASH_TODOS } from '@/bridge/mockData';
@@ -11,6 +12,7 @@ import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
+  const { t } = useTranslation();
   const { showGeneric, openModal, learningCardsEpoch, bumpLearningCards, currentUser } = useBridge();
   const teacherAuthorId = currentUser?.role === 'teacher' ? currentUser.id : '';
   const [studentFilter, setStudentFilter] = useState('');
@@ -19,7 +21,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
 
   const onDebugDeleteLearningCard = useCallback(
     async (card: LearningCardItem) => {
-      if (!window.confirm(`Delete “${card.title}”?`)) return;
+      if (!window.confirm(t('learningCard.deleteConfirm', { title: card.title }))) return;
       try {
         await getDataLayer().learningCards.delete(card.id);
         bumpLearningCards();
@@ -27,7 +29,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
         console.error('[LearningCard] delete failed', e);
       }
     },
-    [bumpLearningCards],
+    [bumpLearningCards, t],
   );
 
   useEffect(() => {
@@ -55,18 +57,13 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       key="report"
       span={12}
       id="dash-report-title"
-      title="Class report"
+      title={t('dashboard.teacher.classReport')}
       titleColor="sky"
       banner
-      subtitle={
-        <>
-          Write or generate a short report, then push it to <strong>students</strong>, <strong>parents</strong>, or
-          both.
-        </>
-      }
+      subtitle={t('dashboard.teacher.classReportSubtitle')}
       headerActions={
         <Button variant="primary" pill id="btn-open-report-modal" onClick={() => openModal({ type: 'report' })}>
-          Create report
+          {t('dashboard.teacher.createReport')}
         </Button>
       }
     />,
@@ -76,9 +73,9 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       span={12}
       className="teacher-card-section"
       id="teacher-cards-title"
-      title="Learning cards"
+      title={t('dashboard.teacher.learningCards')}
       titleColor="sky"
-      subtitle="Concept cards for families: definitions, materials, and a simple plan."
+      subtitle={t('dashboard.teacher.learningCardsSubtitle')}
       headerActions={
         <Button
           variant="secondary"
@@ -86,21 +83,21 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
           id="btn-teacher-create-card"
           onClick={() => openModal({ type: 'learningCard' })}
         >
-          Create card
+          {t('dashboard.teacher.createCard')}
         </Button>
       }
     >
       <div className="parent-cards-grid mt-2" id="teacher-cards">
         {learningCards.length === 0 ? (
           <p className="parent-cards__hint" style={{ gridColumn: '1 / -1' }}>
-            No learning cards yet. Use Create card to add one.
+            {t('dashboard.teacher.noCards')}
           </p>
         ) : (
           learningCards.map((c) => (
             <LearningCardTile
               key={c.id}
               card={c}
-              ctaLabel="Open"
+              ctaLabel={t('dashboard.teacher.ctaOpen')}
               onOpen={(card) => openModal({ type: 'teacherCardPreviewTodo', card })}
               debugDelete={debugMode}
               onDebugDelete={debugMode ? onDebugDeleteLearningCard : undefined}
@@ -110,7 +107,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       </div>
     </DashboardCard>,
 
-    <DashboardCard key="todo" span={6} id="dash-todo-title" title="Today" titleColor="warm">
+    <DashboardCard key="todo" span={6} id="dash-todo-title" title={t('dashboard.teacher.today')} titleColor="warm">
       <ul className="todo-list" id="dash-todo-list">
         {DASH_TODOS.map((t) => {
           const id = `todo-${t.id}`;
@@ -124,7 +121,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       </ul>
     </DashboardCard>,
 
-    <DashboardCard key="publish" span={6} id="dash-publish-title" title="Recent posts" titleColor="lavender">
+    <DashboardCard key="publish" span={6} id="dash-publish-title" title={t('dashboard.teacher.recentPosts')} titleColor="lavender">
       <ul className="publish-list" id="dash-publish-list">
         {DASH_PUBLISH.map((p) => (
           <li key={p.title}>
@@ -141,11 +138,11 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
         id="btn-new-learning-card"
         onClick={() => openModal({ type: 'learningCard' })}
       >
-        + New learning card
+        {t('dashboard.teacher.newLearningCard')}
       </Button>
     </DashboardCard>,
 
-    <DashboardCard key="stats" span={12} id="dash-stats-title" title="Class pulse" titleColor="sky">
+    <DashboardCard key="stats" span={12} id="dash-stats-title" title={t('dashboard.teacher.classPulse')} titleColor="sky">
       <div className="stat-row" id="dash-stats">
         {DASH_STATS.map((s) => (
           <div key={s.label} className="stat-pill">
@@ -160,14 +157,14 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       key="students"
       span={12}
       id="dash-students-title"
-      title="Student directory"
+      title={t('dashboard.teacher.studentDirectory')}
       headerActions={
         <input
           type="search"
           className="field__input field__input--inline field__input--pill"
           id="student-filter"
-          placeholder="Filter by name…"
-          aria-label="Filter students"
+          placeholder={t('dashboard.teacher.filterPlaceholder')}
+          aria-label={t('dashboard.teacher.filterAria')}
           value={studentFilter}
           onChange={(e) => setStudentFilter(e.target.value)}
         />
@@ -177,10 +174,10 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
         <table className="data-table data-table--compact" id="dash-students-table">
           <thead>
             <tr>
-              <th>Student</th>
-              <th>Grade</th>
-              <th>Parent</th>
-              <th>Last note</th>
+              <th>{t('dashboard.teacher.colStudent')}</th>
+              <th>{t('dashboard.teacher.colGrade')}</th>
+              <th>{t('dashboard.teacher.colParent')}</th>
+              <th>{t('dashboard.teacher.colLastNote')}</th>
               <th></th>
             </tr>
           </thead>
@@ -196,13 +193,10 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
                     type="button"
                     className="btn btn--text btn--sm dash-row-action"
                     onClick={() =>
-                      showGeneric(
-                        'Student detail',
-                        'Demo: contact info, past learning-card feedback, and booking history would appear here.',
-                      )
+                      showGeneric(t('dashboard.teacher.studentDetailTitle'), t('dashboard.teacher.studentDetailBody'))
                     }
                   >
-                    View
+                    {t('dashboard.teacher.view')}
                   </button>
                 </td>
               </tr>
@@ -212,7 +206,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       </div>
     </DashboardCard>,
 
-    <DashboardCard key="schedule" span={12} id="dash-schedule-title" title="This week" titleColor="warm">
+    <DashboardCard key="schedule" span={12} id="dash-schedule-title" title={t('dashboard.teacher.thisWeek')} titleColor="warm">
       <div className="schedule-week" id="dash-schedule">
         <ScheduleWeek days={DASH_SCHEDULE} />
       </div>

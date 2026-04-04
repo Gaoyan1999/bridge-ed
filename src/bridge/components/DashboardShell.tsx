@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cx } from '@/bridge/cx';
 
 export type DashboardShellProps = {
@@ -11,6 +12,7 @@ export type DashboardShellProps = {
 };
 
 export function DashboardShell({ active, dashHint, sections, gridId = 'dashboard-grid' }: DashboardShellProps) {
+  const { t } = useTranslation();
   return (
     <section
       className={cx('panel', 'panel--dashboard', active && 'is-visible')}
@@ -22,7 +24,7 @@ export function DashboardShell({ active, dashHint, sections, gridId = 'dashboard
     >
       <header className="panel__header">
         <h2 className="panel__title" id="panel-dashboard-title">
-          Dashboard
+          {t('panels.dashboard')}
         </h2>
         <p className="panel__hint">{dashHint}</p>
       </header>

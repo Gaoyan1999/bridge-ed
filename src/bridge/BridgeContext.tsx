@@ -9,7 +9,8 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
-import { INITIAL_INBOX, INITIAL_THREADS, MODULES, ROLE_COPY } from '@/bridge/mockData';
+import i18n from '@/i18n';
+import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import type { InboxItem, LearningCardItem, ModalState, Module, Role, ThreadMessage } from '@/bridge/types';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
@@ -112,11 +113,20 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
   const [studentMoodsEpoch, setStudentMoodsEpoch] = useState(0);
+  const [i18nTick, setI18nTick] = useState(0);
 
   useEffect(() => {
     const syncHashToModule = () => setModuleState(parseModuleFromHash());
     window.addEventListener('hashchange', syncHashToModule);
     return () => window.removeEventListener('hashchange', syncHashToModule);
+  }, []);
+
+  useEffect(() => {
+    const onLang = () => setI18nTick((n) => n + 1);
+    i18n.on('languageChanged', onLang);
+    return () => {
+      i18n.off('languageChanged', onLang);
+    };
   }, []);
 
   useEffect(() => {
@@ -230,16 +240,34 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     applyRoleNavigation(r);
   };
 
-  const getHints = () => {
-    const c = ROLE_COPY[role];
+  const getHints = useCallback(() => {
+    void i18nTick;
+    if (role === 'teacher') {
+      return {
+        ai: i18n.t('hints.teacher.ai'),
+        chat: i18n.t('hints.teacher.chat'),
+        mood: i18n.t('hints.teacher.mood'),
+        dashboard: i18n.t('hints.teacher.dashboard'),
+        knowledge: undefined,
+      };
+    }
+    if (role === 'parent') {
+      return {
+        ai: i18n.t('hints.parent.ai'),
+        chat: i18n.t('hints.parent.chat'),
+        mood: i18n.t('hints.parent.mood'),
+        dashboard: i18n.t('hints.parent.dashboard'),
+        knowledge: i18n.t('hints.parent.knowledge'),
+      };
+    }
     return {
-      ai: c?.ai ?? '',
-      chat: c?.chat ?? '',
-      mood: c?.mood ?? '',
-      dashboard: c?.dashboard,
-      knowledge: c?.knowledge,
+      ai: i18n.t('hints.student.ai'),
+      chat: i18n.t('hints.student.chat'),
+      mood: i18n.t('hints.student.mood'),
+      dashboard: undefined,
+      knowledge: i18n.t('hints.student.knowledge'),
     };
-  };
+  }, [role, i18nTick]);
 
   const pushTeacherReport = (title: string, body: string, toStudents: boolean, toParents: boolean) => {
     const dateStr = new Date().toISOString().slice(0, 10);

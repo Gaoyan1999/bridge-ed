@@ -1,0 +1,175 @@
+{
+  "app": {
+    "workspaceTitle": "BridgeEd workspace"
+  },
+  "skipLink": {
+    "main": "Skip to main content"
+  },
+  "common": {
+    "send": "Send",
+    "cancel": "Cancel",
+    "subject": "Subject",
+    "status": "Status",
+    "you": "You",
+    "bridgedAi": "BridgeEd AI",
+    "message": "Message",
+    "delete": "Delete"
+  },
+  "roles": {
+    "parent": "Parent",
+    "student": "Student",
+    "teacher": "Teacher"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "knowledge": "Knowledge",
+    "chat": "Messages",
+    "mood": "Mood",
+    "ai": "AI assistant"
+  },
+  "sidebar": {
+    "viewAs": "View as",
+    "tools": "Tools",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "sidebarToggle": "Open or close sidebar",
+    "collapseExpand": "Collapse or expand sidebar",
+    "primaryNav": "Primary navigation and tools",
+    "language": "Language",
+    "uploadReport": "Upload report",
+    "practiceTool": "Practice",
+    "snippets": "Snippets",
+    "uploadTitle": "Upload a report or transcript (demo)",
+    "uploadDemoTitle": "Upload report",
+    "uploadDemoBody": "Demo: upload weekly notes, report cards, or PDFs so the AI can reference them in chat.",
+    "practiceTitle": "Generate practice (demo)",
+    "practiceDemoTitle": "Generate practice",
+    "practiceDemoBody": "Demo: create 2–3 short items from the current learning-card topic for the student to try.",
+    "snippetsTitle": "Quick phrases (demo)",
+    "snippetsDemoTitle": "Quick phrases",
+    "snippetsDemoBody": "Demo: one-tap inserts like “Explain shorter” or “Give a real-life example” into the composer."
+  },
+  "hints": {
+    "parent": {
+      "dashboard": "Learning cards, your child’s week, and mood snapshot (demo).",
+      "ai": "Ask about homework, definitions, or paste a teacher note to get clear next steps.",
+      "chat": "School notices, chat with the teacher, and book a one-to-one slot.",
+      "knowledge": "Pick a learning card and chat with BridgeEd AI about that topic—definitions, practice ideas, and next steps.",
+      "mood": "See your child’s weekly mood summary and trends."
+    },
+    "student": {
+      "ai": "Hints and practice ideas appear here (demo). Deeper tutoring stays on the parent view.",
+      "chat": "Class notices and messages from your teacher (demo).",
+      "knowledge": "Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.",
+      "mood": "Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in."
+    },
+    "teacher": {
+      "dashboard": "Create class reports and push them to students and parents under Messages—plus tasks, posts, and your week.",
+      "ai": "Preview how AI might read to parents; publish through Messages and learning cards.",
+      "chat": "Broadcast to class or parents and manage booking requests.",
+      "mood": "Class mood overview alongside learning feedback."
+    },
+    "dashboardFallback": "Class report, learning cards, tasks, posts, class pulse, directory, and this week’s schedule (demo)."
+  },
+  "panels": {
+    "dashboard": "Dashboard",
+    "knowledge": "Knowledge",
+    "messages": "Messages",
+    "mood": "Mood",
+    "ai": "AI assistant"
+  },
+  "knowledge": {
+    "emptyStudent": "No learning cards yet. When your teacher sends a card to your class, it will show up here.",
+    "emptyParent": "No learning cards yet. Open the dashboard to see cards your teacher shared.",
+    "selectCard": "Select a card",
+    "composerPlaceholder": "Ask about this card’s topic, or paste a homework question…",
+    "demoThread": "Open this card from the dashboard to start the AI thread (demo).",
+    "ariaSuggestedTasks": "Tonight’s suggested tasks",
+    "ariaSubjectStatus": "Subject and status",
+    "taskShort": {
+      "quiz": "Quiz",
+      "parent_led_practice": "Practice",
+      "explain_to_parent": "Teach-back"
+    },
+    "practice": {
+      "button": "Practice",
+      "mockReply": "**Mini practice (Demo)**\n\nLet’s use **Van Gogh’s approach** for a quick exercise: **paint a sunflower**.\n\n- **Brushwork:** Use thick paint and short strokes—leave visible marks like Van Gogh; it doesn’t need to be perfectly smooth.\n- **Color:** Bright yellow as the main hue; add a little deep green and ochre for the center and shadows.\n- **Head and petals:** Start with a flat oval for the flower head, then use radiating strokes for petal direction—add a hint of swirl or movement if you like.\n\nWhen you’re done, share the three colors you used, what you’d tweak next—or upload a photo."
+    }
+  },
+  "ai": {
+    "placeholder": "e.g. explain the discriminant… or paste this week’s teacher comment",
+    "loadSample": "Load sample chat",
+    "demoReply": "(Demo) Got it. In production, replies follow your school’s rules and safety policies. Add grade level or textbook if you want tighter help."
+  },
+  "chat": {
+    "placeholderParent": "Type a message to your teacher…",
+    "placeholderTeacher": "Type a message to this family or class…",
+    "placeholderStudent": "Type a message…",
+    "emptyInbox": "No messages yet.",
+    "broadcast": "Broadcast",
+    "selectThread": "Select a thread",
+    "bookTime": "Book a time",
+    "noMessagesInThread": "No messages in this thread (demo)."
+  },
+  "mood": {
+    "emotion": "Emotion",
+    "back": "Back",
+    "close": "Close",
+    "prompt": "Choose how you’re feeling right now",
+    "sliderHelp": "How pleasant does it feel (0–100)",
+    "veryUnpleasant": "VERY UNPLEASANT",
+    "veryPleasant": "VERY PLEASANT",
+    "noteOptional": "Note (optional)",
+    "notePlaceholder": "Anything to add?",
+    "saving": "Saving…",
+    "next": "Next",
+    "savedSuccess": "Saved. Your parent can see this week’s check-in on the dashboard.",
+    "weekAtGlance": "This week at a glance",
+    "classOverview": "Class mood overview",
+    "colStudent": "Student",
+    "colDominant": "Dominant mood",
+    "colNote": "Note"
+  },
+  "dashboard": {
+    "parent": {
+      "cardsTitle": "Learning cards",
+      "cardsSubtitle": "Short explanations of key concepts your children are learning.",
+      "noCards": "No learning cards yet. Switch to the teacher role and create one.",
+      "scheduleTitle": "Your child’s schedule",
+      "moodTitle": "Your child’s mood",
+      "moodEmpty": "No children linked for this parent in local data. Import a snapshot that includes a users array (e.g. reference/data.json) from Debug → IndexedDB.",
+      "ctaOpenKnowledge": "Open in Knowledge"
+    },
+    "teacher": {
+      "classReport": "Class report",
+      "classReportSubtitle": "Write or generate a short report, then push it to students, parents, or both.",
+      "createReport": "Create report",
+      "learningCards": "Learning cards",
+      "learningCardsSubtitle": "Concept cards for families: definitions, materials, and a simple plan.",
+      "createCard": "Create card",
+      "noCards": "No learning cards yet. Use Create card to add one.",
+      "ctaOpen": "Open",
+      "today": "Today",
+      "recentPosts": "Recent posts",
+      "newLearningCard": "+ New learning card",
+      "classPulse": "Class pulse",
+      "studentDirectory": "Student directory",
+      "filterPlaceholder": "Filter by name…",
+      "filterAria": "Filter students",
+      "colStudent": "Student",
+      "colGrade": "Grade",
+      "colParent": "Parent",
+      "colLastNote": "Last note",
+      "view": "View",
+      "studentDetailTitle": "Student detail",
+      "studentDetailBody": "Demo: contact info, past learning-card feedback, and booking history would appear here.",
+      "thisWeek": "This week"
+    }
+  },
+  "learningCard": {
+    "deleteConfirm": "Delete “{{title}}”?",
+    "deleteAria": "Delete learning card: {{title}}",
+    "delete": "Delete",
+    "linkedTo": "Linked to {{date}}"
+  }
+}
