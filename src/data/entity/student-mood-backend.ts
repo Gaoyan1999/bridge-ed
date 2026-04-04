@@ -26,6 +26,11 @@ export interface StudentMoodBackend {
 
   note: string;
 
+  /** Optional check-in tags (stable ids, e.g. `exam_results`). */
+  reasonTags?: string[];
+  /** Free text when `other` is among `reasonTags`. */
+  otherDetail?: string;
+
   createdAt: string;
   updatedAt: string;
 }

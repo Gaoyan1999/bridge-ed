@@ -1,43 +1,97 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { formatLocalYmd } from '@/bridge/moodWeek';
-import { moodSpectrumLabel } from '@/bridge/moodUtils';
+import { MOOD_LEVEL_PLEASANT, moodLevelFromPleasant } from '@/bridge/moodUtils';
 import { DEMO_STUDENT_MOOD_PROFILE, PARENT_REPORT, TEACHER_MOOD_ROWS } from '@/bridge/mockData';
 import { getDataLayer } from '@/data';
 import { buildStudentMoodFromCheckIn, studentMoodStableId } from '@/data/student-mood-mappers';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
+const MOOD_FACE: { level: number; emoji: string; faceClass: string; labelClass: string }[] = [
+  { level: 0, emoji: '😫', faceClass: 'mood-checkin__face--vu', labelClass: 'mood-checkin__step-label--vu' },
+  { level: 1, emoji: '😕', faceClass: 'mood-checkin__face--u', labelClass: 'mood-checkin__step-label--u' },
+  { level: 2, emoji: '😐', faceClass: 'mood-checkin__face--n', labelClass: 'mood-checkin__step-label--n' },
+  { level: 3, emoji: '🙂', faceClass: 'mood-checkin__face--p', labelClass: 'mood-checkin__step-label--p' },
+  { level: 4, emoji: '😄', faceClass: 'mood-checkin__face--vp', labelClass: 'mood-checkin__step-label--vp' },
+];
+
+const REASON_TAG_IDS = [
+  'exam_results',
+  'teacher',
+  'classmates',
+  'knowledge',
+  'efficiency',
+  'other',
+] as const;
+
 export function MoodPanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
   const { role, currentUser, setModule, bumpStudentMoods } = useBridge();
   const hints = panelHintsForRole(t, role);
-  const [slider, setSlider] = useState(50);
+  const [moodLevel, setMoodLevel] = useState(2);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(() => new Set());
+  const [otherText, setOtherText] = useState('');
   const [note, setNote] = useState('');
   const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  const pleasant = slider / 100;
-  const label = moodSpectrumLabel(slider);
+  const profile = useMemo(
+    () =>
+      currentUser?.role === 'student'
+        ? { studentId: currentUser.id, displayName: currentUser.name }
+        : DEMO_STUDENT_MOOD_PROFILE,
+    [currentUser],
+  );
+
+  useEffect(() => {
+    if (role !== 'student' || !active) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const layer = getDataLayer();
+        const localDate = formatLocalYmd(new Date());
+        const id = studentMoodStableId(profile.studentId, localDate);
+        const existing = await layer.studentMoods.get(id);
+        if (cancelled) return;
+        if (existing) {
+          setMoodLevel(moodLevelFromPleasant(existing.pleasant));
+          setSelectedTags(new Set(existing.reasonTags ?? []));
+          setOtherText(existing.otherDetail ?? '');
+          setNote(existing.note ?? '');
+        }
+      } catch {
+        /* ignore */
+      } finally {
+        if (!cancelled) setHydrated(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [role, active, profile.studentId]);
 
   async function submitStudentMood() {
     setSaving(true);
     try {
       const layer = getDataLayer();
-      const profile =
-        currentUser?.role === 'student'
-          ? { studentId: currentUser.id, displayName: currentUser.name }
-          : DEMO_STUDENT_MOOD_PROFILE;
       const localDate = formatLocalYmd(new Date());
       const id = studentMoodStableId(profile.studentId, localDate);
       const existing = await layer.studentMoods.get(id);
+      const pleasant = MOOD_LEVEL_PLEASANT[moodLevel] ?? 50;
+      const tags = [...selectedTags];
+      const otherDetail = tags.includes('other') ? otherText.trim() : '';
       const built = buildStudentMoodFromCheckIn({
         studentId: profile.studentId,
-        pleasant: slider,
+        pleasant,
         note,
         localDate,
+        reasonTags: tags,
+        otherDetail,
       });
       await layer.studentMoods.put({
         ...built,
@@ -52,6 +106,18 @@ export function MoodPanel({ active }: { active: boolean }) {
     }
   }
 
+  const showOtherField = selectedTags.has('other');
+
+  function toggleTag(id: string) {
+    setSelectedTags((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setSuccess(false);
+  }
+
   return (
     <section
       className={cx('panel', 'panel--mood', active && 'is-visible', role === 'student' && 'panel--student-fill')}
@@ -63,98 +129,145 @@ export function MoodPanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-mood-title"
-        title="Mood"
+        title={t('panels.mood')}
         hint={hints.mood}
         hintId="mood-role-hint"
         hidden={role === 'student'}
       />
 
       <div id="mood-student" className="mood-student-screen" hidden={role !== 'student'}>
-        <div
-          className="emotion-screen"
-          id="emotion-screen"
-          style={{ ['--pleasant' as string]: String(pleasant) }}
-        >
-          <header className="emotion-screen__top">
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-back" aria-label="Back" onClick={() => setModule('chat')}>
+        <div className="mood-checkin" id="mood-checkin-root">
+          <header className="mood-checkin__toolbar">
+            <button
+              type="button"
+              className="mood-checkin__icon-btn"
+              id="mood-emotion-back"
+              aria-label={t('mood.back')}
+              onClick={() => setModule('chat')}
+            >
               <span aria-hidden="true">‹</span>
             </button>
-            <h2 className="emotion-screen__heading">Emotion</h2>
-            <button type="button" className="emotion-screen__icon-btn" id="mood-emotion-close" aria-label="Close" onClick={() => setModule('chat')}>
+            <span className="mood-checkin__toolbar-title">{t('mood.checkin.toolbarTitle')}</span>
+            <button
+              type="button"
+              className="mood-checkin__icon-btn"
+              id="mood-emotion-close"
+              aria-label={t('mood.close')}
+              onClick={() => setModule('chat')}
+            >
               <span aria-hidden="true">×</span>
             </button>
           </header>
 
-          <p className="emotion-screen__prompt">Choose how you’re feeling right now</p>
+          <div className="mood-checkin__sheet">
+            <h2 className="mood-checkin__title">{t('mood.checkin.title')}</h2>
+            <p className="mood-checkin__subtitle">{t('mood.checkin.subtitle')}</p>
 
-          <div
-            className="emotion-ripple"
-            id="emotion-ripple"
-            aria-hidden="true"
-            style={{ ['--pleasant' as string]: String(pleasant) }}
-          >
-            <div className="emotion-ripple__glow"></div>
-            <div className="emotion-ripple__ring emotion-ripple__ring--1"></div>
-            <div className="emotion-ripple__ring emotion-ripple__ring--2"></div>
-            <div className="emotion-ripple__ring emotion-ripple__ring--3"></div>
-          </div>
-
-          <p className="emotion-screen__label" id="emotion-label">
-            {label}
-          </p>
-
-          <div className="emotion-slider-wrap">
-            <label className="visually-hidden" htmlFor="mood-slider">
-              How pleasant does it feel (0–100)
-            </label>
-            <input
-              type="range"
-              className="emotion-slider"
-              id="mood-slider"
-              min={0}
-              max={100}
-              value={slider}
-              step={1}
-              aria-valuetext={label}
-              onChange={(e) => setSlider(Number(e.target.value))}
-            />
-            <div className="emotion-slider__ends">
-              <span>VERY UNPLEASANT</span>
-              <span>VERY PLEASANT</span>
+            <div className="mood-checkin__spectrum" role="radiogroup" aria-label={t('mood.checkin.pleasantAria')}>
+              {MOOD_FACE.map((step) => {
+                const selected = moodLevel === step.level;
+                const caps = t(`mood.checkin.level${step.level}` as const);
+                return (
+                  <div key={step.level} className="mood-checkin__step">
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      aria-label={caps}
+                      title={caps}
+                      className={cx('mood-checkin__face-btn', selected && 'is-selected')}
+                      onClick={() => {
+                        setMoodLevel(step.level);
+                        setSuccess(false);
+                      }}
+                    >
+                      <span className={cx('mood-checkin__face', step.faceClass)} aria-hidden="true">
+                        <span className="mood-checkin__emoji">{step.emoji}</span>
+                      </span>
+                    </button>
+                    <span className={cx('mood-checkin__step-label', step.labelClass)}>{caps}</span>
+                  </div>
+                );
+              })}
             </div>
+
+            <div className="mood-checkin__section">
+              <h3 className="mood-checkin__section-title">{t('mood.checkin.whatsOnMind')}</h3>
+              <div className="mood-checkin__pills" role="group" aria-label={t('mood.checkin.influencedAria')}>
+                {REASON_TAG_IDS.map((id) => {
+                  const on = selectedTags.has(id);
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      className={cx('mood-checkin__pill', on && 'is-selected')}
+                      aria-pressed={on}
+                      onClick={() => toggleTag(id)}
+                    >
+                      {t(`mood.checkin.reasonTags.${id}` as const)}
+                    </button>
+                  );
+                })}
+              </div>
+              {showOtherField && (
+                <label className="mood-checkin__other-field">
+                  <span className="visually-hidden">{t('mood.checkin.specifyOther')}</span>
+                  <input
+                    type="text"
+                    className="mood-checkin__other-input"
+                    placeholder={t('mood.checkin.otherPlaceholder')}
+                    autoComplete="off"
+                    value={otherText}
+                    onChange={(e) => {
+                      setOtherText(e.target.value);
+                      setSuccess(false);
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="mood-checkin__section">
+              <h3 className="mood-checkin__section-title">{t('mood.checkin.anythingToAdd')}</h3>
+              <label className="mood-checkin__note-wrap">
+                <span className="visually-hidden">{t('mood.noteOptional')}</span>
+                <textarea
+                  className="mood-checkin__textarea"
+                  id="mood-note"
+                  rows={4}
+                  maxLength={2000}
+                  placeholder={t('mood.checkin.notePlaceholder')}
+                  value={note}
+                  onChange={(e) => {
+                    setNote(e.target.value);
+                    setSuccess(false);
+                  }}
+                />
+              </label>
+            </div>
+
+            <div className="mood-checkin__actions">
+              <button
+                type="button"
+                className="mood-checkin__submit"
+                id="mood-submit"
+                disabled={saving || !hydrated}
+                onClick={() => void submitStudentMood()}
+              >
+                {saving ? t('mood.checkin.submitSaving') : t('mood.checkin.submit')}
+                {!saving && <ChevronRight className="mood-checkin__submit-icon" strokeWidth={2.5} size={18} aria-hidden />}
+              </button>
+            </div>
+
+            <p className="mood-checkin__success" id="mood-success" role="status" hidden={!success}>
+              {t('mood.savedSuccess')}
+            </p>
           </div>
-
-          <label className="emotion-screen__note-field">
-            <span className="emotion-screen__note-label">Note (optional)</span>
-            <input
-              type="text"
-              className="emotion-screen__note-input"
-              id="mood-note"
-              maxLength={200}
-              placeholder="Anything to add?"
-              autoComplete="off"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </label>
-
-          <button
-            type="button"
-            className="btn emotion-screen__next"
-            id="mood-submit"
-            disabled={saving}
-            onClick={() => void submitStudentMood()}
-          >
-            {saving ? 'Saving…' : 'Next'}
-          </button>
-          <p className="emotion-screen__success" id="mood-success" role="status" hidden={!success}>
-            Saved. Your parent can see this week’s check-in on the dashboard.
-          </p>
         </div>
       </div>
 
       <div id="mood-parent" className="mood-block" hidden={role !== 'parent'}>
-        <h3 className="mood-block__title dash-card__title--sky">This week at a glance</h3>
+        <h3 className="mood-block__title dash-card__title--sky">{t('mood.weekAtGlance')}</h3>
         <div className="report-cards" id="parent-mood-report">
           {PARENT_REPORT.map((r) => (
             <div key={r.label} className="report-card">
@@ -167,14 +280,14 @@ export function MoodPanel({ active }: { active: boolean }) {
       </div>
 
       <div id="mood-teacher" className="mood-block" hidden={role !== 'teacher'}>
-        <h3 className="mood-block__title dash-card__title--lavender">Class mood overview</h3>
+        <h3 className="mood-block__title dash-card__title--lavender">{t('mood.classOverview')}</h3>
         <div className="table-wrap">
           <table className="data-table" id="teacher-mood-table">
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Dominant mood</th>
-                <th>Note</th>
+                <th>{t('mood.colStudent')}</th>
+                <th>{t('mood.colDominant')}</th>
+                <th>{t('mood.colNote')}</th>
               </tr>
             </thead>
             <tbody>
