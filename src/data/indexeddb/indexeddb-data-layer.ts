@@ -14,14 +14,34 @@ function sortByCreatedAtDesc(a: LearningCardBackend, b: LearningCardBackend): nu
 }
 
 class IndexedDbLearningCardsRepo implements LearningCardsRepository {
-  /**
-   * TODO(auth): filter by `authorUserId === userId` (currently returns all rows — demo hack).
-   * Uses `toArray()` + sort so older rows missing an index field still list reliably.
-   */
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
-    void userId;
+    const id = userId.trim();
+    if (!id) return [];
     const rows = await bridgeDb.learningCards.toArray();
-    return rows.sort(sortByCreatedAtDesc);
+    return rows
+      .filter((r) => {
+        if (r.authorUserId === id) return true;
+        // Legacy wizard rows used `"1"` before default author became `teacher-1`.
+        if (id === 'teacher-1' && r.authorUserId === '1') return true;
+        return false;
+      })
+      .sort(sortByCreatedAtDesc);
+  }
+
+  async listForParentUser(parentUserId: string): Promise<LearningCardBackend[]> {
+    const pid = parentUserId.trim();
+    if (!pid) return [];
+    const parent = await bridgeDb.users.get(pid);
+    if (!parent || parent.role !== 'parent' || !parent.children?.length) return [];
+
+    const childSet = new Set(parent.children);
+    const rows = await bridgeDb.learningCards.toArray();
+    const filtered = rows.filter((card) => {
+      if (card.sendStatus !== 'sent') return false;
+      if (card.audience.mode === 'whole_class') return true;
+      return card.audience.selectedStudentIds.some((sid) => childSet.has(sid));
+    });
+    return filtered.sort(sortByCreatedAtDesc);
   }
 
   async get(id: string): Promise<LearningCardBackend | undefined> {

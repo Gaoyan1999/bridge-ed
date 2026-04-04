@@ -12,10 +12,14 @@ import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
+import { useBridge } from '@/bridge/BridgeContext';
 import { cx } from '@/bridge/cx';
 import type { LearningCardCreatePayload } from '@/bridge/types';
 import { getDataLayer } from '@/data';
-import { learningCardCreatePayloadToBackend } from '@/data/learning-card-mappers';
+import {
+  HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
+  learningCardCreatePayloadToBackend,
+} from '@/data/learning-card-mappers';
 
 const WHOLE_CLASS_RECIPIENTS = 28;
 
@@ -74,6 +78,7 @@ export function LearningCardModal({
   /** Called after a card is persisted. */
   onSaved?: () => void;
 }) {
+  const { currentUser } = useBridge();
   const [classLesson, setClassLesson] = useState<string>(() =>
     readStoredOption(LS_KEY_CLASS, LEARNING_CARD_CLASS_OPTIONS, LEARNING_CARD_CLASS_OPTIONS[0]),
   );
@@ -131,7 +136,9 @@ export function LearningCardModal({
         ...(audienceMode === 'selected' ? { selectedParentsByStudent: { ...selectedParents } } : {}),
       },
     };
-    const record = learningCardCreatePayloadToBackend(payload);
+    const authorUserId =
+      currentUser?.role === 'teacher' ? currentUser.id : HARDCODED_LEARNING_CARD_AUTHOR_USER_ID;
+    const record = learningCardCreatePayloadToBackend(payload, authorUserId);
     try {
       await getDataLayer().learningCards.put(record);
       onSaved?.();

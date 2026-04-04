@@ -25,6 +25,8 @@ const ROLE_ICONS: Record<Role, LucideIcon> = {
   student: GraduationCap,
 };
 
+const VIEW_USER_ROLE_ORDER: Record<Role, number> = { teacher: 0, parent: 1, student: 2 };
+
 export interface SidebarChromeProps {
   sidebarCollapsed: boolean;
   toggleSidebarCollapsed: () => void;
@@ -55,11 +57,18 @@ export function Sidebar({
   roleDropdownOpen,
   setRoleDropdownOpen,
 }: SidebarChromeProps) {
-  const { role, setRole, module, setModule, showToolDemo } = useBridge();
+  const { role, setRole, setCurrentUserId, users, currentUser, currentUserId, module, setModule, showToolDemo } =
+    useBridge();
 
   const ddRef = useRef<HTMLDivElement>(null);
   const meta = ROLE_DISPLAY[role];
   const RoleIcon = ROLE_ICONS[role];
+  const viewLabel = currentUser?.name ?? meta.label;
+  const sortedViewUsers = [...users].sort((a, b) => {
+    const o = VIEW_USER_ROLE_ORDER[a.role as Role] - VIEW_USER_ROLE_ORDER[b.role as Role];
+    if (o !== 0) return o;
+    return a.name.localeCompare(b.name);
+  });
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -181,7 +190,7 @@ export function Sidebar({
               aria-haspopup="listbox"
               aria-controls="role-dropdown-menu"
               aria-labelledby="role-label role-dropdown-name"
-              aria-label={`View as ${meta.label}`}
+              aria-label={`View as ${viewLabel}`}
               onClick={(e) => {
                 e.stopPropagation();
                 setRoleDropdownOpen(!roleDropdownOpen);
@@ -194,7 +203,7 @@ export function Sidebar({
                 className={cx('min-w-0 flex-1', sidebarCollapsed && 'sr-only')}
                 id="role-dropdown-name"
               >
-                {meta.label}
+                {viewLabel}
               </span>
               <span
                 className={cx(
@@ -218,33 +227,67 @@ export function Sidebar({
               aria-labelledby="role-label"
               hidden={!roleDropdownOpen}
             >
-              {(['teacher', 'parent', 'student'] as Role[]).map((r) => {
-                const m = ROLE_DISPLAY[r];
-                const active = r === role;
-                const OptIcon = ROLE_ICONS[r];
-                return (
-                  <button
-                    key={r}
-                    type="button"
-                    className={cx(
-                      'flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-none bg-transparent px-[0.65rem] py-[0.55rem] text-left text-[0.9rem] text-[var(--text)] hover:bg-[var(--pill-bg)]',
-                      active && 'bg-[var(--info-banner)] font-semibold text-[var(--link-blue)]',
-                    )}
-                    role="option"
-                    aria-selected={active}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setRole(r);
-                      setRoleDropdownOpen(false);
-                    }}
-                  >
-                    <span className="inline-flex items-center justify-center leading-none" aria-hidden="true">
-                      <OptIcon className="block shrink-0" strokeWidth={2} size={18} />
-                    </span>
-                    <span>{m.label}</span>
-                  </button>
-                );
-              })}
+              {users.length > 0
+                ? sortedViewUsers.map((u) => {
+                    const r = u.role as Role;
+                    const m = ROLE_DISPLAY[r];
+                    const OptIcon = ROLE_ICONS[r];
+                    const active = u.id === currentUserId;
+                    return (
+                      <button
+                        key={u.id}
+                        type="button"
+                        className={cx(
+                          'flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-none bg-transparent px-[0.65rem] py-[0.55rem] text-left text-[0.9rem] text-[var(--text)] hover:bg-[var(--pill-bg)]',
+                          active && 'bg-[var(--info-banner)] font-semibold text-[var(--link-blue)]',
+                        )}
+                        role="option"
+                        aria-selected={active}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentUserId(u.id);
+                          setRoleDropdownOpen(false);
+                        }}
+                      >
+                        <span className="inline-flex items-center justify-center leading-none" aria-hidden="true">
+                          <OptIcon className="block shrink-0" strokeWidth={2} size={18} />
+                        </span>
+                        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                          <span className="truncate">{u.name}</span>
+                          <span className="truncate text-[0.75rem] font-normal text-[var(--text-muted)]">
+                            {m.label} · {u.id}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })
+                : (['teacher', 'parent', 'student'] as Role[]).map((r) => {
+                    const m = ROLE_DISPLAY[r];
+                    const active = r === role;
+                    const OptIcon = ROLE_ICONS[r];
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        className={cx(
+                          'flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-none bg-transparent px-[0.65rem] py-[0.55rem] text-left text-[0.9rem] text-[var(--text)] hover:bg-[var(--pill-bg)]',
+                          active && 'bg-[var(--info-banner)] font-semibold text-[var(--link-blue)]',
+                        )}
+                        role="option"
+                        aria-selected={active}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRole(r);
+                          setRoleDropdownOpen(false);
+                        }}
+                      >
+                        <span className="inline-flex items-center justify-center leading-none" aria-hidden="true">
+                          <OptIcon className="block shrink-0" strokeWidth={2} size={18} />
+                        </span>
+                        <span>{m.label}</span>
+                      </button>
+                    );
+                  })}
             </div>
           </div>
         </div>

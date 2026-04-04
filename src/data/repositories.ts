@@ -4,8 +4,10 @@ import type { StudentMoodBackend } from './entity/student-mood-backend';
 import type { UserBackend } from './entity/user-backend';
 
 export interface LearningCardsRepository {
-  /** Future: filter by author; currently returns all records (demo hack). */
+  /** Cards where `authorUserId === userId` (teacher’s own). Empty `userId` yields `[]`. */
   listByUserId(userId: string): Promise<LearningCardBackend[]>;
+  /** Sent cards visible to this parent: `whole_class`, or `selected_parents` when `selectedStudentIds` intersects the parent’s `children`. */
+  listForParentUser(parentUserId: string): Promise<LearningCardBackend[]>;
   get(id: string): Promise<LearningCardBackend | undefined>;
   put(card: LearningCardBackend): Promise<void>;
   delete(id: string): Promise<void>;
@@ -16,10 +18,7 @@ export interface StudentMoodsRepository {
   put(entry: StudentMoodBackend): Promise<void>;
   /** Inclusive `YYYY-MM-DD` range (lexicographic order matches chronological for ISO dates). */
   listInLocalDateRange(startLocalDate: string, endLocalDate: string): Promise<StudentMoodBackend[]>;
-  /**
-   * Parent dashboard: moods for all linked children.
-   * TODO(auth): pass `parentUserId` and filter; demo returns every row.
-   */
+  /** Parent dashboard: moods for students in `users.children` when `parentUserId` is set; otherwise all rows (no parent context). */
   getChildrenMood(parentUserId?: string): Promise<StudentMoodBackend[]>;
   delete(id: string): Promise<void>;
 }

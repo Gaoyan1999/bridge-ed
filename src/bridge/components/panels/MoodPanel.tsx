@@ -9,7 +9,7 @@ import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
 export function MoodPanel({ active }: { active: boolean }) {
-  const { role, getHints, setModule, bumpStudentMoods } = useBridge();
+  const { role, currentUser, getHints, setModule, bumpStudentMoods } = useBridge();
   const hints = getHints();
   const [slider, setSlider] = useState(50);
   const [note, setNote] = useState('');
@@ -23,7 +23,10 @@ export function MoodPanel({ active }: { active: boolean }) {
     setSaving(true);
     try {
       const layer = getDataLayer();
-      const profile = DEMO_STUDENT_MOOD_PROFILE;
+      const profile =
+        currentUser?.role === 'student'
+          ? { studentId: currentUser.id, displayName: currentUser.name }
+          : DEMO_STUDENT_MOOD_PROFILE;
       const localDate = formatLocalYmd(new Date());
       const id = studentMoodStableId(profile.studentId, localDate);
       const existing = await layer.studentMoods.get(id);

@@ -14,8 +14,19 @@ import type { UserBackend } from '../entity/user-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
-    const q = userId ? `?userId=${encodeURIComponent(userId)}` : '';
-    return apiRequest<LearningCardBackend[]>('GET', `/learning-cards${q}`);
+    if (!userId.trim()) return [];
+    return apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?authorUserId=${encodeURIComponent(userId)}`,
+    );
+  }
+
+  async listForParentUser(parentUserId: string): Promise<LearningCardBackend[]> {
+    if (!parentUserId.trim()) return [];
+    return apiRequest<LearningCardBackend[]>(
+      'GET',
+      `/learning-cards?parentUserId=${encodeURIComponent(parentUserId)}`,
+    );
   }
 
   async get(id: string): Promise<LearningCardBackend | undefined> {

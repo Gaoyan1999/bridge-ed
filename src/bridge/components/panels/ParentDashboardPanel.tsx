@@ -15,7 +15,9 @@ import { ParentMoodWeek } from '@/bridge/components/ParentMoodWeek';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch } = useBridge();
+  const { openCardThreadFromDashboard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
+    useBridge();
+  const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
   const [cards, setCards] = useState<LearningCardItem[]>([]);
   const [moodEntries, setMoodEntries] = useState<StudentMoodBackend[]>([]);
   const [moodChildren, setMoodChildren] = useState<ParentMoodChildProfile[]>([]);
@@ -37,7 +39,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
   useEffect(() => {
     let cancelled = false;
     void getDataLayer()
-      .learningCards.listByUserId('local')
+      .learningCards.listForParentUser(parentUserId)
       .then((rows) => {
         if (!cancelled) setCards(rows.map(learningCardBackendToItem));
       })
@@ -47,16 +49,16 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
     return () => {
       cancelled = true;
     };
-  }, [learningCardsEpoch]);
+  }, [learningCardsEpoch, parentUserId]);
 
   useEffect(() => {
     let cancelled = false;
     const { start, end } = getCurrentWeekLocalDateRange();
     const layer = getDataLayer();
-    void Promise.all([layer.users.list(), layer.studentMoods.getChildrenMood(DEMO_PARENT_USER_ID)])
+    void Promise.all([layer.users.list(), layer.studentMoods.getChildrenMood(parentUserId)])
       .then(([users, rows]) => {
         if (cancelled) return;
-        setMoodChildren(parentMoodChildrenFromUsers(users, DEMO_PARENT_USER_ID));
+        setMoodChildren(parentMoodChildrenFromUsers(users, parentUserId));
         setMoodEntries(rows.filter((r) => r.localDate >= start && r.localDate <= end));
       })
       .catch(() => {
@@ -68,7 +70,7 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
     return () => {
       cancelled = true;
     };
-  }, [studentMoodsEpoch]);
+  }, [studentMoodsEpoch, parentUserId]);
 
   const sections = [
     <DashboardCard

@@ -11,7 +11,9 @@ import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
-  const { openCardThreadFromDashboard, showGeneric, openModal, learningCardsEpoch, bumpLearningCards } = useBridge();
+  const { openCardThreadFromDashboard, showGeneric, openModal, learningCardsEpoch, bumpLearningCards, currentUser } =
+    useBridge();
+  const teacherAuthorId = currentUser?.role === 'teacher' ? currentUser.id : '';
   const [studentFilter, setStudentFilter] = useState('');
   const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
   const debugMode = getDebugMode();
@@ -32,7 +34,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
   useEffect(() => {
     let cancelled = false;
     void getDataLayer()
-      .learningCards.listByUserId('local')
+      .learningCards.listByUserId(teacherAuthorId)
       .then((rows) => {
         if (!cancelled) setLearningCards(rows.map(learningCardBackendToItem));
       })
@@ -42,7 +44,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
     return () => {
       cancelled = true;
     };
-  }, [learningCardsEpoch]);
+  }, [learningCardsEpoch, teacherAuthorId]);
 
   const q = studentFilter.trim().toLowerCase();
   const filteredStudents = !q
