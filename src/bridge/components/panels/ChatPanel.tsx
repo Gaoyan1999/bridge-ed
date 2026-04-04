@@ -60,7 +60,7 @@ export function ChatPanel({ active }: { active: boolean }) {
     >
       <PanelHeader
         titleId="panel-chat-title"
-        title="Chat"
+        title="Messages"
         hint={hints.chat}
         hintId="chat-role-hint"
         split

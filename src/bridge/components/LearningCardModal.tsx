@@ -467,7 +467,7 @@ export function LearningCardModal({
               <p className="learning-card-confirm__lead">You’re about to send this learning card.</p>
               <p className="learning-card-confirm__count">
                 <strong>{recipientCount}</strong> {recipientCount === 1 ? 'family' : 'families'} will get a notification
-                under <strong>Chat</strong> with BrigeEd AI Powered.
+                under <strong>Knowledge</strong> powered by BridgeEd AI.
               </p>
               <ul className="learning-card-confirm__bullets">
                 <li>
