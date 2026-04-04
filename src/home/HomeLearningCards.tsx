@@ -4,6 +4,7 @@ import { LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
 import { getDataLayer } from '@/data';
 import type { LearningCardBackend } from '@/data';
 import { sampleLearningCardBackend } from '@/data/learning-card-mappers';
+import { resolveParentSummaryFromParts } from '@/data';
 
 function viewAsUserIdFromStorage(): string {
   try {
@@ -104,7 +105,12 @@ export function HomeLearningCards() {
         {cards.map((card) => (
           <li key={card.id} className="learning-card">
             <h2 className="learning-card__title">{card.topic || card.classLessonTitle}</h2>
-            <p className="learning-card__summary">{card.parentSummary}</p>
+            <p className="learning-card__summary">
+              {resolveParentSummaryFromParts(
+                { parentSummary: card.parentSummary, translatedSummaries: card.translatedSummaries },
+                undefined,
+              )}
+            </p>
             <p className="learning-card__label">家长可执行动作</p>
             <ol className="learning-card__actions">
               {card.tonightActions

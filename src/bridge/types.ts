@@ -42,6 +42,13 @@ export type LearningCardTonightAction = {
   text: string;
 };
 
+/** Optional per-locale parent summary (from generator); fallback is `summary` / `parentSummary`. */
+export type LearningCardTranslatedSummaries = {
+  zh?: string;
+  en?: string;
+  fr?: string;
+};
+
 export interface LearningCardItem {
   id: string;
   title: string;
@@ -50,7 +57,10 @@ export interface LearningCardItem {
   /** Subject line for listings (e.g. Math, or Math · Geometry). */
   subject: string;
   status: string;
+  /** Canonical parent summary line (legacy / fallback). */
   summary: string;
+  /** When present, resolve localized text via `resolveParentSummaryForDisplay` (see `learning-card-summary.ts`). */
+  translatedSummaries?: LearningCardTranslatedSummaries;
   /** Unix ms sort order and "Linked to ..." line in `LearningCardTile`. */
   at: number;
   threadId: string;
@@ -98,6 +108,7 @@ export type LearningCardCreatePayload = {
   };
   generated: {
     parentSummary: string;
+    translatedSummaries?: LearningCardTranslatedSummaries;
     tonightActions: LearningCardTonightAction[];
   };
   audience: {
