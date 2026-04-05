@@ -59,13 +59,14 @@ export function normalizeTonightActions(raw: unknown): LearningCardTonightAction
   return out;
 }
 
-/** Normalize stored card (e.g. legacy `tonightActions` shape) to current schema. */
+/** Normalize stored card (legacy `tonightActions` / schema v1 to current). Strips removed `sendStatus`. */
 export function normalizeLearningCardBackend(raw: LearningCardBackend): LearningCardBackend {
+  const { sendStatus: _omit, ...rest } = raw as LearningCardBackend & { sendStatus?: unknown };
   return {
-    ...raw,
+    ...rest,
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
-    tonightActions: normalizeTonightActions(raw.tonightActions),
-    status: normalizeLearningCardStatusBackend(raw.status, raw.sentAt),
+    tonightActions: normalizeTonightActions(rest.tonightActions),
+    status: normalizeLearningCardStatusBackend(rest.status, rest.sentAt),
   };
 }
 

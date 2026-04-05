@@ -163,7 +163,8 @@
     "checkin": {
       "toolbarTitle": "Point humeur",
       "title": "Comment vous sentez-vous aujourd’hui ?",
-      "subtitle": "Prenez un instant pour faire le point. Vos ressentis comptent.",
+      "subtitleLine1": "Prenez un instant pour faire le point.",
+      "subtitleLine2": "Vos ressentis comptent.",
       "pleasantAria": "À quel point c’est agréable",
       "level0": "Très désagréable",
       "level1": "Désagréable",

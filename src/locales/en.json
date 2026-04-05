@@ -163,7 +163,8 @@
     "checkin": {
       "toolbarTitle": "Check-in",
       "title": "How are you feeling today?",
-      "subtitle": "Take a moment to check in with yourself. Your feelings matter.",
+      "subtitleLine1": "Take a moment to check in with yourself.",
+      "subtitleLine2": "Your feelings matter.",
       "pleasantAria": "How pleasant does it feel",
       "level0": "Very unpleasant",
       "level1": "Unpleasant",

@@ -73,7 +73,6 @@ export interface LearningCardBackend {
   status: LearningCardStatusBackend;
 }
 
-
 export type LearningCardStatusBackend = {
   status: 'draft' | 'sent' | 'archived';
   student: LearningCardStudentFeedback[];
