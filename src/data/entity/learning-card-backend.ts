@@ -57,7 +57,7 @@ export interface LearningCardBackend {
     en?: string;
     fr?: string;
   };
-  /** Student Knowledge: optional discovery payload (hero image + curated videos). */
+  /** Student Knowledge: optional discovery payload (hero image + free-form text). */
   childKnowledge?: LearningCardChildKnowledge;
   tonightActions: LearningCardTonightActionBackend[];
 

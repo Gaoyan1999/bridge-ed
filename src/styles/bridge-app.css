@@ -877,6 +877,83 @@ body {
   margin-bottom: 0.35rem;
 }
 
+/* Generate & review — underline tabs (Parents / Students) */
+.learning-card-review-tabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.learning-card-review-tabs__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 1rem;
+}
+
+.learning-card-review-tabs__tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0.45rem 0 0.65rem;
+  margin: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.12s ease;
+}
+
+.learning-card-review-tabs__tab:hover {
+  color: var(--text);
+}
+
+.learning-card-review-tabs__tab:focus-visible {
+  outline: 2px solid var(--link-blue);
+  outline-offset: 2px;
+}
+
+.learning-card-review-tabs__tab.is-active {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom-color: var(--link-blue);
+}
+
+.learning-card-review-tabs__panel {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Student tab — hero matches Knowledge discovery; optional modal-only tweak */
+.learning-card-student-preview__hero {
+  margin-top: 0.25rem;
+}
+
+/* Student tab — read-only markdown preview (theme tokens) */
+.learning-card-student-md {
+  margin-top: 0.35rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--pill-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text);
+  max-height: min(420px, 52vh);
+  overflow-y: auto;
+}
+
+.learning-card-student-md.markdown-content a {
+  color: var(--link-blue);
+}
+
+.learning-card-student-md.markdown-content a:hover {
+  color: var(--link-blue-hover);
+}
+
 @keyframes learning-card-ai-hint-enter {
   0% {
     opacity: 0.4;
@@ -2668,48 +2745,12 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
   margin-bottom: 0.35rem;
 }
 
-.knowledge-child-discovery__intro {
+.knowledge-child-discovery__content {
   font-size: 0.92rem;
   line-height: 1.55;
   color: var(--text);
   white-space: pre-wrap;
   margin-bottom: 0.85rem;
-}
-
-.knowledge-child-discovery__picks {
-  margin: 0;
-  padding-left: 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.knowledge-child-discovery__pick {
-  margin: 0;
-  padding-left: 0.15rem;
-}
-
-.knowledge-child-discovery__pick-headline {
-  font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  margin-bottom: 0.4rem;
-  color: var(--text);
-}
-
-.knowledge-child-discovery__field {
-  font-size: 0.86rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}
-
-.knowledge-child-discovery__label {
-  display: inline-block;
-  min-width: 4.5rem;
-  margin-right: 0.35rem;
-  font-weight: 600;
-  color: var(--text);
 }
 
 .knowledge-child-discovery__link {

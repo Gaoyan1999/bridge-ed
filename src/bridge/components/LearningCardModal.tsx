@@ -17,6 +17,7 @@ import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 import { cx } from '@/bridge/cx';
 import type {
+  LearningCardChildKnowledge,
   LearningCardCreatePayload,
   LearningCardTonightAction,
   LearningCardTranslatedSummaries,
@@ -29,8 +30,14 @@ import {
   HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
   learningCardCreatePayloadToBackend,
 } from '@/data/learning-card-mappers';
+import { Markdown } from '@/bridge/components/Markdown/Markdown';
 
 const WHOLE_CLASS_RECIPIENTS = 28;
+
+/** Turn single newlines into Markdown hard breaks so discovery text keeps line-oriented layout. */
+function discoveryPlainTextToMarkdown(src: string): string {
+  return src.replace(/([^\n])\n(?!\n)/g, '$1  \n');
+}
 
 const LS_KEY_GRADE = 'bridge-ed:learning-card:grade';
 const LS_KEY_SUBJECT = 'bridge-ed:learning-card:subject';
@@ -106,6 +113,11 @@ export function LearningCardModal({
   /** LLM output per locale; teacher edits apply to `summary` (stored as `en` + `parentSummary`). */
   const [translatedDraft, setTranslatedDraft] = useState<LearningCardTranslatedSummaries | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  /** Generated student Knowledge (hero + body); read-only in review. */
+  const [childKnowledgeDraft, setChildKnowledgeDraft] = useState<LearningCardChildKnowledge | null>(null);
+  const [childKnowledgeError, setChildKnowledgeError] = useState<string | null>(null);
+  /** Review step: parent-facing vs student-facing draft. */
+  const [reviewTab, setReviewTab] = useState<'parent' | 'student'>('parent');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [tonightActions, setTonightActions] = useState<LearningCardTonightAction[]>(() =>
@@ -132,6 +144,11 @@ export function LearningCardModal({
     topic.trim().length > 0 && grade.trim().length > 0 && subject.trim().length > 0;
 
   async function confirmSendLearningCard() {
+    const childKnowledge: LearningCardChildKnowledge | undefined =
+      childKnowledgeDraft && childKnowledgeDraft.content.trim().length > 0
+        ? { ...childKnowledgeDraft, content: childKnowledgeDraft.content.trim() }
+        : undefined;
+
     const payload: LearningCardCreatePayload = {
       sentAt: Date.now(),
       classInput: {
@@ -151,6 +168,7 @@ export function LearningCardModal({
               },
             }
           : {}),
+        ...(childKnowledge ? { childKnowledge } : {}),
         tonightActions: tonightActions.map((a) => ({
           preset: a.preset,
           include: a.include,
@@ -179,20 +197,53 @@ export function LearningCardModal({
   const runGenerate = async () => {
     setPhase('generating');
     setWarning(null);
+    setChildKnowledgeError(null);
+    const genInput = {
+      classTitle: classLesson,
+      topic: topic.trim(),
+      grade,
+      subject,
+      notes: notes.trim(),
+    };
     try {
-      const draft = await getLlmApi().explainTerminologyToParents({
-        classTitle: classLesson,
-        topic: topic.trim(),
-        grade,
-        subject,
-        notes: notes.trim(),
-      });
+      async function generateChildSafe(): Promise<
+        { ok: true; data: LearningCardChildKnowledge } | { ok: false; message: string }
+      > {
+        try {
+          const api = getLlmApi();
+          const [hero, body] = await Promise.all([
+            api.generateChildKnowledgeHero(genInput),
+            api.generateChildKnowledge(genInput),
+          ]);
+          const data: LearningCardChildKnowledge = { ...hero, ...body };
+          return { ok: true, data };
+        } catch (e) {
+          return {
+            ok: false,
+            message: e instanceof Error ? e.message : 'Student discovery generation failed.',
+          };
+        }
+      }
+
+      const [draft, childResult] = await Promise.all([
+        getLlmApi().explainTerminologyToParents(genInput),
+        generateChildSafe(),
+      ]);
       const ts = draft.translatedSummaries;
       setTranslatedDraft(ts);
       setSummary(
         resolveParentSummaryForDisplay('', ts, uiLangFromI18n(i18n.language)),
       );
       setWarning(draft.warning ?? null);
+
+      if (childResult.ok) {
+        setChildKnowledgeDraft(childResult.data);
+        setChildKnowledgeError(null);
+      } else {
+        setChildKnowledgeDraft(null);
+        setChildKnowledgeError(childResult.message);
+      }
+      setReviewTab('parent');
       setPhase('review');
     } catch (e) {
       setWarning(e instanceof Error ? e.message : 'Generation failed.');
@@ -345,8 +396,10 @@ export function LearningCardModal({
             <div className="learning-card-gen__orb" aria-hidden="true">
               <Sparkles className="learning-card-gen__sparkle" strokeWidth={2} size={28} />
             </div>
-            <p className="learning-card-gen__title">Generating parent summary...</p>
-            <p className="learning-card-gen__hint">Drafting a short parent summary from your notes.</p>
+            <p className="learning-card-gen__title">Generating drafts...</p>
+            <p className="learning-card-gen__hint">
+              Parent summary and student video discovery (for Knowledge) from your class context.
+            </p>
             <div className="learning-card-gen__dots" aria-hidden="true">
               <span />
               <span />
@@ -366,69 +419,152 @@ export function LearningCardModal({
           }}
         >
           <div className="modal__scroll learning-card-main__scroll">
-            <div className="learning-card-review-summary">
-              <p className="field__label">Parent summary</p>
-              {warning && (
-                <p className="field__hint" role="status">
-                  {warning}
-                </p>
-              )}
-              <div className="learning-card-ai-hint" role="note">
-                <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
-                  <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
+            <div className="learning-card-review-tabs">
+              <div
+                className="learning-card-review-tabs__bar"
+                role="tablist"
+                aria-label="Preview by audience"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  id="lc-tab-parent"
+                  aria-selected={reviewTab === 'parent'}
+                  aria-controls="lc-panel-parent"
+                  tabIndex={reviewTab === 'parent' ? 0 : -1}
+                  className={cx('learning-card-review-tabs__tab', reviewTab === 'parent' && 'is-active')}
+                  onClick={() => setReviewTab('parent')}
+                >
+                  Parents
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="lc-tab-student"
+                  aria-selected={reviewTab === 'student'}
+                  aria-controls="lc-panel-student"
+                  tabIndex={reviewTab === 'student' ? 0 : -1}
+                  className={cx('learning-card-review-tabs__tab', reviewTab === 'student' && 'is-active')}
+                  onClick={() => setReviewTab('student')}
+                >
+                  Students
+                </button>
+              </div>
+
+              {reviewTab === 'parent' && (
+                <div
+                  id="lc-panel-parent"
+                  role="tabpanel"
+                  aria-labelledby="lc-tab-parent"
+                  className="learning-card-review-tabs__panel"
+                >
+                  <div className="learning-card-review-summary">
+                    <p className="field__label">Parent summary</p>
+                    {warning && (
+                      <p className="field__hint" role="status">
+                        {warning}
+                      </p>
+                    )}
+                    <div className="learning-card-ai-hint" role="note">
+                      <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
+                        <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
+                      </div>
+                      <p className="learning-card-ai-hint__text">
+                        Families will see this in their preferred language - we translate the summary automatically for
+                        each parent.
+                      </p>
+                    </div>
+                    <FieldTextArea
+                      id="lc-summary"
+                      label="Parent summary"
+                      labelHidden
+                      value={summary}
+                      onChange={setSummary}
+                      rows={5}
+                    />
+                  </div>
+                  <fieldset
+                    className="field field--actions-pick field--actions-pick--grouped"
+                    aria-labelledby="lc-tonight-heading"
+                  >
+                    <p id="lc-tonight-heading" className="learning-card-actions-section__kicker">
+                      Tonight&apos;s actions
+                    </p>
+                    <div className="learning-card-actions-group">
+                      <ul className="learning-card-actions learning-card-actions--presets">
+                        {tonightActions.map((row, idx) => {
+                          const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
+                          const isLast = idx === tonightActions.length - 1;
+                          return (
+                            <li
+                              key={row.preset}
+                              className={cx(
+                                'learning-card-actions__row',
+                                'learning-card-actions__row--preset',
+                                isLast && 'learning-card-actions__row--last',
+                              )}
+                            >
+                              <Checkbox
+                                isSelected={row.include}
+                                onChange={(v) => {
+                                  setTonightActions((prev) =>
+                                    prev.map((x) => (x.preset === row.preset ? { ...x, include: v } : x)),
+                                  );
+                                }}
+                                className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
+                                aria-label={`Include: ${copy.title}`}
+                              />
+                              <div className="learning-card-actions__preset-body">
+                                <span className="learning-card-actions__preset-title">{copy.title}</span>
+                                <span className="learning-card-actions__preset-desc">{copy.description}</span>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </fieldset>
                 </div>
-                <p className="learning-card-ai-hint__text">
-                  Families will see this in their preferred language - we translate the summary automatically for each
-                  parent.
-                </p>
-              </div>
-              <FieldTextArea
-                id="lc-summary"
-                label="Parent summary"
-                labelHidden
-                value={summary}
-                onChange={setSummary}
-                rows={5}
-              />
-            </div>
-            <fieldset className="field field--actions-pick field--actions-pick--grouped" aria-labelledby="lc-tonight-heading">
-              <p id="lc-tonight-heading" className="learning-card-actions-section__kicker">
-                Tonight&apos;s actions
-              </p>              
-              <div className="learning-card-actions-group">
-                <ul className="learning-card-actions learning-card-actions--presets">
-                  {tonightActions.map((row, idx) => {
-                    const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
-                    const isLast = idx === tonightActions.length - 1;
-                    return (
-                      <li
-                        key={row.preset}
-                        className={cx(
-                          'learning-card-actions__row',
-                          'learning-card-actions__row--preset',
-                          isLast && 'learning-card-actions__row--last',
-                        )}
-                      >
-                        <Checkbox
-                          isSelected={row.include}
-                          onChange={(v) => {
-                            setTonightActions((prev) =>
-                              prev.map((x) => (x.preset === row.preset ? { ...x, include: v } : x)),
-                            );
-                          }}
-                          className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
-                          aria-label={`Include: ${copy.title}`}
+              )}
+
+              {reviewTab === 'student' && (
+                <div
+                  id="lc-panel-student"
+                  role="tabpanel"
+                  aria-labelledby="lc-tab-student"
+                  className="learning-card-review-tabs__panel"
+                >
+                  <div className="learning-card-review-summary">
+                    <p className="field__label">Student discovery (videos)</p>
+                    {childKnowledgeError && (
+                      <p className="field__hint" role="alert">
+                        {childKnowledgeError} Go back and try generating again.
+                      </p>
+                    )}
+                    {!childKnowledgeError && childKnowledgeDraft && childKnowledgeDraft.content.trim().length > 0 && (
+                      <>
+                        <img
+                          className="knowledge-child-discovery__hero learning-card-student-preview__hero"
+                          src={childKnowledgeDraft.heroImageUrl}
+                          alt={childKnowledgeDraft.heroImageAlt ?? ''}
+                          loading="lazy"
+                          decoding="async"
                         />
-                        <div className="learning-card-actions__preset-body">
-                          <span className="learning-card-actions__preset-title">{copy.title}</span>
-                          <span className="learning-card-actions__preset-desc">{copy.description}</span>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </fieldset>
+                        <Markdown className="learning-card-student-md">
+                          {discoveryPlainTextToMarkdown(childKnowledgeDraft.content)}
+                        </Markdown>
+                      </>
+                    )}
+                    {!childKnowledgeError &&
+                      (!childKnowledgeDraft || !childKnowledgeDraft.content.trim()) && (
+                      <p className="field__hint" role="status">
+                        Nothing generated for students yet. Go back and run generate again.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="modal__footer">
             <div className="modal__actions">
@@ -541,6 +677,9 @@ export function LearningCardModal({
               <ul className="learning-card-confirm__bullets">
                 <li>
                   Summary: {summary.trim() ? 'Ready' : '-'}
+                </li>
+                <li>
+                  Student discovery: {childKnowledgeDraft?.content.trim() ? 'Ready' : 'Not included'}
                 </li>
                 <li>
                   Tonight&apos;s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
