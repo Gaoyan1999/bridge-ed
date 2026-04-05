@@ -96,6 +96,11 @@
     "lcStepsEmpty": "此卡暂无建议步骤。",
     "lcStatus": "状态",
     "studentYourProgress": "你的进度",
+    "lcProgressShort": {
+      "todo": "TODO",
+      "doing": "DOING",
+      "done": "DONE"
+    },
     "studentLearningStatus": {
       "not_started": "未学习",
       "learning": "学习中",
@@ -111,6 +116,7 @@
       "challenge": "不想学了"
     },
     "finishChange": "换一个选项",
+    "done": "完成",
     "ariaFinishChoices": "这张卡你感觉怎么样？",
     "challengeFeedbackTitle": "写一句就好",
     "challengeFeedbackSubtitle": "哪里无聊、太难或不想学？一句话就够，老师可以更好地帮你。",

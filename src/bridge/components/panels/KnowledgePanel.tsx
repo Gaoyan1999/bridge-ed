@@ -18,7 +18,7 @@ type KnowledgeInboxRow = {
 };
 
 import { useTranslation } from 'react-i18next';
-import { ImagePlus, ListChecks } from 'lucide-react';
+import { Check, ChevronDown, ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
@@ -84,7 +84,7 @@ function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t:
   return t(`knowledge.taskShort.${preset}`);
 }
 
-/** Inbox rows keep subject + status on opposite ends; thread header groups both on the left. */
+/** Inbox rows keep subject + status on opposite ends; thread header shows subject tags only (status stays in the list). */
 function KnowledgeCardLabels({
   card,
   studentLearningStatus,
@@ -102,20 +102,24 @@ function KnowledgeCardLabels({
     aria: t('common.subject'),
   }));
   const showProgress = studentLearningStatus != null;
-  const splitForInbox = layout === 'inbox' && showProgress;
+  /** List sidebar shows TODO/DOING/DONE; thread title row only shows subject tags (status is on the right / in list). */
+  const showStatusChip = showProgress && layout === 'inbox';
+  const splitForInbox = layout === 'inbox' && showStatusChip;
   const statusLine =
-    studentLearningStatus === 'finished' && studentFinishedType
-      ? t(`knowledge.studentFinishedType.${studentFinishedType}`)
-      : studentLearningStatus != null
-        ? t(`knowledge.studentLearningStatus.${studentLearningStatus}`)
-        : '';
+    studentLearningStatus === 'not_started'
+      ? t('knowledge.lcProgressShort.todo')
+      : studentLearningStatus === 'learning'
+        ? t('knowledge.lcProgressShort.doing')
+        : studentLearningStatus === 'finished'
+          ? t('knowledge.lcProgressShort.done')
+          : '';
   const statusTitle =
     studentLearningStatus === 'finished' && studentFinishedType
-      ? `${t('knowledge.lcStatus')}: ${t(`knowledge.studentFinishedType.${studentFinishedType}`)}`
+      ? `${t('knowledge.lcStatus')}: ${t('knowledge.lcProgressShort.done')} (${t(`knowledge.studentFinishedType.${studentFinishedType}`)})`
       : studentLearningStatus != null
-        ? `${t('knowledge.lcStatus')}: ${t(`knowledge.studentLearningStatus.${studentLearningStatus}`)}`
+        ? `${t('knowledge.lcStatus')}: ${statusLine}`
         : '';
-  if (!tags.length && !showProgress) return null;
+  if (!tags.length && !showStatusChip) return null;
   return (
     <div
       className={cx(
@@ -123,7 +127,7 @@ function KnowledgeCardLabels({
         splitForInbox && 'knowledge-inbox__labels--split',
       )}
       role="group"
-      aria-label={showProgress ? t('knowledge.ariaInboxLabels') : t('common.subject')}
+      aria-label={showStatusChip ? t('knowledge.ariaInboxLabels') : t('common.subject')}
     >
       <div className="knowledge-inbox__labels-left">
         {tags.map((row) => (
@@ -139,7 +143,7 @@ function KnowledgeCardLabels({
           </span>
         ))}
       </div>
-      {studentLearningStatus != null ? (
+      {showStatusChip ? (
         <span
           className={cx(
             'knowledge-inbox__label',
@@ -180,59 +184,120 @@ function StudentLearningFinishRow({
   onChangeMind: () => void;
   t: TFunction;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const finished = studentFeedback.status === 'finished';
   const ft = studentFeedback.finishedType;
   const busy = !threadId;
   const lock = busy || finished || Boolean(choicesLocked);
+  const canOpenMenu = !finished && !busy && !choicesLocked;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (lock) setMenuOpen(false);
+  }, [lock]);
+
+  const closeAnd = (fn: () => void) => {
+    setMenuOpen(false);
+    fn();
+  };
+
+  const triggerLabel = finished && ft ? t(`knowledge.studentFinishedType.${ft}`) : t('knowledge.done');
 
   return (
     <div className="knowledge-lc-finish-wrap" role="group" aria-label={t('knowledge.ariaFinishChoices')}>
-      <div className="knowledge-lc-finish-row">
-        <button
-          type="button"
-          className={cx(
-            'knowledge-lc-finish-btn',
-            'knowledge-lc-finish-btn--green',
-            finished && ft === 'pretty_easy' && 'knowledge-lc-finish-btn--picked',
-          )}
-          disabled={lock}
-          aria-pressed={finished && ft === 'pretty_easy'}
-          onClick={onFinishEasy}
-        >
-          {t('knowledge.studentFinishedType.pretty_easy')}
-        </button>
-        <button
-          type="button"
-          className={cx(
-            'knowledge-lc-finish-btn',
-            'knowledge-lc-finish-btn--blue',
-            finished && ft === 'think_get_it' && 'knowledge-lc-finish-btn--picked',
-          )}
-          disabled={lock}
-          aria-pressed={finished && ft === 'think_get_it'}
-          onClick={onFinishThink}
-        >
-          {t('knowledge.studentFinishedType.think_get_it')}
-        </button>
-        <button
-          type="button"
-          className={cx(
-            'knowledge-lc-finish-btn',
-            'knowledge-lc-finish-btn--red',
-            finished && ft === 'challenge' && 'knowledge-lc-finish-btn--picked',
-          )}
-          disabled={lock}
-          aria-pressed={finished && ft === 'challenge'}
-          onClick={onOpenSkipFeedback}
-        >
-          {t('knowledge.studentFinishedType.challenge')}
-        </button>
-      </div>
       {finished ? (
         <button type="button" className="knowledge-lc-finish-change" onClick={onChangeMind}>
           {t('knowledge.finishChange')}
         </button>
       ) : null}
+      <div ref={wrapRef} className="knowledge-lc-finish-dropdown">
+        <Button
+          id="knowledge-lc-finish-trigger"
+          type="button"
+          variant="primary"
+          pill
+          sm
+          className={cx(
+            'knowledge-lc-finish-done-trigger',
+            finished &&
+              ft &&
+              cx(
+                'knowledge-lc-finish-done-trigger--result',
+                ft === 'pretty_easy' && 'knowledge-lc-finish-done-trigger--result-easy',
+                ft === 'think_get_it' && 'knowledge-lc-finish-done-trigger--result-think',
+                ft === 'challenge' && 'knowledge-lc-finish-done-trigger--result-challenge',
+              ),
+          )}
+          disabled={busy || finished || Boolean(choicesLocked)}
+          aria-expanded={canOpenMenu ? menuOpen : undefined}
+          aria-haspopup={canOpenMenu ? 'menu' : undefined}
+          aria-controls={canOpenMenu ? 'knowledge-lc-finish-menu' : undefined}
+          onClick={() => {
+            if (!canOpenMenu) return;
+            setMenuOpen((o) => !o);
+          }}
+        >
+          <Check className="knowledge-lc-finish-done-icon" strokeWidth={2} size={16} aria-hidden />
+          <span>{triggerLabel}</span>
+          {canOpenMenu ? (
+            <ChevronDown
+              className={cx('knowledge-lc-finish-done-chevron', menuOpen && 'is-open')}
+              strokeWidth={2}
+              size={14}
+              aria-hidden
+            />
+          ) : null}
+        </Button>
+        {canOpenMenu && menuOpen ? (
+          <div
+            id="knowledge-lc-finish-menu"
+            role="menu"
+            className="knowledge-lc-finish-menu"
+            aria-labelledby="knowledge-lc-finish-trigger"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              className="knowledge-lc-finish-menu__item knowledge-lc-finish-menu__item--easy"
+              onClick={() => closeAnd(onFinishEasy)}
+            >
+              {t('knowledge.studentFinishedType.pretty_easy')}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="knowledge-lc-finish-menu__item knowledge-lc-finish-menu__item--think"
+              onClick={() => closeAnd(onFinishThink)}
+            >
+              {t('knowledge.studentFinishedType.think_get_it')}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="knowledge-lc-finish-menu__item knowledge-lc-finish-menu__item--skip"
+              onClick={() => closeAnd(onOpenSkipFeedback)}
+            >
+              {t('knowledge.studentFinishedType.challenge')}
+            </button>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -571,50 +636,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                   ) : null}
                 </div>
               </div>
-
-              {currentCard ? (
-                <div className="knowledge-lc-detail">
-                  <section className="knowledge-lc-detail__block" aria-labelledby="knowledge-steps-heading">
-                    <h4 id="knowledge-steps-heading" className="knowledge-lc-detail__title">
-                      <ListChecks className="knowledge-lc-detail__title-icon" strokeWidth={2} size={16} aria-hidden />
-                      {t('knowledge.lcStepsTitle')}
-                    </h4>
-                    {includedSteps.length === 0 ? (
-                      <p className="knowledge-lc-detail__empty">{t('knowledge.lcStepsEmpty')}</p>
-                    ) : (
-                      <ul className="knowledge-lc-detail__steps">
-                        {includedSteps.map((action) => {
-                          const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset];
-                          return (
-                            <li key={action.preset} className="knowledge-lc-detail__step">
-                              <span className="knowledge-lc-detail__step-title">{copy.title}</span>
-                              <span className="knowledge-lc-detail__step-desc">{copy.description}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </section>
-
-                  {role === 'student' && studentFeedback ? (
-                    <section className="knowledge-lc-detail__block" aria-labelledby="knowledge-status-heading">
-                      <h4 id="knowledge-status-heading" className="knowledge-lc-detail__status-heading">
-                        {t('knowledge.lcStatus')}
-                      </h4>
-                      <div className="knowledge-parent-fb" role="group" aria-label={t('knowledge.studentYourProgress')}>
-                        <label className="knowledge-parent-fb__check">
-                          <input
-                            type="checkbox"
-                            checked={studentFeedback.watchedVideo}
-                            onChange={() => void persistStudentPatch({ watchedVideo: !studentFeedback.watchedVideo })}
-                          />
-                          {t('knowledge.studentWatchedVideo')}
-                        </label>
-                      </div>
-                    </section>
-                  ) : null}
-                </div>
-              ) : null}
 
               <div className="msg-thread" id="knowledge-msg-thread">
                 {role === 'student' && currentCard?.childKnowledge ? (

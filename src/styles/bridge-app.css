@@ -1978,12 +1978,23 @@ html.theme-dark .learning-card-actions-group {
   letter-spacing: 0.01em;
 }
 
-.panel--knowledge .knowledge-inbox__label--student-not-started,
-.panel--knowledge .knowledge-inbox__label--student-learning,
-.panel--knowledge .knowledge-inbox__label--student-finished {
-  border-color: rgba(11, 87, 208, 0.28);
+/* Student list / header: TODO (gray) · DOING (blue) · DONE (green) */
+.panel--knowledge .knowledge-inbox__label--student-not-started {
+  border-color: rgba(107, 114, 128, 0.42);
+  background: rgba(243, 244, 246, 0.96);
+  color: rgb(75, 85, 99);
+}
+
+.panel--knowledge .knowledge-inbox__label--student-learning {
+  border-color: rgba(11, 87, 208, 0.32);
   background: var(--accent-soft);
   color: var(--link-blue);
+}
+
+.panel--knowledge .knowledge-inbox__label--student-finished {
+  border-color: rgba(22, 163, 74, 0.38);
+  background: rgba(220, 252, 231, 0.95);
+  color: rgb(21, 128, 61);
 }
 
 .knowledge-parent-fb {
@@ -2169,74 +2180,129 @@ html.theme-dark .learning-card-actions-group {
 }
 
 .knowledge-lc-finish-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.35rem;
 }
 
-.knowledge-lc-finish-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.35rem 0.45rem;
+/* "Pick again" — absolute so it does not reserve vertical space above Done */
+.knowledge-lc-finish-wrap > .knowledge-lc-finish-change {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.35rem);
+  z-index: 2;
+  white-space: nowrap;
 }
 
-.knowledge-lc-finish-btn {
+.knowledge-lc-finish-dropdown {
+  position: relative;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  border: none;
-  cursor: pointer;
-  font: inherit;
-  line-height: 1.2;
-  transition:
-    filter 0.12s ease,
-    box-shadow 0.12s ease,
-    opacity 0.12s ease;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.knowledge-lc-finish-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.42;
+.knowledge-lc-finish-done-trigger {
+  gap: 0.35rem;
 }
 
-.knowledge-lc-finish-btn:disabled.knowledge-lc-finish-btn--picked {
+.knowledge-lc-finish-done-trigger--result:disabled {
   opacity: 1;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  cursor: default;
 }
 
-.knowledge-lc-finish-btn--green {
-  background: rgba(220, 252, 231, 0.95);
+/* Finished state — color matches the chosen feedback */
+.knowledge-lc-finish-done-trigger--result-easy:disabled {
+  background: rgb(21, 128, 61);
+  color: #fff;
+}
+
+.knowledge-lc-finish-done-trigger--result-easy:disabled:hover {
+  background: rgb(21, 128, 61);
+}
+
+.knowledge-lc-finish-done-trigger--result-think:disabled {
+  background: var(--link-blue);
+  color: #fff;
+}
+
+.knowledge-lc-finish-done-trigger--result-think:disabled:hover {
+  background: var(--link-blue);
+}
+
+.knowledge-lc-finish-done-trigger--result-challenge:disabled {
+  background: rgb(185, 28, 28);
+  color: #fff;
+}
+
+.knowledge-lc-finish-done-trigger--result-challenge:disabled:hover {
+  background: rgb(185, 28, 28);
+}
+
+.knowledge-lc-finish-done-icon {
+  flex-shrink: 0;
+}
+
+.knowledge-lc-finish-done-chevron {
+  flex-shrink: 0;
+  margin-left: 0.1rem;
+  opacity: 0.9;
+  transition: transform 0.18s ease;
+}
+
+.knowledge-lc-finish-done-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.knowledge-lc-finish-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 60;
+  min-width: 12rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  background: var(--surface);
+  box-shadow:
+    0 4px 24px rgba(60, 64, 67, 0.18),
+    0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.knowledge-lc-finish-menu__item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.12s ease;
+}
+
+.knowledge-lc-finish-menu__item:hover {
+  background: var(--pill-bg);
+}
+
+.knowledge-lc-finish-menu__item--easy {
   color: rgb(21, 128, 61);
 }
 
-.knowledge-lc-finish-btn--green:hover:not(:disabled) {
-  filter: brightness(0.97);
-}
-
-.knowledge-lc-finish-btn--blue {
-  background: var(--accent-soft);
+.knowledge-lc-finish-menu__item--think {
   color: var(--link-blue);
 }
 
-.knowledge-lc-finish-btn--blue:hover:not(:disabled) {
-  filter: brightness(0.97);
-}
-
-.knowledge-lc-finish-btn--red {
-  background: rgba(254, 226, 226, 0.95);
+.knowledge-lc-finish-menu__item--skip {
   color: rgb(185, 28, 28);
-}
-
-.knowledge-lc-finish-btn--red:hover:not(:disabled) {
-  filter: brightness(0.97);
 }
 
 .knowledge-lc-finish-change {
@@ -2496,6 +2562,23 @@ html.theme-dark .learning-card-actions-group {
 /* Student Mood: one full page inside the canvas — no inner scroll, no “card” rounding on the blue block */
 .main__canvas-inner:has(#panel-mood.panel--mood.panel--student-fill.is-visible) {
   overflow-y: hidden;
+}
+
+/* Remove vertical pad so mood fills the card (no white strips at top/bottom inside rounded canvas). */
+.main__canvas-inner:has(#panel-mood.panel--mood.panel--student-fill.is-visible) .main__canvas-pad {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Shell matches mood palette; blue bottom edge instead of default white --surface strip. */
+.main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is-visible) {
+  background: linear-gradient(180deg, var(--mood-bg-top) 0%, var(--mood-bg-mid) 50%, var(--mood-bg-bottom) 100%);
+  border-bottom: 2px solid rgba(11, 87, 208, 0.42);
+}
+
+html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is-visible) {
+  background: linear-gradient(180deg, #1a2332 0%, #1c2635 50%, #18202d 100%);
+  border-bottom: 2px solid rgba(138, 180, 248, 0.45);
 }
 
 .emotion-screen {
@@ -3102,6 +3185,10 @@ html.theme-dark .knowledge-child-discovery {
   --mood-bg-top: #e3f0ff;
   --mood-bg-mid: #e8f4fc;
   --mood-bg-bottom: #d8e8f8;
+  /* Outer-only shadow — avoid inset white line / toolbar drop-shadow that reads as a bright band */
+  --mood-surface-shadow:
+    0 8px 32px rgba(11, 87, 208, 0.09),
+    0 2px 10px rgba(60, 64, 67, 0.04);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -3116,6 +3203,7 @@ html.theme-dark .knowledge-child-discovery {
   margin: 0;
   border-radius: 0;
   min-height: 100%;
+  box-shadow: var(--mood-surface-shadow);
 }
 
 .mood-checkin__toolbar {
@@ -3127,6 +3215,9 @@ html.theme-dark .knowledge-child-discovery {
   max-width: 32rem;
   margin: 0 auto;
   width: 100%;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .mood-checkin__icon-btn {
@@ -3356,8 +3447,7 @@ html.theme-dark .knowledge-child-discovery {
 }
 
 .mood-checkin__actions {
-  display: flex;
-  justify-content: flex-end;
+  display: flex;  
   width: 100%;
   max-width: 28rem;
   margin: 0.35rem auto 0;
@@ -3418,4 +3508,7 @@ html.theme-dark .mood-checkin--blue {
   --mood-chip-selected: rgba(138, 180, 248, 0.22);
   --mood-chip-border: rgba(138, 180, 248, 0.35);
   --mood-face-selected-bg: rgba(255, 255, 255, 0.12);
+  --mood-surface-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.4),
+    0 2px 10px rgba(0, 0, 0, 0.22);
 }
