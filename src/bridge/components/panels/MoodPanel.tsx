@@ -11,22 +11,15 @@ import { buildStudentMoodFromCheckIn, studentMoodStableId } from '@/data/student
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 
-const MOOD_FACE: { level: number; emoji: string; faceClass: string; labelClass: string }[] = [
-  { level: 0, emoji: '😫', faceClass: 'mood-checkin__face--vu', labelClass: 'mood-checkin__step-label--vu' },
-  { level: 1, emoji: '😕', faceClass: 'mood-checkin__face--u', labelClass: 'mood-checkin__step-label--u' },
-  { level: 2, emoji: '😐', faceClass: 'mood-checkin__face--n', labelClass: 'mood-checkin__step-label--n' },
-  { level: 3, emoji: '🙂', faceClass: 'mood-checkin__face--p', labelClass: 'mood-checkin__step-label--p' },
-  { level: 4, emoji: '😄', faceClass: 'mood-checkin__face--vp', labelClass: 'mood-checkin__step-label--vp' },
+const MOOD_FACE: { level: number; emoji: string }[] = [
+  { level: 0, emoji: '😫' },
+  { level: 1, emoji: '😕' },
+  { level: 2, emoji: '😐' },
+  { level: 3, emoji: '🙂' },
+  { level: 4, emoji: '😄' },
 ];
 
-const REASON_TAG_IDS = [
-  'exam_results',
-  'teacher',
-  'classmates',
-  'knowledge',
-  'efficiency',
-  'other',
-] as const;
+const REASON_TAG_IDS = ['exam_results', 'teacher', 'classmates', 'knowledge', 'efficiency'] as const;
 
 export function MoodPanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
@@ -34,7 +27,6 @@ export function MoodPanel({ active }: { active: boolean }) {
   const hints = panelHintsForRole(t, role);
   const [moodLevel, setMoodLevel] = useState(2);
   const [selectedTags, setSelectedTags] = useState<Set<string>>(() => new Set());
-  const [otherText, setOtherText] = useState('');
   const [note, setNote] = useState('');
   const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -60,8 +52,9 @@ export function MoodPanel({ active }: { active: boolean }) {
         if (cancelled) return;
         if (existing) {
           setMoodLevel(moodLevelFromPleasant(existing.pleasant));
-          setSelectedTags(new Set(existing.reasonTags ?? []));
-          setOtherText(existing.otherDetail ?? '');
+          setSelectedTags(
+            new Set((existing.reasonTags ?? []).filter((id) => id !== 'other')),
+          );
           setNote(existing.note ?? '');
         }
       } catch {
@@ -83,15 +76,13 @@ export function MoodPanel({ active }: { active: boolean }) {
       const id = studentMoodStableId(profile.studentId, localDate);
       const existing = await layer.studentMoods.get(id);
       const pleasant = MOOD_LEVEL_PLEASANT[moodLevel] ?? 50;
-      const tags = [...selectedTags];
-      const otherDetail = tags.includes('other') ? otherText.trim() : '';
+      const tagsArr = [...selectedTags];
       const built = buildStudentMoodFromCheckIn({
         studentId: profile.studentId,
         pleasant,
         note,
         localDate,
-        reasonTags: tags,
-        otherDetail,
+        reasonTags: tagsArr,
       });
       await layer.studentMoods.put({
         ...built,
@@ -105,8 +96,6 @@ export function MoodPanel({ active }: { active: boolean }) {
       setSaving(false);
     }
   }
-
-  const showOtherField = selectedTags.has('other');
 
   function toggleTag(id: string) {
     setSelectedTags((prev) => {
@@ -136,7 +125,7 @@ export function MoodPanel({ active }: { active: boolean }) {
       />
 
       <div id="mood-student" className="mood-student-screen" hidden={role !== 'student'}>
-        <div className="mood-checkin" id="mood-checkin-root">
+        <div className="mood-checkin mood-checkin--blue mood-checkin--page" id="mood-checkin-root">
           <header className="mood-checkin__toolbar">
             <button
               type="button"
@@ -160,8 +149,11 @@ export function MoodPanel({ active }: { active: boolean }) {
           </header>
 
           <div className="mood-checkin__sheet">
-            <h2 className="mood-checkin__title">{t('mood.checkin.title')}</h2>
-            <p className="mood-checkin__subtitle">{t('mood.checkin.subtitle')}</p>
+            <div className="mood-checkin__intro">
+              <h2 className="mood-checkin__title">{t('mood.checkin.title')}</h2>
+              <p className="mood-checkin__subtitle mood-checkin__subtitle-line">{t('mood.checkin.subtitleLine1')}</p>
+              <p className="mood-checkin__subtitle mood-checkin__subtitle-line">{t('mood.checkin.subtitleLine2')}</p>
+            </div>
 
             <div className="mood-checkin__spectrum" role="radiogroup" aria-label={t('mood.checkin.pleasantAria')}>
               {MOOD_FACE.map((step) => {
@@ -181,11 +173,11 @@ export function MoodPanel({ active }: { active: boolean }) {
                         setSuccess(false);
                       }}
                     >
-                      <span className={cx('mood-checkin__face', step.faceClass)} aria-hidden="true">
+                      <span className="mood-checkin__face" aria-hidden="true">
                         <span className="mood-checkin__emoji">{step.emoji}</span>
                       </span>
                     </button>
-                    <span className={cx('mood-checkin__step-label', step.labelClass)}>{caps}</span>
+                    <span className="mood-checkin__step-label">{caps}</span>
                   </div>
                 );
               })}
@@ -209,22 +201,6 @@ export function MoodPanel({ active }: { active: boolean }) {
                   );
                 })}
               </div>
-              {showOtherField && (
-                <label className="mood-checkin__other-field">
-                  <span className="visually-hidden">{t('mood.checkin.specifyOther')}</span>
-                  <input
-                    type="text"
-                    className="mood-checkin__other-input"
-                    placeholder={t('mood.checkin.otherPlaceholder')}
-                    autoComplete="off"
-                    value={otherText}
-                    onChange={(e) => {
-                      setOtherText(e.target.value);
-                      setSuccess(false);
-                    }}
-                  />
-                </label>
-              )}
             </div>
 
             <div className="mood-checkin__section">
@@ -234,7 +210,7 @@ export function MoodPanel({ active }: { active: boolean }) {
                 <textarea
                   className="mood-checkin__textarea"
                   id="mood-note"
-                  rows={4}
+                  rows={3}
                   maxLength={2000}
                   placeholder={t('mood.checkin.notePlaceholder')}
                   value={note}
