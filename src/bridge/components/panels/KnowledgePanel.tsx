@@ -10,6 +10,7 @@ import {
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
+import { KnowledgeChildDiscovery } from '@/bridge/components/KnowledgeChildDiscovery';
 import { Markdown } from '@/bridge/components/Markdown';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { KnowledgeParentEmptyExample } from '@/bridge/components/KnowledgeParentEmptyExample';
@@ -426,32 +427,37 @@ export function KnowledgePanel({ active }: { active: boolean }) {
               ) : null}
 
               <div className="msg-thread" id="knowledge-msg-thread">
-                {!msgs.length ? (
-                  <p className="panel__hint">{t('knowledge.demoThread')}</p>
-                ) : (
-                  msgs.map((m, idx) => (
-                    <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
-                      <div className="msg__who">{msgWhoLabel(m.who, t)}</div>
-                      {m.type === 'in' ? (
-                        <>
-                          <MessageAttachmentGrid attachments={m.attachments} />
-                          {m.text?.trim() ? (
-                            <Markdown className="markdown-content--msg-in">{m.text}</Markdown>
-                          ) : null}
-                        </>
-                      ) : (
-                        <>
-                          <MessageAttachmentGrid attachments={m.attachments} />
-                          {m.text?.trim() ? (
-                            <div className="msg__body msg__body--plain" style={{ whiteSpace: 'pre-wrap' }}>
-                              {m.text}
-                            </div>
-                          ) : null}
-                        </>
-                      )}
-                    </div>
-                  ))
-                )}
+                {role === 'student' && currentCard?.childKnowledge ? (
+                  <KnowledgeChildDiscovery data={currentCard.childKnowledge} />
+                ) : null}
+                {role === 'student' && currentCard && !currentCard.childKnowledge && msgs.length === 0 ? (
+                  <p className="panel__hint knowledge-student-fallback">{t('knowledge.studentNoChildContent')}</p>
+                ) : null}
+                {!msgs.length && role === 'parent' ? <p className="panel__hint">{t('knowledge.demoThread')}</p> : null}
+                {msgs.length > 0
+                  ? msgs.map((m, idx) => (
+                      <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
+                        <div className="msg__who">{msgWhoLabel(m.who, t)}</div>
+                        {m.type === 'in' ? (
+                          <>
+                            <MessageAttachmentGrid attachments={m.attachments} />
+                            {m.text?.trim() ? (
+                              <Markdown className="markdown-content--msg-in">{m.text}</Markdown>
+                            ) : null}
+                          </>
+                        ) : (
+                          <>
+                            <MessageAttachmentGrid attachments={m.attachments} />
+                            {m.text?.trim() ? (
+                              <div className="msg__body msg__body--plain" style={{ whiteSpace: 'pre-wrap' }}>
+                                {m.text}
+                              </div>
+                            ) : null}
+                          </>
+                        )}
+                      </div>
+                    ))
+                  : null}
               </div>
               <input
                 ref={knowledgeFileInputRef}

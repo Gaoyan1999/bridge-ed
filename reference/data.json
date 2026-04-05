@@ -64,6 +64,31 @@
         "en": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
         "fr": "Qu’est-ce que cela veut dire ?\nAujourd’hui, les enfants ont découvert comment le peintre Vincent van Gogh créait : pas seulement regarder des tableaux, mais les « astuces » qui rendent son art particulier.\n\nQu’est-ce que son « style » ? En termes simples, trois grands traits :\n\n- Peinture épaisse et coups de pinceau visibles, comme de petits traits de couleur.\n\n- Couleurs vives (jaunes audacieux, bleus profonds), même si ce n’est pas le réel au détail près.\n\n- Tourbillons et mouvement : les étoiles semblent tourner, l’herbe ondule au vent.\n\nEn bref : peindre avec des couleurs vives et des lignes épaisses et ondulées pour donner de l’énergie et de l’émotion."
       },
+      "childKnowledge": {
+        "heroImageUrl": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80",
+        "heroImageAlt": "美术馆中的画作（演示配图）",
+        "intro": "给你挑了几支讲梵高、笔触和《星夜》的小短片，画风很活泼。你可以边画边看，想一想：他的画为什么看起来像在动？",
+        "picks": [
+          {
+            "headline": "入门：梵高是谁？他为什么这么有名",
+            "videoTitle": "Vincent van Gogh for Kids | Famous Artists for Children",
+            "url": "https://www.youtube.com/watch?v=87SftBC1vFo",
+            "reason": "用孩子能懂的话介绍生平与代表作，适合第一次接触梵高时建立整体印象。"
+          },
+          {
+            "headline": "细看《星夜》：旋涡、厚涂和颜色",
+            "videoTitle": "Starry Night by Vincent van Gogh | Art for Kids!",
+            "url": "https://www.youtube.com/watch?v=5vZlQe7yM8Y",
+            "reason": "画面贴近你课上看到的「旋涡与动感」，帮助孩子把「风格」三个字和具体笔触对上号。"
+          },
+          {
+            "headline": "动手向：向日葵与厚涂笔触",
+            "videoTitle": "Van Gogh Sunflowers Art Lesson for Kids",
+            "url": "https://www.youtube.com/watch?v=QFJ5QdG1J1k",
+            "reason": "跟着示范用厚涂和亮色叠色，和「向日葵」主题直接呼应；看完可以试画一小张并拍照给老师。"
+          }
+        ]
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -196,6 +221,31 @@
         "en": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
         "fr": "Paroi cellulaire, chloroplastes, noyau — ce qu’il faut retenir pour la feuille d’étiquetage du schéma."
       },
+      "childKnowledge": {
+        "heroImageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
+        "heroImageAlt": "医学与健康主题插图（演示）",
+        "intro": "下面这些视频画风可爱、互动也多，给你这个年级看刚刚好。随便点开一个，看看哪个最有意思：",
+        "picks": [
+          {
+            "headline": "全方位器官概览：适合作为 Unit Intro",
+            "videoTitle": "Human Body Organs | Science For Kids | STEM Home Learning",
+            "url": "https://www.youtube.com/watch?v=B3Fv2X8EKfE",
+            "reason": "动画色彩鲜艳，介绍了心脏、肺、大脑等核心器官。视频中提到「成人有 206 块骨头而婴儿有 300 块」这类有趣的 facts，很容易吸引 G6 孩子的注意力。"
+          },
+          {
+            "headline": "沉浸式体验：人体内部之旅",
+            "videoTitle": "A Journey Inside Your Body (Bright Side)",
+            "url": "https://www.youtube.com/watch?v=3pjkQcQBTtc",
+            "reason": "这是一个模拟「缩小版旅行」的视角，第一人称视角带学生进入消化道和血管。虽然风格稍显活泼，但它能很好地建立空间感，让学生理解器官之间的物理关系。"
+          },
+          {
+            "headline": "专项系统：消化系统（G6 重点）",
+            "videoTitle": "Biology | \"What's In Our Digestive System?\" Explained",
+            "url": "https://www.youtube.com/watch?v=W55-QiHCYGA",
+            "reason": "Big Bang Academy 的风格非常符合「可爱」的要求，动画极其精良，逻辑清晰，适合讲解复杂的消化过程，帮助学生理解「能量转化」这一科学概念。"
+          }
+        ]
+      },
       "tonightActions": [
         {
           "preset": "quiz",
@@ -239,6 +289,31 @@
         "zh": "本周科学课复习气压概念，帮助孩子理解大气中的压力如何运作，从而更好地认识天气与天气变化。",
         "en": "This week in science, your child is reviewing the concept of barometric pressure, which is about understanding how air pressure works in the atmosphere. This helps them learn about weather and how it changes.",
         "fr": "Cette semaine en sciences, votre enfant révise la pression barométrique : comprendre comment la pression de l’air fonctionne dans l’atmosphère, pour mieux saisir la météo et ses changements."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "/knowledge/mock-hero.png",
+        "heroImageAlt": "知识面板示意（演示配图）",
+        "intro": "下面几支小视频用动画讲气压、天气和大气，很好懂。你可以边看边想：空气是怎么压住地面的？风和云又是怎么来的？",
+        "picks": [
+          {
+            "headline": "从「飞机为什么能飞」理解气压与升力",
+            "videoTitle": "How Airplanes Fly! | Airplane Science | SciShow Kids",
+            "url": "https://www.youtube.com/watch?v=VLpSxHwfU04",
+            "reason": "用机翼、风速与空气密度把「气压差」讲得很直观；适合当「大气压」的引子，把抽象概念和看得见的现象联系起来。"
+          },
+          {
+            "headline": "大气层：我们头顶的「空气海洋」",
+            "videoTitle": "Bill Nye The Science Guy - Atmosphere",
+            "url": "https://www.youtube.com/watch?v=r4yL18XOmZ0",
+            "reason": "经典科学秀风格，把大气层、压强与生命所需气体讲得很上头；语速偏快，建议开字幕或和家长一起看。"
+          },
+          {
+            "headline": "天气与水的循环（和云、雨怎么来有关）",
+            "videoTitle": "The Water Cycle | The Dr. Binocs Show | Peekaboo Kidz",
+            "url": "https://www.youtube.com/watch?v=fcTDSPM5S4U",
+            "reason": "把蒸发、凝结、降水串成一条线，帮助理解「为什么气压图和天气预报总连在一起」；动画节奏友好，适合做笔记关键词。"
+          }
+        ]
       },
       "tonightActions": [
         {

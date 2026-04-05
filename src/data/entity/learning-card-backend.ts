@@ -1,4 +1,4 @@
-import type { LearningCardTonightAction } from '@/bridge/types';
+import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/bridge/types';
 
 /**
  * Backend contract for Learning Cards intended for REST/JSON APIs and IndexedDB documents.
@@ -57,6 +57,8 @@ export interface LearningCardBackend {
     en?: string;
     fr?: string;
   };
+  /** Student Knowledge: optional discovery payload (hero image + curated videos). */
+  childKnowledge?: LearningCardChildKnowledge;
   tonightActions: LearningCardTonightActionBackend[];
 
   audience: {
