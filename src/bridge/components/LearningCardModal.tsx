@@ -370,6 +370,27 @@ export function LearningCardModal({
               isRequired
               placeholder={t('learningCard.wizard.topicPlaceholder')}
             />
+            <div className="learning-card-wizard-student-section">
+              <p className="learning-card-wizard-student-section__heading">{t('learningCard.wizard.studentSectionTitle')}</p>
+              <div
+                className="learning-card-wizard-promo"
+                role="region"
+                aria-label={t('learningCard.wizard.studentPreviewAria')}
+              >
+                <div className="learning-card-wizard-promo__inner learning-card-wizard-promo__inner--text-only">
+                  <div className="learning-card-wizard-promo__lead">
+                    <span className="learning-card-wizard-promo__icon" aria-hidden>
+                      <Sparkles strokeWidth={2} size={22} />
+                    </span>
+                    <div className="learning-card-wizard-promo__text">
+                      <h4 className="learning-card-wizard-promo__title">{t('learningCard.wizard.studentPreviewTitle')}</h4>
+                      <p className="learning-card-wizard-promo__body">{t('learningCard.wizard.studentPreviewBody')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="learning-card-wizard-student-section__parent-hint">{t('learningCard.wizard.studentPreviewParentHint')}</p>
+            </div>
             <FieldTextArea
               id="lc-notes"
               label={t('learningCard.wizard.notes')}
@@ -421,7 +442,7 @@ export function LearningCardModal({
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-review-tabs">
               <div
-                className="learning-card-review-tabs__bar"
+                className="learning-card-review-tabs__bar learning-card-review-tabs__bar--pills"
                 role="tablist"
                 aria-label={t('learningCard.wizard.ariaReviewTabs')}
               >
@@ -456,7 +477,7 @@ export function LearningCardModal({
                   id="lc-panel-parent"
                   role="tabpanel"
                   aria-labelledby="lc-tab-parent"
-                  className="learning-card-review-tabs__panel"
+                  className="learning-card-review-tabs__panel learning-card-review-tabs__panel--parent"
                 >
                   <div className="learning-card-review-summary">
                     <p className="field__label">{t('learningCard.wizard.parentSummary')}</p>
@@ -467,7 +488,7 @@ export function LearningCardModal({
                     )}
                     <div className="learning-card-ai-hint" role="note">
                       <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
-                        <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
+                        <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={14} />
                       </div>
                       <p className="learning-card-ai-hint__text">{t('learningCard.wizard.aiHint')}</p>
                     </div>
@@ -477,7 +498,7 @@ export function LearningCardModal({
                       labelHidden
                       value={summary}
                       onChange={setSummary}
-                      rows={5}
+                      rows={4}
                     />
                   </div>
                   <fieldset
@@ -529,10 +550,12 @@ export function LearningCardModal({
                   id="lc-panel-student"
                   role="tabpanel"
                   aria-labelledby="lc-tab-student"
-                  className="learning-card-review-tabs__panel"
+                  className="learning-card-review-tabs__panel learning-card-review-tabs__panel--student"
                 >
-                  <div className="learning-card-review-summary">
-                    <p className="field__label">{t('learningCard.wizard.studentDiscovery')}</p>
+                  <div className="learning-card-review-summary learning-card-student-preview">
+                    <p className="field__label learning-card-student-preview__kicker">
+                      {t('learningCard.wizard.studentDiscovery')}
+                    </p>
                     {childKnowledgeError && (
                       <p className="field__hint" role="alert">
                         {childKnowledgeError}
@@ -540,18 +563,20 @@ export function LearningCardModal({
                       </p>
                     )}
                     {!childKnowledgeError && childKnowledgeDraft && childKnowledgeDraft.content.trim().length > 0 && (
-                      <>
-                        <img
-                          className="knowledge-child-discovery__hero learning-card-student-preview__hero"
-                          src={childKnowledgeDraft.heroImageUrl}
-                          alt={childKnowledgeDraft.heroImageAlt ?? ''}
-                          loading="lazy"
-                          decoding="async"
-                        />
+                      <div className="learning-card-student-preview__body">
+                        <div className="learning-card-student-preview__hero-wrap">
+                          <img
+                            className="knowledge-child-discovery__hero learning-card-student-preview__hero"
+                            src={childKnowledgeDraft.heroImageUrl}
+                            alt={childKnowledgeDraft.heroImageAlt ?? ''}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
                         <Markdown className="learning-card-student-md">
                           {discoveryPlainTextToMarkdown(childKnowledgeDraft.content)}
                         </Markdown>
-                      </>
+                      </div>
                     )}
                     {!childKnowledgeError &&
                       (!childKnowledgeDraft || !childKnowledgeDraft.content.trim()) && (
@@ -671,44 +696,58 @@ export function LearningCardModal({
         <div className="book-form learning-card-form">
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-confirm">
-              <p className="learning-card-confirm__lead">{t('learningCard.wizard.confirmLead')}</p>
-              <p className="learning-card-confirm__count">
-                {t('learningCard.wizard.confirmCount', {
-                  count: recipientCount,
-                  familyWord: t(
-                    recipientCount === 1 ? 'learningCard.wizard.familyOne' : 'learningCard.wizard.familyOther',
-                  ),
-                })}
-              </p>
-              <ul className="learning-card-confirm__bullets">
-                <li>
-                  {t('learningCard.wizard.bulletSummary', {
-                    status: summary.trim() ? t('learningCard.wizard.statusReady') : t('learningCard.wizard.statusDash'),
-                  })}
-                </li>
-                <li>
-                  {t('learningCard.wizard.bulletStudentDiscovery', {
-                    status: childKnowledgeDraft?.content.trim()
-                      ? t('learningCard.wizard.statusReady')
-                      : t('learningCard.wizard.statusNotIncluded'),
-                  })}
-                </li>
-                <li>
-                  {t('learningCard.wizard.bulletTonightActions', {
-                    selected: tonightActions.filter((a) => a.include).length,
-                    total: LEARNING_CARD_TONIGHT_ACTION_PRESETS.length,
-                  })}
-                </li>
-                <li>
-                  {t('learningCard.wizard.bulletAudience', {
-                    kind: t(
-                      audienceMode === 'class'
-                        ? 'learningCard.wizard.audienceKindClass'
-                        : 'learningCard.wizard.audienceKindSelected',
+              <div className="learning-card-confirm__lead-row">
+                <span
+                  className="learning-card-confirm__done-badge"
+                  role="img"
+                  aria-label={t('learningCard.wizard.confirmDoneBadgeTitle')}
+                >
+                  <Check className="learning-card-confirm__done-check" aria-hidden strokeWidth={3} size={14} />
+                </span>
+                <p className="learning-card-confirm__lead">{t('learningCard.wizard.confirmLead')}</p>
+              </div>
+              <div className="learning-card-confirm__highlight">
+                <p className="learning-card-confirm__count">
+                  {t('learningCard.wizard.confirmCount', {
+                    count: recipientCount,
+                    familyWord: t(
+                      recipientCount === 1 ? 'learningCard.wizard.familyOne' : 'learningCard.wizard.familyOther',
                     ),
                   })}
-                </li>
-              </ul>
+                </p>
+                <ul className="learning-card-confirm__bullets">
+                  <li>
+                    <span className="learning-card-confirm__bullet-label">{t('learningCard.wizard.bulletSummaryLabel')}</span>{' '}
+                    <strong className="learning-card-confirm__bullet-value">
+                      {summary.trim() ? t('learningCard.wizard.statusReady') : t('learningCard.wizard.statusDash')}
+                    </strong>
+                  </li>
+                  <li>
+                    <span className="learning-card-confirm__bullet-label">{t('learningCard.wizard.bulletStudentDiscoveryLabel')}</span>{' '}
+                    <strong className="learning-card-confirm__bullet-value">
+                      {childKnowledgeDraft?.content.trim()
+                        ? t('learningCard.wizard.statusReady')
+                        : t('learningCard.wizard.statusNotIncluded')}
+                    </strong>
+                  </li>
+                  <li>
+                    <span className="learning-card-confirm__bullet-label">{t('learningCard.wizard.bulletTonightActionsLabel')}</span>{' '}
+                    <strong className="learning-card-confirm__bullet-value">
+                      {tonightActions.filter((a) => a.include).length} / {LEARNING_CARD_TONIGHT_ACTION_PRESETS.length}
+                    </strong>
+                  </li>
+                  <li>
+                    <span className="learning-card-confirm__bullet-label">{t('learningCard.wizard.bulletAudienceLabel')}</span>{' '}
+                    <strong className="learning-card-confirm__bullet-value">
+                      {t(
+                        audienceMode === 'class'
+                          ? 'learningCard.wizard.audienceKindClass'
+                          : 'learningCard.wizard.audienceKindSelected',
+                      )}
+                    </strong>
+                  </li>
+                </ul>
+              </div>
               {saveError && (
                 <p className="field__hint" role="alert">
                   {saveError}
