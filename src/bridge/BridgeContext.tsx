@@ -168,6 +168,23 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const currentUser: UserBackend | undefined =
     users.length > 0 && currentUserId ? users.find((u) => u.id === currentUserId) : undefined;
 
+  const setModule = (m: Module) => {
+    if (!MODULES.includes(m)) return;
+    setModuleState(m);
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', `#${m}`);
+    }
+  };
+
+  const applyRoleNavigation = (r: Role) => {
+    if (r === 'teacher' || r === 'parent') {
+      setModule('dashboard');
+    } else {
+      // Student: Knowledge as the default when switching view-as user (sidebar).
+      setModule('knowledge');
+    }
+  };
+
   useEffect(() => {
     if (role !== 'student' && module === 'mood') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync hash when role cannot use Mood (student-only)
@@ -181,11 +198,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (role !== 'student') return;
     if (module !== 'dashboard') return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- student shell is Chat + Mood only
-    setModuleState('chat');
-    if (typeof history !== 'undefined' && history.replaceState) {
-      history.replaceState(null, '', '#chat');
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- student default view is Knowledge
+    setModule('knowledge');
   }, [role, module]);
 
   useEffect(() => {
@@ -196,29 +210,6 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       history.replaceState(null, '', '#dashboard');
     }
   }, [role, module]);
-
-  const setModule = (m: Module) => {
-    if (!MODULES.includes(m)) return;
-    setModuleState(m);
-    if (typeof history !== 'undefined' && history.replaceState) {
-      history.replaceState(null, '', `#${m}`);
-    }
-  };
-
-  const applyRoleNavigation = (r: Role) => {
-    if (r === 'teacher' || r === 'parent') {
-      setModule('dashboard');
-    } else {
-      // Student home: Chat (+ Mood in nav), not the parent dashboard.
-      setModuleState((cur) => {
-        if (cur !== 'dashboard') return cur;
-        if (typeof history !== 'undefined' && history.replaceState) {
-          history.replaceState(null, '', '#chat');
-        }
-        return 'chat';
-      });
-    }
-  };
 
   const persistViewUserId = (id: string) => {
     try {

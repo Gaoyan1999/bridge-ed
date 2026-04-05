@@ -51,23 +51,13 @@ export type LearningCardTranslatedSummaries = {
   fr?: string;
 };
 
-/** Curated picks for the student “Knowledge” discovery view (mock / future AI). */
-export type LearningCardChildKnowledgeVideoPick = {
-  /** Section title, e.g. “全方位器官概览：适合作为 Unit Intro”. */
-  headline: string;
-  videoTitle: string;
-  url: string;
-  /** Why this clip fits (shown to the student). */
-  reason: string;
-};
-
-/** Student-only: hero + intro + external video picks (not the parent noun-summary thread). */
+/** Student-only: hero + free-form discovery text (not the parent noun-summary thread). */
 export type LearningCardChildKnowledge = {
+  /** Cover image URL (from AI / media picker alongside discovery text). */
   heroImageUrl: string;
   heroImageAlt?: string;
-  /** Opening paragraph(s); may use newlines. */
-  intro: string;
-  picks: LearningCardChildKnowledgeVideoPick[];
+  /** Intro, video titles, links, reasons—may use newlines; URLs may be plain text. */
+  content: string;
 };
 
 export interface LearningCardItem {

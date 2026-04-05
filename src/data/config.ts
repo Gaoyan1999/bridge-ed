@@ -20,3 +20,12 @@ export function getDebugMode(): boolean {
   const v = import.meta.env.VITE_DEBUG;
   return v === 'true' || v === '1';
 }
+
+/**
+ * When true, `LlmApi.explainTerminologyToParents` calls the backend. When false (default), uses a local mock
+ * to avoid token spend. Set in `.env`: `VITE_USE_LLM=true`.
+ */
+export function getUseLlm(): boolean {
+  const v = import.meta.env.VITE_USE_LLM;
+  return v === 'true' || v === '1';
+}

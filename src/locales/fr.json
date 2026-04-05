@@ -106,11 +106,6 @@
     "practice": {
       "button": "Pratique",
       "mockReply": "**Mini-pratique**\n\nUtilisons la **manière de Van Gogh** pour un petit exercice : **peindre un tournesol**.\n\n- **Pinceau :** Peinture épaisse et coups courts — laissez des marques visibles comme Van Gogh ; pas besoin d’être parfaitement lisse.\n- **Couleur :** Jaune vif comme ton principal ; un peu de vert profond et d’ocre pour le cœur et les ombres.\n- **Cœur et pétales :** Commencez par une ovale plate pour le cœur, puis des traits rayonnants pour les pétales — un peu de mouvement si vous voulez.\n\nEnsuite, dites quelles trois couleurs vous avez utilisées, ce que vous ajusteriez — ou envoyez une photo."
-    },
-    "childDiscovery": {
-      "videoTitle": "Titre de la vidéo",
-      "link": "Lien",
-      "reason": "Pourquoi cette vidéo"
     }
   },
   "chat": {

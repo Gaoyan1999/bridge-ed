@@ -1,6 +1,32 @@
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LearningCardChildKnowledge } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
+
+const URL_IN_TEXT = /(https?:\/\/\S+)/g;
+
+function ContentWithLinks({ text }: { text: string }) {
+  const parts = text.split(URL_IN_TEXT);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="knowledge-child-discovery__link"
+          >
+            {part}
+          </a>
+        ) : (
+          <Fragment key={i}>{part}</Fragment>
+        ),
+      )}
+    </>
+  );
+}
 
 export function KnowledgeChildDiscovery({
   data,
@@ -20,35 +46,9 @@ export function KnowledgeChildDiscovery({
         decoding="async"
       />
       <div className="knowledge-child-discovery__source">{t('common.bridgedAi')}</div>
-      <div className="knowledge-child-discovery__intro">{data.intro}</div>
-      <ol className="knowledge-child-discovery__picks">
-        {data.picks.map((pick, i) => (
-          <li key={`${pick.url}-${i}`} className="knowledge-child-discovery__pick">
-            <div className="knowledge-child-discovery__pick-headline">
-              {i + 1}. {pick.headline}
-            </div>
-            <div className="knowledge-child-discovery__field">
-              <span className="knowledge-child-discovery__label">{t('knowledge.childDiscovery.videoTitle')}</span>
-              {pick.videoTitle}
-            </div>
-            <div className="knowledge-child-discovery__field">
-              <span className="knowledge-child-discovery__label">{t('knowledge.childDiscovery.link')}</span>
-              <a
-                href={pick.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="knowledge-child-discovery__link"
-              >
-                {pick.url}
-              </a>
-            </div>
-            <div className="knowledge-child-discovery__field">
-              <span className="knowledge-child-discovery__label">{t('knowledge.childDiscovery.reason')}</span>
-              {pick.reason}
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div className="knowledge-child-discovery__content">
+        <ContentWithLinks text={data.content} />
+      </div>
     </div>
   );
 }
