@@ -16,7 +16,6 @@ const EXAMPLE_CARD: LearningCardItem = {
   title: '勾股定理',
   grade: 'G9',
   subject: 'G9 · Math',
-  status: 'New',
   summary:
     'Tonight: review how factoring ties to area models, then try two textbook-style problems with your child.',
   at: Date.now(),
@@ -52,9 +51,8 @@ export function KnowledgeParentEmptyExample() {
         </div>
         <button type="button" className="inbox-item inbox-item--knowledge is-active" disabled tabIndex={-1}>
           <div className="inbox-item__title">{card.title}</div>
-          <div className="knowledge-inbox__labels" role="group" aria-label="Subject and status">
+          <div className="knowledge-inbox__labels" role="group" aria-label="Subject">
             <span className="knowledge-inbox__label knowledge-inbox__label--subject">Math</span>
-            <span className="knowledge-inbox__label knowledge-inbox__label--status">New</span>
           </div>
           <div className="inbox-item__meta">{new Date(card.at).toISOString().slice(0, 10)}</div>
         </button>
@@ -68,9 +66,8 @@ export function KnowledgeParentEmptyExample() {
             </h3>
             <div className="thread-header__knowledge-toolbar">
               <div className="thread-header__knowledge-left">
-                <div className="knowledge-inbox__labels" role="group" aria-label="Subject and status">
+                <div className="knowledge-inbox__labels" role="group" aria-label="Subject">
                   <span className="knowledge-inbox__label knowledge-inbox__label--subject">Math</span>
-                  <span className="knowledge-inbox__label knowledge-inbox__label--status">New</span>
                 </div>
               </div>
               {includedSteps.length > 0 ? (

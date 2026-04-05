@@ -8,7 +8,17 @@ import { LEARNING_CARD_TONIGHT_ACTION_PRESETS } from '@/bridge/types';
 import {
   LEARNING_CARD_SCHEMA_VERSION,
   type LearningCardBackend,
+  type LearningCardStatusBackend,
 } from '@/data/entity/learning-card-backend';
+
+function defaultLearningCardStatusBackend(sentAt: string | null): LearningCardStatusBackend {
+  const sent = sentAt != null && String(sentAt).trim() !== '';
+  return {
+    status: sent ? 'sent' : 'draft',
+    student: [],
+    parent: [],
+  };
+}
 
 function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
   return typeof v === 'string' && (LEARNING_CARD_TONIGHT_ACTION_PRESETS as readonly string[]).includes(v);
@@ -28,12 +38,14 @@ export function normalizeTonightActions(raw: unknown): LearningCardTonightAction
   return out;
 }
 
-/** Normalize stored card (legacy `tonightActions` / schema v1 to current). */
-export function normalizeLearningCardBackend(card: LearningCardBackend): LearningCardBackend {
+/** Normalize stored card (legacy `tonightActions` / schema v1 to current). Strips removed `sendStatus`. */
+export function normalizeLearningCardBackend(raw: LearningCardBackend): LearningCardBackend {
+  const { sendStatus: _omit, ...card } = raw as LearningCardBackend & { sendStatus?: unknown };
   return {
     ...card,
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
     tonightActions: normalizeTonightActions(card.tonightActions),
+    status: card.status ?? defaultLearningCardStatusBackend(card.sentAt),
   };
 }
 
@@ -99,9 +111,9 @@ export function learningCardCreatePayloadToBackend(
       recipientCount: payload.audience.recipientCount,
       selectedStudentIds: selectedIds,
     },
-    sendStatus: 'sent',
     sentAt: sentAtIso,
     threadId,
+    status: defaultLearningCardStatusBackend(sentAtIso),
   };
 }
 
@@ -132,9 +144,9 @@ export function sampleLearningCardBackend(): LearningCardBackend {
       recipientCount: 28,
       selectedStudentIds: [],
     },
-    sendStatus: 'sent',
     sentAt: now,
     threadId,
+    status: defaultLearningCardStatusBackend(now),
   };
 }
 
@@ -168,9 +180,9 @@ export function learningCardItemToBackendSnapshot(
       recipientCount: 28,
       selectedStudentIds: [],
     },
-    sendStatus: 'sent',
     sentAt: ts,
     threadId: item.threadId,
+    status: defaultLearningCardStatusBackend(ts),
   };
 }
 
@@ -185,7 +197,6 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     title,
     grade,
     subject,
-    status: 'New',
     summary: summary.length > 0 ? summary : '-',
     ...(backend.translatedSummaries ? { translatedSummaries: { ...backend.translatedSummaries } } : {}),
     ...(backend.childKnowledge ? { childKnowledge: backend.childKnowledge } : {}),

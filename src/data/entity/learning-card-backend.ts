@@ -10,16 +10,13 @@ import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/br
  *
  * IndexedDB hints (suggested):
  * - Object store: `learningCards`, keyPath: `id`
- * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`, `sendStatus`
+ * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`
  */
 
 export const LEARNING_CARD_SCHEMA_VERSION = 2 as const;
 
 /** Who receives the card (maps from wizard `class` / `selected`). */
 export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
-
-/** Teacher-side send pipeline. */
-export type LearningCardSendStatus = 'draft' | 'sent' | 'failed';
 
 /** Same shape as `LearningCardTonightAction` in persisted JSON / IndexedDB. */
 export type LearningCardTonightActionBackend = LearningCardTonightAction;
@@ -67,10 +64,34 @@ export interface LearningCardBackend {
     selectedStudentIds: string[];
   };
 
-  sendStatus: LearningCardSendStatus;
-  /** When the card was successfully sent to families (null while draft or failed). */
+  /** When the card was successfully sent to families (null while not yet sent). */
   sentAt: string | null;
 
   /** Chat / notification thread for this card. */
   threadId: string;
+
+  status: LearningCardStatusBackend;
+}
+
+
+export type LearningCardStatusBackend = {
+  status: 'draft' | 'sent' | 'archived';
+  student: LearningCardStudentFeedback[];
+  parent: LearningCardParentFeedback[];
+};
+
+type LearningCardStudentFeedback = {
+  studentId: string;
+  watchedVideo: boolean;  
+  chatedWithAI: boolean;
+  status: 'not_started' | 'learning' | 'finished';
+  finishedType?: 'pretty_easy' | 'think_get_it' | 'challenge';
+}
+
+
+type LearningCardParentFeedback = {
+  parentId: string;
+  status: 'unread' | 'read' | 'actioned';
+  chatedWithAI: boolean;
+  doNotUnderstand: boolean;
 }

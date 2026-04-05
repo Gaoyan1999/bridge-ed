@@ -67,7 +67,6 @@ export interface LearningCardItem {
   grade: string;
   /** Subject line for listings (e.g. Math, or Math · Geometry). */
   subject: string;
-  status: string;
   /** Canonical parent summary line (legacy / fallback). */
   summary: string;
   /** When present, resolve localized text via `resolveParentSummaryForDisplay` (see `learning-card-summary.ts`). */
