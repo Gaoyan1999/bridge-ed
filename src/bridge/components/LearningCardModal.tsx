@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, ListChecks, Sparkles, Users } from 'lucide-react';
 import { Checkbox, Label, Radio, RadioGroup } from 'react-aria-components';
@@ -64,12 +64,6 @@ function persistSelect(key: string, value: string) {
   }
 }
 
-const STEPS = [
-  { id: 'input', label: 'Class input' },
-  { id: 'draft', label: 'Generate & review' },
-  { id: 'audience', label: 'Audience' },
-] as const;
-
 type Phase = 'input' | 'generating' | 'review' | 'audience' | 'confirm';
 
 function stepIndex(phase: Phase): number {
@@ -96,7 +90,17 @@ export function LearningCardModal({
   /** Called after a card is persisted. */
   onSaved?: () => void;
 }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const steps = useMemo(
+    () =>
+      [
+        { id: 'input' as const, label: t('learningCard.wizard.stepClassInput') },
+        { id: 'draft' as const, label: t('learningCard.wizard.stepGenerateReview') },
+        { id: 'audience' as const, label: t('learningCard.wizard.stepAudience') },
+      ] as const,
+    [t],
+  );
   const { currentUser } = useBridge();
   const classLesson = DEFAULT_CLASS_LESSON;
   const [grade, setGrade] = useState<string>(() =>
@@ -220,7 +224,7 @@ export function LearningCardModal({
         } catch (e) {
           return {
             ok: false,
-            message: e instanceof Error ? e.message : 'Student discovery generation failed.',
+            message: e instanceof Error ? e.message : t('learningCard.wizard.errors.childGenFailed'),
           };
         }
       }
@@ -246,7 +250,7 @@ export function LearningCardModal({
       setReviewTab('parent');
       setPhase('review');
     } catch (e) {
-      setWarning(e instanceof Error ? e.message : 'Generation failed.');
+      setWarning(e instanceof Error ? e.message : t('learningCard.wizard.errors.generationFailed'));
       setPhase('input');
     }
   };
@@ -255,7 +259,7 @@ export function LearningCardModal({
     const teacherSummary = summary.trim();
     const selectedActionCount = tonightActions.filter((action) => action.include).length;
     if (!teacherSummary || selectedActionCount === 0) {
-      setSaveError('Add a summary and select at least one action before sending.');
+      setSaveError(t('learningCard.wizard.errors.saveBeforeSend'));
       return;
     }
 
@@ -264,16 +268,16 @@ export function LearningCardModal({
     try {
       await confirmSendLearningCard();
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : 'Failed to save learning card.');
+      setSaveError(e instanceof Error ? e.message : t('learningCard.wizard.errors.saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const stepper = (
-    <nav className="learning-card-steps" aria-label="Wizard steps">
+    <nav className="learning-card-steps" aria-label={t('learningCard.wizard.ariaStepper')}>
       <ol className="learning-card-steps__list">
-        {STEPS.map((s, i) => {
+        {steps.map((s, i) => {
           const done = i < activeStep;
           const current = i === activeStep;
           const upcoming = i > activeStep;
@@ -303,11 +307,9 @@ export function LearningCardModal({
     <>
       <div className="modal__header modal__header--learning-card">
         <h3 id="modal-learning-card-title" className="modal__title">
-          New learning card
+          {t('learningCard.wizard.title')}
         </h3>
-        <p className="modal__lede">
-          Draft a parent-friendly card from your class notes, then choose who receives it.
-        </p>
+        <p className="modal__lede">{t('learningCard.wizard.lede')}</p>
       </div>
 
       <div className="learning-card-wizard">
@@ -341,7 +343,7 @@ export function LearningCardModal({
               /> */}
               <FieldSelect
                 id="lc-grade"
-                label="Grade"
+                label={t('learningCard.wizard.grade')}
                 value={grade}
                 onValueChange={(v) => {
                   setGrade(v);
@@ -351,7 +353,7 @@ export function LearningCardModal({
               />
               <FieldSelect
                 id="lc-subject"
-                label="Subject"
+                label={t('learningCard.wizard.subject')}
                 value={subject}
                 onValueChange={(v) => {
                   setSubject(v);
@@ -362,28 +364,28 @@ export function LearningCardModal({
             </div>
             <FieldTextInput
               id="lc-topic"
-              label="Topic & focus"
+              label={t('learningCard.wizard.topic')}
               value={topic}
               onChange={setTopic}
               isRequired
-              placeholder="e.g. Factoring quadratics, common pitfalls"
+              placeholder={t('learningCard.wizard.topicPlaceholder')}
             />
             <FieldTextArea
               id="lc-notes"
-              label="Extra notes for the generator (optional)"
+              label={t('learningCard.wizard.notes')}
               value={notes}
               onChange={setNotes}
               rows={3}
-              placeholder="Anything the model should emphasize for families..."
+              placeholder={t('learningCard.wizard.notesPlaceholder')}
             />
           </div>
           <div className="modal__footer">
             <div className="modal__actions">
               <Button variant="text" type="button" onClick={onClose}>
-                Cancel
+                {t('learningCard.wizard.cancel')}
               </Button>
               <Button variant="primary" pill type="submit" disabled={!canSubmitInput}>
-                Generate parent version
+                {t('learningCard.wizard.generate')}
               </Button>
             </div>
           </div>
@@ -396,10 +398,8 @@ export function LearningCardModal({
             <div className="learning-card-gen__orb" aria-hidden="true">
               <Sparkles className="learning-card-gen__sparkle" strokeWidth={2} size={28} />
             </div>
-            <p className="learning-card-gen__title">Generating drafts...</p>
-            <p className="learning-card-gen__hint">
-              Parent summary and student video discovery (for Knowledge) from your class context.
-            </p>
+            <p className="learning-card-gen__title">{t('learningCard.wizard.generatingTitle')}</p>
+            <p className="learning-card-gen__hint">{t('learningCard.wizard.generatingHint')}</p>
             <div className="learning-card-gen__dots" aria-hidden="true">
               <span />
               <span />
@@ -423,7 +423,7 @@ export function LearningCardModal({
               <div
                 className="learning-card-review-tabs__bar"
                 role="tablist"
-                aria-label="Preview by audience"
+                aria-label={t('learningCard.wizard.ariaReviewTabs')}
               >
                 <button
                   type="button"
@@ -435,7 +435,7 @@ export function LearningCardModal({
                   className={cx('learning-card-review-tabs__tab', reviewTab === 'parent' && 'is-active')}
                   onClick={() => setReviewTab('parent')}
                 >
-                  Parents
+                  {t('learningCard.wizard.tabParents')}
                 </button>
                 <button
                   type="button"
@@ -447,7 +447,7 @@ export function LearningCardModal({
                   className={cx('learning-card-review-tabs__tab', reviewTab === 'student' && 'is-active')}
                   onClick={() => setReviewTab('student')}
                 >
-                  Students
+                  {t('learningCard.wizard.tabStudents')}
                 </button>
               </div>
 
@@ -459,7 +459,7 @@ export function LearningCardModal({
                   className="learning-card-review-tabs__panel"
                 >
                   <div className="learning-card-review-summary">
-                    <p className="field__label">Parent summary</p>
+                    <p className="field__label">{t('learningCard.wizard.parentSummary')}</p>
                     {warning && (
                       <p className="field__hint" role="status">
                         {warning}
@@ -469,14 +469,11 @@ export function LearningCardModal({
                       <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
                         <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={18} />
                       </div>
-                      <p className="learning-card-ai-hint__text">
-                        Families will see this in their preferred language - we translate the summary automatically for
-                        each parent.
-                      </p>
+                      <p className="learning-card-ai-hint__text">{t('learningCard.wizard.aiHint')}</p>
                     </div>
                     <FieldTextArea
                       id="lc-summary"
-                      label="Parent summary"
+                      label={t('learningCard.wizard.parentSummary')}
                       labelHidden
                       value={summary}
                       onChange={setSummary}
@@ -488,7 +485,7 @@ export function LearningCardModal({
                     aria-labelledby="lc-tonight-heading"
                   >
                     <p id="lc-tonight-heading" className="learning-card-actions-section__kicker">
-                      Tonight&apos;s actions
+                      {t('learningCard.wizard.tonightActions')}
                     </p>
                     <div className="learning-card-actions-group">
                       <ul className="learning-card-actions learning-card-actions--presets">
@@ -512,7 +509,7 @@ export function LearningCardModal({
                                   );
                                 }}
                                 className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
-                                aria-label={`Include: ${copy.title}`}
+                                aria-label={t('learningCard.wizard.includePresetAria', { title: copy.title })}
                               />
                               <div className="learning-card-actions__preset-body">
                                 <span className="learning-card-actions__preset-title">{copy.title}</span>
@@ -535,10 +532,11 @@ export function LearningCardModal({
                   className="learning-card-review-tabs__panel"
                 >
                   <div className="learning-card-review-summary">
-                    <p className="field__label">Student discovery (videos)</p>
+                    <p className="field__label">{t('learningCard.wizard.studentDiscovery')}</p>
                     {childKnowledgeError && (
                       <p className="field__hint" role="alert">
-                        {childKnowledgeError} Go back and try generating again.
+                        {childKnowledgeError}
+                        {t('learningCard.wizard.childErrorFollowUp')}
                       </p>
                     )}
                     {!childKnowledgeError && childKnowledgeDraft && childKnowledgeDraft.content.trim().length > 0 && (
@@ -558,7 +556,7 @@ export function LearningCardModal({
                     {!childKnowledgeError &&
                       (!childKnowledgeDraft || !childKnowledgeDraft.content.trim()) && (
                       <p className="field__hint" role="status">
-                        Nothing generated for students yet. Go back and run generate again.
+                        {t('learningCard.wizard.studentEmpty')}
                       </p>
                     )}
                   </div>
@@ -569,10 +567,10 @@ export function LearningCardModal({
           <div className="modal__footer">
             <div className="modal__actions">
               <Button variant="text" type="button" onClick={() => setPhase('input')}>
-                Back
+                {t('learningCard.wizard.back')}
               </Button>
               <Button variant="primary" pill type="submit">
-                Continue to audience
+                {t('learningCard.wizard.continueAudience')}
               </Button>
             </div>
           </div>
@@ -595,16 +593,18 @@ export function LearningCardModal({
               onChange={(v) => setAudienceMode(v as 'class' | 'selected')}
               className="field field--audience-mode"
             >
-              <Label className="field__label">Who should receive this card?</Label>
+              <Label className="field__label">{t('learningCard.wizard.whoReceives')}</Label>
               <div className="learning-card-audience-cards">
                 <Radio value="class" className="learning-card-audience-card">
                   <span className="learning-card-audience-card__icon" aria-hidden="true">
                     <Users strokeWidth={1.75} size={28} />
                   </span>
                   <span className="learning-card-audience-card__body">
-                    <strong className="learning-card-audience-card__title">Whole class</strong>
+                    <strong className="learning-card-audience-card__title">
+                      {t('learningCard.wizard.audienceWholeClass')}
+                    </strong>
                     <span className="learning-card-audience-card__sub">
-                      All linked parents ({WHOLE_CLASS_RECIPIENTS})
+                      {t('learningCard.wizard.audienceWholeClassSub', { count: WHOLE_CLASS_RECIPIENTS })}
                     </span>
                   </span>
                 </Radio>
@@ -613,9 +613,11 @@ export function LearningCardModal({
                     <ListChecks strokeWidth={1.75} size={28} />
                   </span>
                   <span className="learning-card-audience-card__body">
-                    <strong className="learning-card-audience-card__title">Selected parents</strong>
+                    <strong className="learning-card-audience-card__title">
+                      {t('learningCard.wizard.audienceSelected')}
+                    </strong>
                     <span className="learning-card-audience-card__sub">
-                      Pick families from your roster (demo)
+                      {t('learningCard.wizard.audienceSelectedSub')}
                     </span>
                   </span>
                 </Radio>
@@ -623,7 +625,7 @@ export function LearningCardModal({
             </RadioGroup>
             {audienceMode === 'selected' && (
               <fieldset className="field">
-                <legend className="field__label">Parents</legend>
+                <legend className="field__label">{t('learningCard.wizard.parentsLegend')}</legend>
                 <ul className="learning-card-parent-list">
                   {DASH_STUDENTS.map((s) => (
                     <li key={s.name}>
@@ -641,7 +643,7 @@ export function LearningCardModal({
                 </ul>
                 {audienceMode === 'selected' && recipientCount === 0 && (
                   <p className="field__hint" role="alert">
-                    Select at least one parent.
+                    {t('learningCard.wizard.selectOneParent')}
                   </p>
                 )}
               </fieldset>
@@ -650,7 +652,7 @@ export function LearningCardModal({
           <div className="modal__footer">
             <div className="modal__actions">
               <Button variant="text" type="button" onClick={() => setPhase('review')}>
-                Back
+                {t('learningCard.wizard.back')}
               </Button>
               <Button
                 variant="primary"
@@ -658,7 +660,7 @@ export function LearningCardModal({
                 type="submit"
                 disabled={audienceMode === 'selected' && recipientCount === 0}
               >
-                Review send
+                {t('learningCard.wizard.reviewSend')}
               </Button>
             </div>
           </div>
@@ -669,24 +671,42 @@ export function LearningCardModal({
         <div className="book-form learning-card-form">
           <div className="modal__scroll learning-card-main__scroll">
             <div className="learning-card-confirm">
-              <p className="learning-card-confirm__lead">You&apos;re about to send this learning card.</p>
+              <p className="learning-card-confirm__lead">{t('learningCard.wizard.confirmLead')}</p>
               <p className="learning-card-confirm__count">
-                <strong>{recipientCount}</strong> {recipientCount === 1 ? 'family' : 'families'} will get a notification
-                under <strong>Knowledge</strong> powered by BridgeEd AI.
+                {t('learningCard.wizard.confirmCount', {
+                  count: recipientCount,
+                  familyWord: t(
+                    recipientCount === 1 ? 'learningCard.wizard.familyOne' : 'learningCard.wizard.familyOther',
+                  ),
+                })}
               </p>
               <ul className="learning-card-confirm__bullets">
                 <li>
-                  Summary: {summary.trim() ? 'Ready' : '-'}
+                  {t('learningCard.wizard.bulletSummary', {
+                    status: summary.trim() ? t('learningCard.wizard.statusReady') : t('learningCard.wizard.statusDash'),
+                  })}
                 </li>
                 <li>
-                  Student discovery: {childKnowledgeDraft?.content.trim() ? 'Ready' : 'Not included'}
+                  {t('learningCard.wizard.bulletStudentDiscovery', {
+                    status: childKnowledgeDraft?.content.trim()
+                      ? t('learningCard.wizard.statusReady')
+                      : t('learningCard.wizard.statusNotIncluded'),
+                  })}
                 </li>
                 <li>
-                  Tonight&apos;s actions selected: {tonightActions.filter((a) => a.include).length} /{' '}
-                  {LEARNING_CARD_TONIGHT_ACTION_PRESETS.length}
+                  {t('learningCard.wizard.bulletTonightActions', {
+                    selected: tonightActions.filter((a) => a.include).length,
+                    total: LEARNING_CARD_TONIGHT_ACTION_PRESETS.length,
+                  })}
                 </li>
                 <li>
-                  Audience: {audienceMode === 'class' ? 'Whole class' : 'Selected parents'}
+                  {t('learningCard.wizard.bulletAudience', {
+                    kind: t(
+                      audienceMode === 'class'
+                        ? 'learningCard.wizard.audienceKindClass'
+                        : 'learningCard.wizard.audienceKindSelected',
+                    ),
+                  })}
                 </li>
               </ul>
               {saveError && (
@@ -699,7 +719,7 @@ export function LearningCardModal({
           <div className="modal__footer">
             <div className="modal__actions">
               <Button variant="text" type="button" onClick={() => setPhase('audience')}>
-                Back
+                {t('learningCard.wizard.back')}
               </Button>
               <Button
                 variant="primary"
@@ -708,7 +728,7 @@ export function LearningCardModal({
                 onClick={() => void sendLearningCard()}
                 disabled={isSaving}
               >
-                {isSaving ? 'Sending...' : 'Send learning card'}
+                {isSaving ? t('learningCard.wizard.sending') : t('learningCard.wizard.send')}
               </Button>
             </div>
           </div>
