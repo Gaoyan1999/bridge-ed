@@ -70,7 +70,7 @@
     "student": {
       "chat": "班级通知与老师发来的消息。",
       "knowledge": "选择班级学习卡，就该主题与 BridgeEd AI 对话——练习思路与简明讲解。",
-      "mood": "拖动滑块表示此刻感受，然后点「下一步」保存心情打卡。"
+      "mood": "选择心情、标记影响因素并提交——家长可在仪表盘查看本周摘要。"
     },
     "teacher": {
       "dashboard": "撰写班级报告并通过消息推送给学生与家长——以及任务、动态与本周安排。",
@@ -92,6 +92,10 @@
     "composerPlaceholder": "询问本卡主题，或粘贴作业问题…",
     "demoThread": "从仪表盘打开此卡以开始 AI 对话。",
     "studentNoChildContent": "这张学习卡还没有「童趣版」配图与精选视频。请在下方直接向 BridgeEd AI 提问，或请老师稍后在卡片里补充孩子专属内容。",
+    "lcStepsTitle": "掌握步骤",
+    "lcStepsEmpty": "此卡暂无建议步骤。",
+    "lcStatus": "状态",
+    "lcDone": "完成",
     "ariaSuggestedTasks": "今晚建议任务",
     "ariaSubjectStatus": "科目与状态",
     "taskShort": {
@@ -136,7 +140,34 @@
     "classOverview": "班级心情总览",
     "colStudent": "学生",
     "colDominant": "主要心情",
-    "colNote": "备注"
+    "colNote": "备注",
+    "checkin": {
+      "toolbarTitle": "打卡",
+      "title": "今天感觉怎么样？",
+      "subtitle": "花一点时间关照自己，你的感受很重要。",
+      "pleasantAria": "愉悦程度",
+      "level0": "非常不愉快",
+      "level1": "不愉快",
+      "level2": "一般",
+      "level3": "愉快",
+      "level4": "非常愉快",
+      "whatsOnMind": "在想什么？",
+      "influencedAria": "影响心情的因素",
+      "otherPlaceholder": "若选择「其他」，请说明…",
+      "anythingToAdd": "还有补充吗？",
+      "notePlaceholder": "在此写下想法… 仅在你的日记中可见。",
+      "submit": "提交反馈",
+      "submitSaving": "保存中…",
+      "specifyOther": "说明其他",
+      "reasonTags": {
+        "exam_results": "考试成绩",
+        "teacher": "老师",
+        "classmates": "同学",
+        "knowledge": "知识点",
+        "efficiency": "学习效率",
+        "other": "其他"
+      }
+    }
   },
   "dashboard": {
     "parent": {

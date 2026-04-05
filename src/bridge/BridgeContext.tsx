@@ -44,6 +44,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
     out[k] = initial[k]!.map((m) => ({
       ...m,
       attachments: m.attachments?.map((a) => ({ ...a })),
+      learningCard: m.learningCard ? { ...m.learningCard } : undefined,
     }));
   }
   return out;

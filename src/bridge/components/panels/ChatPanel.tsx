@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
+import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
@@ -143,12 +144,21 @@ export function ChatPanel({ active }: { active: boolean }) {
               <p className="panel__hint">{t('chat.noMessagesInThread')}</p>
             ) : (
               msgs.map((m, idx) => (
-                <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
+                <div
+                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}`}
+                  className={cx(
+                    'msg',
+                    m.type === 'out' ? 'msg--out' : 'msg--in',
+                    m.learningCard && 'msg--learning-card',
+                  )}
+                >
                   <div className="msg__who">
                     {m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who}
                   </div>
                   <MessageAttachmentGrid attachments={m.attachments} />
-                  {m.text?.trim() ? (
+                  {m.learningCard ? (
+                    <ChatLearningCardMessage card={m.learningCard} />
+                  ) : m.text?.trim() ? (
                     <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
                   ) : null}
                 </div>

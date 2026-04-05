@@ -23,6 +23,8 @@ export interface ThreadMessage {
   type: 'in' | 'out';
   text: string;
   attachments?: ThreadMessageAttachment[];
+  /** Rich preview when a learning card is pushed into Messages (demo / future API). */
+  learningCard?: LearningCardItem;
 }
 
 /** Parent dashboard children linked to mood check-ins (demo roster). */

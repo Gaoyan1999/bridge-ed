@@ -31,6 +31,11 @@ export function normalizeStudentMoodBackend(raw: RawStudentMood): StudentMoodBac
   const pleasant = Math.max(0, Math.min(100, Math.round(raw.pleasant ?? 50)));
   const mood: StudentMoodKind = isStudentMoodKind(raw.mood) ? raw.mood : pleasantToStudentMoodKind(pleasant);
 
+  const reasonTags = Array.isArray(raw.reasonTags)
+    ? raw.reasonTags.filter((x): x is string => typeof x === 'string')
+    : undefined;
+  const otherDetail = typeof raw.otherDetail === 'string' ? raw.otherDetail : undefined;
+
   return {
     id: raw.id!,
     schemaVersion: STUDENT_MOOD_SCHEMA_VERSION,
@@ -39,6 +44,8 @@ export function normalizeStudentMoodBackend(raw: RawStudentMood): StudentMoodBac
     pleasant,
     mood,
     note: typeof raw.note === 'string' ? raw.note : '',
+    ...(reasonTags?.length ? { reasonTags } : {}),
+    ...(otherDetail !== undefined && otherDetail !== '' ? { otherDetail } : {}),
     createdAt: raw.createdAt!,
     updatedAt: raw.updatedAt!,
   };
@@ -49,10 +56,15 @@ export function buildStudentMoodFromCheckIn(params: {
   pleasant: number;
   note: string;
   localDate: string;
+  reasonTags?: string[];
+  otherDetail?: string;
 }): StudentMoodBackend {
   const now = new Date().toISOString();
   const id = studentMoodStableId(params.studentId, params.localDate);
   const pleasant = Math.max(0, Math.min(100, Math.round(params.pleasant)));
+  const tags = params.reasonTags?.filter((x) => typeof x === 'string' && x.trim()) ?? [];
+  const otherDetail =
+    tags.includes('other') && typeof params.otherDetail === 'string' ? params.otherDetail.trim() : undefined;
   return {
     id,
     schemaVersion: STUDENT_MOOD_SCHEMA_VERSION,
@@ -61,6 +73,8 @@ export function buildStudentMoodFromCheckIn(params: {
     pleasant,
     mood: pleasantToStudentMoodKind(pleasant),
     note: params.note.trim(),
+    ...(tags.length ? { reasonTags: tags } : {}),
+    ...(otherDetail ? { otherDetail } : {}),
     createdAt: now,
     updatedAt: now,
   };

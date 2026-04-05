@@ -70,7 +70,7 @@
     "student": {
       "chat": "Class notices and messages from your teacher.",
       "knowledge": "Pick a class learning card and chat with BridgeEd AI about that topic—practice ideas and quick explanations.",
-      "mood": "Move the slider from very unpleasant to very pleasant, then tap Next to save your check-in."
+      "mood": "Pick how you feel, tag what influenced your mood, and submit—your parent can see the weekly summary on the dashboard."
     },
     "teacher": {
       "dashboard": "Create class reports and push them to students and parents under Messages—plus tasks, posts, and your week.",
@@ -92,6 +92,10 @@
     "composerPlaceholder": "Ask about this card’s topic, or paste a homework question…",
     "demoThread": "Open this card from the dashboard to start the AI thread.",
     "studentNoChildContent": "This card doesn’t have kid-friendly media picks yet. Ask BridgeEd AI below—or your teacher can add student-facing content later.",
+    "lcStepsTitle": "Steps to mastery",
+    "lcStepsEmpty": "No suggested steps on this card.",
+    "lcStatus": "Status",
+    "lcDone": "Done",
     "ariaSuggestedTasks": "Tonight’s suggested tasks",
     "ariaSubjectStatus": "Subject and status",
     "taskShort": {
@@ -136,7 +140,34 @@
     "classOverview": "Class mood overview",
     "colStudent": "Student",
     "colDominant": "Dominant mood",
-    "colNote": "Note"
+    "colNote": "Note",
+    "checkin": {
+      "toolbarTitle": "Check-in",
+      "title": "How are you feeling today?",
+      "subtitle": "Take a moment to check in with yourself. Your feelings matter.",
+      "pleasantAria": "How pleasant does it feel",
+      "level0": "Very unpleasant",
+      "level1": "Unpleasant",
+      "level2": "Neutral",
+      "level3": "Pleasant",
+      "level4": "Very pleasant",
+      "whatsOnMind": "What’s on your mind?",
+      "influencedAria": "What influenced your mood",
+      "otherPlaceholder": "Please specify if “Other”…",
+      "anythingToAdd": "Anything to add?",
+      "notePlaceholder": "Share your thoughts here… It stays private within your journal.",
+      "submit": "Submit my feedback",
+      "submitSaving": "Saving…",
+      "specifyOther": "Specify other",
+      "reasonTags": {
+        "exam_results": "Exam results",
+        "teacher": "Teacher",
+        "classmates": "Classmates",
+        "knowledge": "Knowledge points",
+        "efficiency": "Learning efficiency",
+        "other": "Other"
+      }
+    }
   },
   "dashboard": {
     "parent": {
