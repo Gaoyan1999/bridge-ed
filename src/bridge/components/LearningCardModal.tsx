@@ -31,13 +31,9 @@ import {
   learningCardCreatePayloadToBackend,
 } from '@/data/learning-card-mappers';
 import { Markdown } from '@/bridge/components/Markdown/Markdown';
+import { discoveryPlainTextToMarkdown } from '@/bridge/discoveryPlainTextToMarkdown';
 
 const WHOLE_CLASS_RECIPIENTS = 28;
-
-/** Turn single newlines into Markdown hard breaks so discovery text keeps line-oriented layout. */
-function discoveryPlainTextToMarkdown(src: string): string {
-  return src.replace(/([^\n])\n(?!\n)/g, '$1  \n');
-}
 
 const LS_KEY_GRADE = 'bridge-ed:learning-card:grade';
 const LS_KEY_SUBJECT = 'bridge-ed:learning-card:subject';

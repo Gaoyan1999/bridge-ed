@@ -1110,7 +1110,7 @@ html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tab
   border-radius: var(--radius-sm);
   background: var(--pill-bg);
   border: 1px solid var(--border-light);
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 0.78rem;
   line-height: 1.32;
   max-height: none;
@@ -1126,11 +1126,44 @@ html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tab
 
 .learning-card-student-md .markdown-content h1,
 .learning-card-student-md .markdown-content h2,
-.learning-card-student-md .markdown-content h3,
 .learning-card-student-md .markdown-content h4 {
   margin: 0.35em 0 0.15em;
   font-size: 0.92em;
   line-height: 1.2;
+}
+
+/* Section kickers (Getting started / Going deeper / Hands-on) — dark blue, semibold */
+.learning-card-student-md .markdown-content h3,
+.knowledge-child-discovery-md.markdown-content h3 {
+  margin: 0.4em 0 0.15em;
+  font-size: 0.95em;
+  font-weight: 650;
+  line-height: 1.28;
+  color: #15488c;
+}
+
+html.theme-dark .learning-card-student-md .markdown-content h3,
+html.theme-dark .knowledge-child-discovery-md.markdown-content h3 {
+  color: #7ab3f0;
+}
+
+/* “Why we picked it” — bold label, muted yellow (low saturation) */
+.learning-card-student-md .markdown-content strong {
+  font-weight: 650;
+  color: hsl(44, 28%, 44%);
+}
+
+html.theme-dark .learning-card-student-md .markdown-content strong {
+  color: hsl(46, 22%, 68%);
+}
+
+.knowledge-child-discovery-md.markdown-content strong {
+  font-weight: 650;
+  color: hsl(44, 28%, 44%);
+}
+
+html.theme-dark .knowledge-child-discovery-md.markdown-content strong {
+  color: hsl(46, 22%, 68%);
 }
 
 /* Generate & review — tighter scroll + parent panel */
@@ -3420,7 +3453,7 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
 .knowledge-child-discovery__content {
   font-size: 0.92rem;
   line-height: 1.55;
-  color: var(--text);
+  color: var(--text-muted);
   white-space: pre-wrap;
   margin-bottom: 0.85rem;
 }
