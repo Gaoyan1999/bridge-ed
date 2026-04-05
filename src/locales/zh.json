@@ -139,7 +139,8 @@
     "checkin": {
       "toolbarTitle": "打卡",
       "title": "今天感觉怎么样？",
-      "subtitle": "花一点时间关照自己，你的感受很重要。",
+      "subtitleLine1": "花一点时间关照自己。",
+      "subtitleLine2": "你的感受很重要。",
       "pleasantAria": "愉悦程度",
       "level0": "非常不愉快",
       "level1": "不愉快",
