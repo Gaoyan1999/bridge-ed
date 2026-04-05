@@ -741,6 +741,114 @@ body {
   }
 }
 
+/* Learning card wizard — student preview + promo strip (class input step) */
+.learning-card-wizard-student-section {
+  margin-top: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.learning-card-wizard-student-section__heading {
+  margin: 0 0 0.45rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.learning-card-wizard-student-section__parent-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  max-width: 40rem;
+}
+
+.learning-card-wizard-promo {
+  margin-top: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--link-blue) 26%, var(--border-light));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--link-blue) 11%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 7%, var(--surface)) 48%,
+    var(--surface) 100%
+  );
+}
+
+.learning-card-wizard-promo__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.learning-card-wizard-promo__inner--text-only {
+  justify-content: flex-start;
+}
+
+.learning-card-wizard-promo__lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.learning-card-wizard-promo__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--link-blue) 18%, transparent);
+  color: var(--link-blue);
+}
+
+.learning-card-wizard-promo__text {
+  min-width: 0;
+}
+
+.learning-card-wizard-promo__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.learning-card-wizard-promo__body {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  max-width: 36rem;
+}
+
+@media (max-width: 560px) {
+  .learning-card-wizard-promo__inner {
+    align-items: flex-start;
+  }
+}
+
+html.theme-dark .learning-card-wizard-promo {
+  border-color: color-mix(in srgb, var(--link-blue) 30%, var(--border-light));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--link-blue) 16%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 10%, var(--surface)) 52%,
+    var(--surface) 100%
+  );
+}
+
+html.theme-dark .learning-card-wizard-promo__icon {
+  background: color-mix(in srgb, var(--link-blue) 22%, transparent);
+  color: var(--link-blue);
+}
+
 .modal__header--learning-card .modal__title {
   margin-bottom: 0.35rem;
 }
@@ -887,51 +995,66 @@ body {
   margin-bottom: 0.35rem;
 }
 
-/* Generate & review — underline tabs (Parents / Students) */
+/* Generate & review — Parents / Students as compact blue pills */
 .learning-card-review-tabs {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.learning-card-review-tabs__bar {
+.learning-card-review-tabs__bar--pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1.5rem;
-  border-bottom: 1px solid var(--border-light);
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.4rem;
+  padding: 0;
+  border: none;
 }
 
-.learning-card-review-tabs__tab {
+.learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab {
   position: relative;
-  background: none;
-  border: none;
-  padding: 0.45rem 0 0.65rem;
   margin: 0;
+  padding: 0.28rem 0.78rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--link-blue) 35%, var(--border-light));
+  background: color-mix(in srgb, var(--link-blue) 9%, var(--surface));
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 400;
+  font-size: 0.8125rem;
+  font-weight: 500;
   letter-spacing: -0.01em;
   cursor: pointer;
-  color: var(--text-muted);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color 0.12s ease;
+  color: var(--link-blue);
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
 }
 
-.learning-card-review-tabs__tab:hover {
-  color: var(--text);
+.learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab:hover {
+  background: color-mix(in srgb, var(--link-blue) 16%, var(--surface));
 }
 
-.learning-card-review-tabs__tab:focus-visible {
+.learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab:focus-visible {
   outline: 2px solid var(--link-blue);
   outline-offset: 2px;
 }
 
-.learning-card-review-tabs__tab.is-active {
-  color: var(--text);
+.learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab.is-active {
+  background: var(--link-blue);
+  color: #fff;
+  border-color: var(--link-blue);
   font-weight: 600;
-  border-bottom-color: var(--link-blue);
+}
+
+html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab:not(.is-active) {
+  background: color-mix(in srgb, var(--link-blue) 16%, var(--surface));
+  border-color: color-mix(in srgb, var(--link-blue) 42%, var(--border-light));
+  color: var(--link-blue);
+}
+
+html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tabs__tab.is-active {
+  color: #fff;
 }
 
 .learning-card-review-tabs__panel {
@@ -939,21 +1062,208 @@ body {
   min-height: 0;
 }
 
-/* Student tab — hero matches Knowledge discovery; optional modal-only tweak */
-.learning-card-student-preview__hero {
-  margin-top: 0.25rem;
+.learning-card-review-tabs__panel--student {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* Student tab — read-only markdown preview (theme tokens) */
+.learning-card-student-preview {
+  margin-bottom: 0.2rem;
+}
+
+.learning-card-student-preview__kicker {
+  margin-bottom: 0.25rem;
+}
+
+/* Image on top, text below — full-width banner, cover to lay flat across */
+.learning-card-student-preview__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 0;
+}
+
+.learning-card-student-preview__hero-wrap {
+  width: 100%;
+  height: min(12rem, 32vh);
+  min-height: 7.5rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: color-mix(in srgb, var(--border-light) 50%, var(--surface));
+}
+
+.learning-card-student-preview .learning-card-student-preview__hero {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Student tab — read-only markdown preview (compact) */
 .learning-card-student-md {
-  margin-top: 0.35rem;
-  padding: 0.85rem 1rem;
+  margin-top: 0;
+  padding: 0.4rem 0.55rem;
   border-radius: var(--radius-sm);
   background: var(--pill-bg);
   border: 1px solid var(--border-light);
-  color: var(--text);
-  max-height: min(420px, 52vh);
-  overflow-y: auto;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.32;
+  max-height: none;
+}
+
+.learning-card-student-md .markdown-content > *:first-child {
+  margin-top: 0;
+}
+
+.learning-card-student-md .markdown-content p {
+  margin: 0.28em 0;
+}
+
+.learning-card-student-md .markdown-content h1,
+.learning-card-student-md .markdown-content h2,
+.learning-card-student-md .markdown-content h4 {
+  margin: 0.35em 0 0.15em;
+  font-size: 0.92em;
+  line-height: 1.2;
+}
+
+/* Section kickers (Getting started / Going deeper / Hands-on) — dark blue, semibold */
+.learning-card-student-md .markdown-content h3,
+.knowledge-child-discovery-md.markdown-content h3 {
+  margin: 0.4em 0 0.15em;
+  font-size: 0.95em;
+  font-weight: 650;
+  line-height: 1.28;
+  color: #15488c;
+}
+
+html.theme-dark .learning-card-student-md .markdown-content h3,
+html.theme-dark .knowledge-child-discovery-md.markdown-content h3 {
+  color: #7ab3f0;
+}
+
+/* “Why we picked it” — bold label, muted yellow (low saturation) */
+.learning-card-student-md .markdown-content strong {
+  font-weight: 650;
+  color: hsl(44, 28%, 44%);
+}
+
+html.theme-dark .learning-card-student-md .markdown-content strong {
+  color: hsl(46, 22%, 68%);
+}
+
+.knowledge-child-discovery-md.markdown-content strong {
+  font-weight: 650;
+  color: hsl(44, 28%, 44%);
+}
+
+html.theme-dark .knowledge-child-discovery-md.markdown-content strong {
+  color: hsl(46, 22%, 68%);
+}
+
+/* Generate & review — tighter scroll + parent panel */
+#form-learning-card-review > .modal__scroll {
+  padding-top: 0.45rem;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+}
+
+#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary {
+  margin-bottom: 0.5rem;
+  padding: 0.55rem 0.65rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--link-blue) 9%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 3%, var(--surface)) 100%
+  );
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--link-blue) 10%, transparent);
+}
+
+#form-learning-card-review .learning-card-review-summary > .field__label {
+  margin-bottom: 0.2rem;
+}
+
+#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill {
+  background: color-mix(in srgb, var(--link-blue) 5%, #fff);
+  border-color: color-mix(in srgb, var(--link-blue) 20%, var(--border-light));
+}
+
+html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill {
+  background: color-mix(in srgb, var(--link-blue) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--link-blue) 28%, var(--border-light));
+}
+
+#form-learning-card-review .learning-card-ai-hint {
+  margin-top: 0.2rem;
+  margin-bottom: 0.4rem;
+  padding: 0.38rem 0.5rem;
+  gap: 0.4rem;
+}
+
+#form-learning-card-review .learning-card-ai-hint__icon-wrap {
+  width: 1.45rem;
+  height: 1.45rem;
+  margin-top: 0.04rem;
+}
+
+#form-learning-card-review .learning-card-ai-hint__text {
+  font-size: 0.75rem;
+  line-height: 1.32;
+  font-weight: 500;
+}
+
+#form-learning-card-review .field--actions-pick--grouped {
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.65rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--link-blue) 9%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 3%, var(--surface)) 100%
+  );
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--link-blue) 10%, transparent);
+}
+
+#form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group {
+  border: 1px solid var(--border-light);
+  background: color-mix(in srgb, var(--link-blue) 4%, var(--surface));
+  box-shadow: none;
+}
+
+html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary {
+  border: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--link-blue) 14%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 6%, var(--surface)) 100%
+  );
+}
+
+html.theme-dark #form-learning-card-review .field--actions-pick--grouped {
+  border: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--link-blue) 14%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 6%, var(--surface)) 100%
+  );
+}
+
+html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group {
+  background: color-mix(in srgb, var(--link-blue) 8%, var(--surface));
+  border-color: var(--border-light);
+}
+
+#form-learning-card-review .modal__footer {
+  padding-top: 0.4rem;
+  padding-bottom: 0.85rem;
 }
 
 .learning-card-student-md.markdown-content a {
@@ -1025,7 +1335,7 @@ body {
   margin-bottom: 0.65rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--heading-lavender) 14%, var(--surface));
+  background: color-mix(in srgb, var(--link-blue) 12%, var(--surface));
   animation: learning-card-ai-hint-enter 1.35s ease-in-out both;
 }
 
@@ -1044,11 +1354,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--heading-lavender) 26%, var(--surface));
+  background: color-mix(in srgb, var(--link-blue) 18%, var(--surface));
 }
 
 .learning-card-ai-hint__icon {
-  color: var(--heading-lavender);
+  color: var(--link-blue);
 }
 
 .learning-card-ai-hint__text {
@@ -1060,11 +1370,11 @@ body {
 }
 
 html.theme-dark .learning-card-ai-hint {
-  background: color-mix(in srgb, var(--heading-lavender) 22%, var(--surface));
+  background: color-mix(in srgb, var(--link-blue) 18%, var(--surface));
 }
 
 html.theme-dark .learning-card-ai-hint__icon-wrap {
-  background: color-mix(in srgb, var(--heading-lavender) 32%, var(--surface));
+  background: color-mix(in srgb, var(--link-blue) 26%, var(--surface));
 }
 
 .field--actions-pick {
@@ -1371,18 +1681,67 @@ html.theme-dark .learning-card-actions-group {
   padding: 0.25rem 0 0.5rem;
 }
 
-.learning-card-confirm__lead {
+.learning-card-confirm__lead-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
   margin: 0 0 0.65rem;
+}
+
+.learning-card-confirm__done-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.12rem;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 1px 2px color-mix(in srgb, #000 12%, transparent);
+}
+
+.learning-card-confirm__done-check {
+  display: block;
+}
+
+.learning-card-confirm__lead {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
 }
 
+/* Tight wrap: box only as wide/tall as the notification line + checklist */
+.learning-card-confirm__highlight {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.5rem;
+  padding: 0.65rem 0.9rem 0.75rem;
+  vertical-align: top;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--link-blue) 35%, var(--border-light));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--link-blue) 10%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 4%, var(--surface)) 100%
+  );
+}
+
 .learning-card-confirm__count {
-  margin: 0 0 1rem;
+  margin: 0 0 0.65rem;
   font-size: 0.9rem;
   line-height: 1.5;
   color: var(--text-muted);
+}
+
+.learning-card-confirm__highlight .learning-card-confirm__count:last-child {
+  margin-bottom: 0;
 }
 
 .learning-card-confirm__count strong {
@@ -1396,6 +1755,29 @@ html.theme-dark .learning-card-actions-group {
   font-size: 0.88rem;
   color: var(--text-muted);
   line-height: 1.55;
+}
+
+.learning-card-confirm__highlight .learning-card-confirm__bullets {
+  margin: 0;
+}
+
+.learning-card-confirm__bullet-label {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.learning-card-confirm__bullet-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+html.theme-dark .learning-card-confirm__highlight {
+  border-color: color-mix(in srgb, var(--link-blue) 40%, var(--border-light));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--link-blue) 14%, var(--surface)) 0%,
+    color-mix(in srgb, var(--link-blue) 6%, var(--surface)) 100%
+  );
 }
 
 .field__input--inline {
@@ -3071,7 +3453,7 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
 .knowledge-child-discovery__content {
   font-size: 0.92rem;
   line-height: 1.55;
-  color: var(--text);
+  color: var(--text-muted);
   white-space: pre-wrap;
   margin-bottom: 0.85rem;
 }

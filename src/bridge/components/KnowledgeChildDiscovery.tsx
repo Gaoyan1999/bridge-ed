@@ -1,32 +1,8 @@
-import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LearningCardChildKnowledge } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
-
-const URL_IN_TEXT = /(https?:\/\/\S+)/g;
-
-function ContentWithLinks({ text }: { text: string }) {
-  const parts = text.split(URL_IN_TEXT);
-  return (
-    <>
-      {parts.map((part, i) =>
-        /^https?:\/\//.test(part) ? (
-          <a
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="knowledge-child-discovery__link"
-          >
-            {part}
-          </a>
-        ) : (
-          <Fragment key={i}>{part}</Fragment>
-        ),
-      )}
-    </>
-  );
-}
+import { Markdown } from '@/bridge/components/Markdown';
+import { discoveryPlainTextToMarkdown } from '@/bridge/discoveryPlainTextToMarkdown';
 
 export function KnowledgeChildDiscovery({
   data,
@@ -47,7 +23,7 @@ export function KnowledgeChildDiscovery({
       />
       <div className="knowledge-child-discovery__source">{t('common.bridgedAi')}</div>
       <div className="knowledge-child-discovery__content">
-        <ContentWithLinks text={data.content} />
+        <Markdown className="knowledge-child-discovery-md">{discoveryPlainTextToMarkdown(data.content)}</Markdown>
       </div>
     </div>
   );
