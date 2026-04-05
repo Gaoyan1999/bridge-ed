@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, ListChecks } from 'lucide-react';
 import { Markdown } from '@/bridge/components/Markdown';
 import { Button } from '@/bridge/components/ui/Button';
 import type { LearningCardItem, LearningCardTonightActionPreset } from '@/bridge/types';
-import { LEARNING_CARD_TONIGHT_PRESET_LABELS, LEARNING_CARD_TONIGHT_PRESET_SHORT } from '@/bridge/types';
+import { LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
 import { normalizeTonightActions } from '@/data/learning-card-mappers';
 
 /**
@@ -32,15 +33,16 @@ const EXAMPLE_AI_INTRO =
 /**
  * Shown inside parent Knowledge when there are no learning cards yet — previews layout and interactions (example only).
  */
+function exampleTonightActionLabel(preset: LearningCardTonightActionPreset, t: (k: string) => string): string {
+  if (preset === 'parent_led_practice') return t('knowledge.practice.button');
+  return t(`knowledge.taskShort.${preset}`);
+}
+
 export function KnowledgeParentEmptyExample() {
+  const { t } = useTranslation();
   const [completionDone, setCompletionDone] = useState(false);
   const card = EXAMPLE_CARD;
   const includedSteps = card.tonightActions.filter((a) => a.include);
-  const showPracticeAction = card.tonightActions.some(
-    (a) => a.preset === 'parent_led_practice' && a.include,
-  );
-  const omitPractice: LearningCardTonightActionPreset[] = showPracticeAction ? ['parent_led_practice'] : [];
-  const taskChips = includedSteps.filter((a) => !omitPractice.includes(a.preset));
 
   return (
     <>
@@ -70,24 +72,27 @@ export function KnowledgeParentEmptyExample() {
                   <span className="knowledge-inbox__label knowledge-inbox__label--subject">Math</span>
                   <span className="knowledge-inbox__label knowledge-inbox__label--status">New</span>
                 </div>
-                <div className="knowledge-inbox__tasks" role="group" aria-label="Tonight’s suggested tasks">
-                  {taskChips.map((a) => (
-                    <span key={a.preset} className="knowledge-inbox__task-chip">
-                      {LEARNING_CARD_TONIGHT_PRESET_SHORT[a.preset]}
-                    </span>
+              </div>
+              {includedSteps.length > 0 ? (
+                <div
+                  className="thread-header__knowledge-right knowledge-tonight-actions"
+                  role="group"
+                  aria-label={t('knowledge.ariaSuggestedTasks')}
+                >
+                  {includedSteps.map((a) => (
+                    <Button
+                      key={a.preset}
+                      type="button"
+                      variant="secondary"
+                      pill
+                      className="btn--sm knowledge-tonight-actions__btn"
+                      disabled
+                      title={LEARNING_CARD_TONIGHT_PRESET_LABELS[a.preset].title}
+                    >
+                      {exampleTonightActionLabel(a.preset, t)}
+                    </Button>
                   ))}
                 </div>
-              </div>
-              {showPracticeAction ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  pill
-                  className="btn--sm thread-header__practice-btn"
-                  disabled
-                >
-                  Practice
-                </Button>
               ) : null}
             </div>
           </div>

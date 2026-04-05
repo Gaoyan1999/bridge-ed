@@ -83,6 +83,41 @@ export function createLlmApi(): LlmApi {
   return new LlmApi();
 }
 
+/** Optional card context when running a Knowledge “tonight” slash command. */
+export type KnowledgeTonightCommandInput = {
+  cardTitle?: string;
+};
+
+/** AI reply body for quiz / practice / teach-back in Knowledge. */
+export type KnowledgeTonightCommandResult = {
+  reply: string;
+};
+
+/** Mock replies — used when `VITE_USE_LLM` is off or as fallback. */
+const MOCK_KNOWLEDGE_QUIZ_REPLY =
+  '**Quick check (Demo)**\n\n' +
+  'Try these in order—say your answers out loud or jot them in chat:\n\n' +
+  '1. In one sentence, what is the **main idea** your teacher wants you to remember from this lesson?\n' +
+  '2. Name **one example** from class (or the card) that shows that idea.\n' +
+  '3. What is **one question** you still have—or one thing you’d explain differently next time?\n\n' +
+  'Reply with 1–3 short bullets when you’re ready.';
+
+const MOCK_KNOWLEDGE_PRACTICE_REPLY =
+  '**Mini practice (Demo)**\n\n' +
+  'Let’s use **Van Gogh’s approach** for a quick exercise: **paint a sunflower**.\n\n' +
+  '- **Brushwork:** Use thick paint and short strokes—leave visible marks like Van Gogh; it doesn’t need to be perfectly smooth.\n' +
+  '- **Color:** Bright yellow as the main hue; add a little deep green and ochre for the center and shadows.\n' +
+  '- **Head and petals:** Start with a flat oval for the flower head, then use radiating strokes for petal direction—add a hint of swirl or movement if you like.\n\n' +
+  'When you’re done, share the three colors you used, what you’d tweak next—or upload a photo.';
+
+const MOCK_KNOWLEDGE_TEACH_BACK_REPLY =
+  '**Teach-back (Demo)**\n\n' +
+  'Pretend you’re the teacher for two minutes:\n\n' +
+  '- Walk your parent through the topic **in your own words**, smallest steps first.\n' +
+  '- Use **one drawing, gesture, or everyday example** so they can “see” it.\n' +
+  '- End with: “The part I’m most sure about is ___; the part I want to check is ___.”\n\n' +
+  'When you’re done, your parent can react or ask one follow-up question here.';
+
 async function mockExplainTerminologyToParents(
   input: LearningCardGenerateInput,
 ): Promise<LearningCardGenerateResult> {
@@ -162,5 +197,71 @@ export class LlmApi {
     }
 
     return res.json() as Promise<LearningCardGenerateResult>;
+  }
+
+  /**
+   * Knowledge thread: response after user sends `/quiz`.
+   * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/quiz`.
+   */
+  async knowledgeQuiz(input: KnowledgeTonightCommandInput = {}): Promise<KnowledgeTonightCommandResult> {
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 320));
+      return { reply: MOCK_KNOWLEDGE_QUIZ_REPLY };
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/learning-cards/knowledge-tonight/quiz`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to run Knowledge quiz.');
+    }
+    return res.json() as Promise<KnowledgeTonightCommandResult>;
+  }
+
+  /**
+   * Knowledge thread: response after user sends `/practice`.
+   * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/practice`.
+   */
+  async knowledgePractice(input: KnowledgeTonightCommandInput = {}): Promise<KnowledgeTonightCommandResult> {
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 320));
+      return { reply: MOCK_KNOWLEDGE_PRACTICE_REPLY };
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/learning-cards/knowledge-tonight/practice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to run Knowledge practice.');
+    }
+    return res.json() as Promise<KnowledgeTonightCommandResult>;
+  }
+
+  /**
+   * Knowledge thread: response after user sends `/teach-back`.
+   * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/teach-back`.
+   */
+  async knowledgeTeachBack(input: KnowledgeTonightCommandInput = {}): Promise<KnowledgeTonightCommandResult> {
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 320));
+      return { reply: MOCK_KNOWLEDGE_TEACH_BACK_REPLY };
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/learning-cards/knowledge-tonight/teach-back`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to run Knowledge teach-back.');
+    }
+    return res.json() as Promise<KnowledgeTonightCommandResult>;
   }
 }
