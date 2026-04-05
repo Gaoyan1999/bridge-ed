@@ -2153,6 +2153,98 @@ html.theme-dark .learning-card-actions-group {
   gap: 0.28rem 0.35rem;
 }
 
+.thread-header__knowledge-right .knowledge-lc-finish-wrap {
+  flex-shrink: 0;
+  max-width: min(100%, 24rem);
+}
+
+.knowledge-lc-finish-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.knowledge-lc-finish-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem 0.45rem;
+}
+
+.knowledge-lc-finish-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.2;
+  transition:
+    filter 0.12s ease,
+    box-shadow 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.knowledge-lc-finish-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.knowledge-lc-finish-btn:disabled.knowledge-lc-finish-btn--picked {
+  opacity: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.knowledge-lc-finish-btn--green {
+  background: rgba(220, 252, 231, 0.95);
+  color: rgb(21, 128, 61);
+}
+
+.knowledge-lc-finish-btn--green:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-btn--blue {
+  background: var(--accent-soft);
+  color: var(--link-blue);
+}
+
+.knowledge-lc-finish-btn--blue:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-btn--red {
+  background: rgba(254, 226, 226, 0.95);
+  color: rgb(185, 28, 28);
+}
+
+.knowledge-lc-finish-btn--red:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-change {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--link-blue);
+  background: transparent;
+  border: none;
+  padding: 0.1rem 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.knowledge-lc-finish-change:hover {
+  color: var(--text);
+}
+
 /* Tonight actions — Quiz / Practice / Teach-back as one control group */
 .knowledge-tonight-actions {
   display: flex;
@@ -2863,68 +2955,28 @@ html.theme-dark .learning-card-actions-group {
   max-width: 28rem;
 }
 
-.knowledge-reflection-modal__subtitle {
+.knowledge-challenge-feedback-modal__subtitle {
   margin-bottom: 0;
+  line-height: 1.45;
 }
 
-.knowledge-reflection-modal__body {
+.knowledge-challenge-feedback-modal__body {
   padding-top: 0.25rem;
 }
 
-.knowledge-reflection-modal__fieldset {
-  border: none;
-  margin: 0 0 1rem;
-  padding: 0;
-}
-
-.knowledge-reflection-modal__legend {
-  font-size: 0.875rem;
+.knowledge-challenge-feedback-modal__error {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-  padding: 0;
+  color: rgb(185, 28, 28);
 }
 
-.knowledge-reflection-modal__radios {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.knowledge-reflection-modal__radio {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.45rem;
-  font-size: 0.875rem;
-  line-height: 1.35;
-  cursor: pointer;
-}
-
-.knowledge-reflection-modal__radio input {
-  margin-top: 0.15rem;
-  flex-shrink: 0;
-  accent-color: var(--link-blue);
-}
-
-.knowledge-reflection-modal__actions {
+.knowledge-challenge-feedback-modal__actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
   width: 100%;
-  justify-content: space-between;
-}
-
-.knowledge-reflection-modal__actions-spacer {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.knowledge-reflection-modal__actions-trailing {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

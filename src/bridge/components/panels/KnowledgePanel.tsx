@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   LearningCardBackend,
   LearningCardStudentFeedback,
+  LearningCardStudentFinishedType,
   LearningCardStudentLearningStatus,
 } from '@/data/entity/learning-card-backend';
 
@@ -13,10 +14,11 @@ type KnowledgeInboxRow = {
   subject: string;
   date: string;
   studentLearningStatus?: StudentLearningStatusKey;
+  studentFinishedType?: LearningCardStudentFinishedType;
 };
 
 import { useTranslation } from 'react-i18next';
-import { Check, ImagePlus, ListChecks } from 'lucide-react';
+import { ImagePlus, ListChecks } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
@@ -33,7 +35,7 @@ import { KnowledgeParentEmptyExample } from '@/bridge/components/KnowledgeParent
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
-import { StudentLearningReflectionModal } from '@/bridge/components/ui/StudentLearningReflectionModal';
+import { StudentChallengeFeedbackModal } from '@/bridge/components/ui/StudentChallengeFeedbackModal';
 import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
 import { getLlmApi } from '@/data/api/llm-api';
@@ -86,10 +88,12 @@ function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t:
 function KnowledgeCardLabels({
   card,
   studentLearningStatus,
+  studentFinishedType,
   layout = 'inbox',
 }: {
   card: Pick<LearningCardItem, 'subject'>;
   studentLearningStatus?: StudentLearningStatusKey;
+  studentFinishedType?: LearningCardStudentFinishedType;
   layout?: 'inbox' | 'thread';
 }) {
   const { t } = useTranslation();
@@ -99,6 +103,18 @@ function KnowledgeCardLabels({
   }));
   const showProgress = studentLearningStatus != null;
   const splitForInbox = layout === 'inbox' && showProgress;
+  const statusLine =
+    studentLearningStatus === 'finished' && studentFinishedType
+      ? t(`knowledge.studentFinishedType.${studentFinishedType}`)
+      : studentLearningStatus != null
+        ? t(`knowledge.studentLearningStatus.${studentLearningStatus}`)
+        : '';
+  const statusTitle =
+    studentLearningStatus === 'finished' && studentFinishedType
+      ? `${t('knowledge.lcStatus')}: ${t(`knowledge.studentFinishedType.${studentFinishedType}`)}`
+      : studentLearningStatus != null
+        ? `${t('knowledge.lcStatus')}: ${t(`knowledge.studentLearningStatus.${studentLearningStatus}`)}`
+        : '';
   if (!tags.length && !showProgress) return null;
   return (
     <div
@@ -133,54 +149,91 @@ function KnowledgeCardLabels({
             studentLearningStatus === 'learning' && 'knowledge-inbox__label--student-learning',
             studentLearningStatus === 'finished' && 'knowledge-inbox__label--student-finished',
           )}
-          title={`${t('knowledge.lcStatus')}: ${t(`knowledge.studentLearningStatus.${studentLearningStatus}`)}`}
+          title={statusTitle}
         >
           <span className="visually-hidden">
             {t('knowledge.lcStatus')}:{' '}
           </span>
-          {t(`knowledge.studentLearningStatus.${studentLearningStatus}`)}
+          {statusLine}
         </span>
       ) : null}
     </div>
   );
 }
 
-function LearningCardCompletionButton({
+function StudentLearningFinishRow({
   threadId,
-  role,
   studentFeedback,
-  onStudentHeaderOpenReflection,
+  choicesLocked,
+  onFinishEasy,
+  onFinishThink,
+  onOpenSkipFeedback,
+  onChangeMind,
   t,
 }: {
   threadId: string | undefined;
-  role: string;
-  studentFeedback: LearningCardStudentFeedback | null;
-  onStudentHeaderOpenReflection?: () => void;
+  studentFeedback: LearningCardStudentFeedback;
+  choicesLocked?: boolean;
+  onFinishEasy: () => void;
+  onFinishThink: () => void;
+  onOpenSkipFeedback: () => void;
+  onChangeMind: () => void;
   t: TFunction;
 }) {
-  if (role !== 'student' || !studentFeedback) return null;
-  const done = studentFeedback.status === 'finished';
+  const finished = studentFeedback.status === 'finished';
+  const ft = studentFeedback.finishedType;
+  const busy = !threadId;
+  const lock = busy || finished || Boolean(choicesLocked);
+
   return (
-    <button
-      type="button"
-      className={cx(
-        'knowledge-lc-completion',
-        'knowledge-lc-completion--header',
-        done && 'knowledge-lc-completion--done',
-      )}
-      disabled={!threadId}
-      aria-pressed={done}
-      aria-haspopup="dialog"
-      onClick={() => {
-        if (!threadId) return;
-        onStudentHeaderOpenReflection?.();
-      }}
-    >
-      <span className="knowledge-lc-completion__circle" data-done={done ? 'true' : undefined} aria-hidden>
-        {done ? <Check className="knowledge-lc-completion__check" strokeWidth={3} size={14} /> : null}
-      </span>
-      <span className="knowledge-lc-completion__label">{t('knowledge.lcDone')}</span>
-    </button>
+    <div className="knowledge-lc-finish-wrap" role="group" aria-label={t('knowledge.ariaFinishChoices')}>
+      <div className="knowledge-lc-finish-row">
+        <button
+          type="button"
+          className={cx(
+            'knowledge-lc-finish-btn',
+            'knowledge-lc-finish-btn--green',
+            finished && ft === 'pretty_easy' && 'knowledge-lc-finish-btn--picked',
+          )}
+          disabled={lock}
+          aria-pressed={finished && ft === 'pretty_easy'}
+          onClick={onFinishEasy}
+        >
+          {t('knowledge.studentFinishedType.pretty_easy')}
+        </button>
+        <button
+          type="button"
+          className={cx(
+            'knowledge-lc-finish-btn',
+            'knowledge-lc-finish-btn--blue',
+            finished && ft === 'think_get_it' && 'knowledge-lc-finish-btn--picked',
+          )}
+          disabled={lock}
+          aria-pressed={finished && ft === 'think_get_it'}
+          onClick={onFinishThink}
+        >
+          {t('knowledge.studentFinishedType.think_get_it')}
+        </button>
+        <button
+          type="button"
+          className={cx(
+            'knowledge-lc-finish-btn',
+            'knowledge-lc-finish-btn--red',
+            finished && ft === 'challenge' && 'knowledge-lc-finish-btn--picked',
+          )}
+          disabled={lock}
+          aria-pressed={finished && ft === 'challenge'}
+          onClick={onOpenSkipFeedback}
+        >
+          {t('knowledge.studentFinishedType.challenge')}
+        </button>
+      </div>
+      {finished ? (
+        <button type="button" className="knowledge-lc-finish-change" onClick={onChangeMind}>
+          {t('knowledge.finishChange')}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -206,7 +259,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
   const [tonightActionBusy, setTonightActionBusy] = useState(false);
-  const [studentReflectionOpen, setStudentReflectionOpen] = useState(false);
+  const [challengeFeedbackOpen, setChallengeFeedbackOpen] = useState(false);
   const [cardBackends, setCardBackends] = useState<LearningCardBackend[]>([]);
   const cardBackendsRef = useRef(cardBackends);
   cardBackendsRef.current = cardBackends;
@@ -264,7 +317,11 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       if (role === 'student' && studentUserId) {
         const b = cardBackends.find((x) => x.threadId === c.threadId);
         if (b) {
-          row.studentLearningStatus = getStudentFeedbackForUser(b, studentUserId).status;
+          const fb = getStudentFeedbackForUser(b, studentUserId);
+          row.studentLearningStatus = fb.status;
+          if (fb.status === 'finished' && fb.finishedType) {
+            row.studentFinishedType = fb.finishedType;
+          }
         }
       }
       return row;
@@ -305,11 +362,27 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     [role, studentUserId, threadId, bumpLearningCards],
   );
 
+  const finishCardEasy = useCallback(() => {
+    void persistStudentPatch({ status: 'finished', finishedType: 'pretty_easy', feeling: undefined });
+  }, [persistStudentPatch]);
+
+  const finishCardThink = useCallback(() => {
+    void persistStudentPatch({ status: 'finished', finishedType: 'think_get_it', feeling: undefined });
+  }, [persistStudentPatch]);
+
+  const reopenCardLearning = useCallback(() => {
+    void persistStudentPatch({ status: 'learning', finishedType: undefined, feeling: undefined });
+  }, [persistStudentPatch]);
+
   const includedSteps = useMemo(
     () => currentCard?.tonightActions.filter((a) => a.include) ?? [],
     [currentCard],
   );
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
+
+  useEffect(() => {
+    setChallengeFeedbackOpen(false);
+  }, [threadId]);
 
   useEffect(() => {
     if (!active || !threadId) return;
@@ -421,6 +494,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       <KnowledgeCardLabels
         card={{ subject: item.subject }}
         studentLearningStatus={item.studentLearningStatus}
+        studentFinishedType={item.studentFinishedType}
       />
       <div className="inbox-item__meta">{item.date}</div>
     </button>
@@ -472,15 +546,23 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                           studentLearningStatus={
                             role === 'student' && studentFeedback ? studentFeedback.status : undefined
                           }
+                          studentFinishedType={
+                            role === 'student' && studentFeedback?.status === 'finished'
+                              ? studentFeedback.finishedType
+                              : undefined
+                          }
                         />
                       </div>
                       {role === 'student' && studentFeedback ? (
                         <div className="thread-header__knowledge-right">
-                          <LearningCardCompletionButton
+                          <StudentLearningFinishRow
                             threadId={threadId}
-                            role={role}
                             studentFeedback={studentFeedback}
-                            onStudentHeaderOpenReflection={() => setStudentReflectionOpen(true)}
+                            choicesLocked={challengeFeedbackOpen}
+                            onFinishEasy={finishCardEasy}
+                            onFinishThink={finishCardThink}
+                            onOpenSkipFeedback={() => setChallengeFeedbackOpen(true)}
+                            onChangeMind={reopenCardLearning}
                             t={t}
                           />
                         </div>
@@ -651,26 +733,17 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 }
               />
             </div>
-            {role === 'student' && studentFeedback && studentReflectionOpen ? (
-              <StudentLearningReflectionModal
+            {role === 'student' && studentFeedback && challengeFeedbackOpen ? (
+              <StudentChallengeFeedbackModal
                 key={threadId}
-                onClose={() => setStudentReflectionOpen(false)}
-                studentFeedback={studentFeedback}
-                onSave={(p) => {
+                onClose={() => setChallengeFeedbackOpen(false)}
+                onSubmit={(feeling) => {
                   void persistStudentPatch({
                     status: 'finished',
-                    finishedType: p.finishedType,
-                    feeling: p.feeling.trim() || undefined,
+                    finishedType: 'challenge',
+                    feeling: feeling.trim() || undefined,
                   });
-                  setStudentReflectionOpen(false);
-                }}
-                onMarkIncomplete={() => {
-                  void persistStudentPatch({
-                    status: 'learning',
-                    finishedType: undefined,
-                    feeling: undefined,
-                  });
-                  setStudentReflectionOpen(false);
+                  setChallengeFeedbackOpen(false);
                 }}
               />
             ) : null}
