@@ -1870,48 +1870,6 @@ html.theme-dark .learning-card-actions-group {
   min-height: 0;
 }
 
-/* Knowledge: 60% active learning / 40% finished & archived; each column scrolls independently */
-.panel--knowledge .inbox.inbox--knowledge-split {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-}
-
-.panel--knowledge .inbox__section--active {
-  flex: 6 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.panel--knowledge .inbox__section--done {
-  flex: 4 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--border-light);
-}
-
-.panel--knowledge .inbox__section-label {
-  flex-shrink: 0;
-  margin: 0.5rem 0.75rem 0.35rem;
-  padding: 0;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-  background: transparent;
-}
-
-.panel--knowledge .inbox__scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
 .inbox-item {
   display: block;
   width: 100%;
@@ -1934,17 +1892,7 @@ html.theme-dark .learning-card-actions-group {
   border-left: 3px solid var(--link-blue);
 }
 
-/* Finished / archived inbox rows: green selection (Knowledge bottom section) */
-.panel--knowledge .inbox__section--done .inbox-item:hover {
-  background: rgba(220, 252, 231, 0.55);
-}
-
-.panel--knowledge .inbox__section--done .inbox-item.is-active {
-  background: rgba(220, 252, 231, 0.92);
-  border-left-color: rgb(22, 163, 74);
-}
-
-/* Knowledge — subject / status chips (same blue system as Messages) */
+/* Knowledge — subject / status chips (unified blue) */
 .knowledge-inbox__labels {
   display: flex;
   flex-wrap: wrap;
@@ -2006,10 +1954,10 @@ html.theme-dark .learning-card-actions-group {
 }
 
 .panel--knowledge .knowledge-inbox__label--status {
-  font-weight: 500;
-  border-color: var(--border-light);
-  background: var(--pill-bg);
-  color: var(--text-muted);
+  font-weight: 600;
+  border-color: rgba(11, 87, 208, 0.28);
+  background: var(--accent-soft);
+  color: var(--link-blue);
 }
 
 /* Parent progress in inbox / header — rectangular (not pill) */
@@ -2020,43 +1968,14 @@ html.theme-dark .learning-card-actions-group {
   letter-spacing: 0.01em;
 }
 
-.panel--knowledge .knowledge-inbox__label--type-warning {
-  border-color: rgba(180, 83, 9, 0.45);
-  background: rgba(254, 243, 199, 0.85);
-  color: rgb(146, 64, 14);
-}
-
-.panel--knowledge .knowledge-inbox__label--type-info {
-  border-color: rgba(11, 87, 208, 0.28);
-  background: var(--accent-soft);
-  color: var(--link-blue);
-}
-
-.panel--knowledge .knowledge-inbox__label--type-success {
-  border-color: rgba(22, 163, 74, 0.4);
-  background: rgba(220, 252, 231, 0.9);
-  color: rgb(21, 128, 61);
-}
-
-.panel--knowledge .knowledge-inbox__label--student-not-started {
-  border-color: rgba(100, 116, 139, 0.45);
-  background: rgba(241, 245, 249, 0.95);
-  color: rgb(71, 85, 105);
-}
-
-.panel--knowledge .knowledge-inbox__label--student-learning {
-  border-color: rgba(11, 87, 208, 0.28);
-  background: var(--accent-soft);
-  color: var(--link-blue);
-}
-
+.panel--knowledge .knowledge-inbox__label--student-not-started,
+.panel--knowledge .knowledge-inbox__label--student-learning,
 .panel--knowledge .knowledge-inbox__label--student-finished {
-  border-color: rgba(22, 163, 74, 0.4);
-  background: rgba(220, 252, 231, 0.9);
-  color: rgb(21, 128, 61);
+  border-color: rgba(11, 87, 208, 0.28);
+  background: var(--accent-soft);
+  color: var(--link-blue);
 }
 
-/* Parent — persisted LearningCardParentFeedback in Knowledge */
 .knowledge-parent-fb {
   display: flex;
   flex-direction: column;
@@ -3029,7 +2948,7 @@ html.theme-dark .learning-card-actions-group {
     border-bottom: 1px solid var(--border-light);
   }
 
-  .panel--knowledge .inbox.inbox--knowledge-split {
+  .panel--knowledge .inbox {
     max-height: min(52vh, 420px);
   }
 }
@@ -3052,15 +2971,6 @@ html.theme-dark {
 html.theme-dark .inbox-item,
 html.theme-dark .thread-pane {
   background: var(--surface);
-}
-
-html.theme-dark .panel--knowledge .inbox__section--done .inbox-item:hover {
-  background: rgba(34, 197, 94, 0.12);
-}
-
-html.theme-dark .panel--knowledge .inbox__section--done .inbox-item.is-active {
-  background: rgba(34, 197, 94, 0.2);
-  border-left-color: rgb(74, 222, 128);
 }
 
 html.theme-dark .msg--in {

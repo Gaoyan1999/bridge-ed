@@ -95,15 +95,6 @@
     "lcStepsTitle": "掌握步骤",
     "lcStepsEmpty": "此卡暂无建议步骤。",
     "lcStatus": "状态",
-    "parentYourProgress": "你的进度",
-    "parentReadStatus": {
-      "unread": "未读",
-      "read": "已读",
-      "actioned": "已完成"
-    },
-    "parentChatedWithAI": "已与 AI 对话",
-    "parentNotChatedWithAI": "尚未与 AI 对话",
-    "parentDoNotUnderstand": "我没看懂（需要更多帮助）",
     "studentYourProgress": "你的进度",
     "studentLearningStatus": {
       "not_started": "未学习",
@@ -130,8 +121,7 @@
     "ariaSuggestedTasks": "今晚建议任务",
     "ariaSubjectStatus": "科目与状态",
     "ariaInboxLabels": "科目与进度状态",
-    "inboxLearningSectionAria": "学习中",
-    "inboxFinishedArchived": "已完成",
+    "inboxListAria": "学习卡列表",
     "taskShort": {
       "quiz": "测验",
       "parent_led_practice": "实践",

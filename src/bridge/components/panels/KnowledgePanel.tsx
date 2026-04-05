@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   LearningCardBackend,
-  LearningCardParentFeedback,
   LearningCardStudentFeedback,
   LearningCardStudentLearningStatus,
 } from '@/data/entity/learning-card-backend';
 
-type CardProgressStatusKey = 'unread' | 'read' | 'actioned';
 type StudentLearningStatusKey = LearningCardStudentLearningStatus;
 
 type KnowledgeInboxRow = {
@@ -14,41 +12,9 @@ type KnowledgeInboxRow = {
   title: string;
   subject: string;
   date: string;
-  parentProgressStatus?: CardProgressStatusKey;
   studentLearningStatus?: StudentLearningStatusKey;
 };
 
-function partitionKnowledgeInbox(
-  items: KnowledgeInboxRow[],
-  cardBackends: LearningCardBackend[],
-  role: string,
-  studentUserId: string,
-): { active: KnowledgeInboxRow[]; done: KnowledgeInboxRow[] } {
-  const active: KnowledgeInboxRow[] = [];
-  const done: KnowledgeInboxRow[] = [];
-  for (const item of items) {
-    const b = cardBackends.find((x) => x.threadId === item.id);
-    const lifecycle = b?.status?.status ?? 'sent';
-    if (lifecycle === 'archived') {
-      done.push(item);
-      continue;
-    }
-    if (role === 'student' && studentUserId) {
-      const st = item.studentLearningStatus ?? 'not_started';
-      if (st === 'finished') done.push(item);
-      else active.push(item);
-      continue;
-    }
-    if (role === 'parent') {
-      const pr = item.parentProgressStatus ?? 'unread';
-      if (pr === 'actioned') done.push(item);
-      else active.push(item);
-      continue;
-    }
-    active.push(item);
-  }
-  return { active, done };
-}
 import { useTranslation } from 'react-i18next';
 import { Check, ImagePlus, ListChecks } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
@@ -66,17 +32,14 @@ import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid
 import { KnowledgeParentEmptyExample } from '@/bridge/components/KnowledgeParentEmptyExample';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
-import { KnowledgeInboxStatusLabel } from '@/bridge/components/ui/KnowledgeInboxStatusLabel';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { StudentLearningReflectionModal } from '@/bridge/components/ui/StudentLearningReflectionModal';
 import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
 import { getLlmApi } from '@/data/api/llm-api';
 import {
-  getParentFeedbackForUser,
   getStudentFeedbackForUser,
   learningCardBackendToItem,
-  upsertParentFeedbackOnCard,
   upsertStudentFeedbackOnCard,
 } from '@/data/learning-card-mappers';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
@@ -119,23 +82,13 @@ function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t:
   return t(`knowledge.taskShort.${preset}`);
 }
 
-function parentProgressStatusLabelType(
-  status: CardProgressStatusKey,
-): 'info' | 'success' | 'warning' {
-  if (status === 'unread') return 'warning';
-  if (status === 'read') return 'info';
-  return 'success';
-}
-
 /** Inbox rows keep subject + status on opposite ends; thread header groups both on the left. */
 function KnowledgeCardLabels({
   card,
-  parentProgressStatus,
   studentLearningStatus,
   layout = 'inbox',
 }: {
   card: Pick<LearningCardItem, 'subject'>;
-  parentProgressStatus?: CardProgressStatusKey;
   studentLearningStatus?: StudentLearningStatusKey;
   layout?: 'inbox' | 'thread';
 }) {
@@ -144,7 +97,7 @@ function KnowledgeCardLabels({
     ...row,
     aria: t('common.subject'),
   }));
-  const showProgress = parentProgressStatus != null || studentLearningStatus != null;
+  const showProgress = studentLearningStatus != null;
   const splitForInbox = layout === 'inbox' && showProgress;
   if (!tags.length && !showProgress) return null;
   return (
@@ -170,18 +123,6 @@ function KnowledgeCardLabels({
           </span>
         ))}
       </div>
-      {parentProgressStatus != null ? (
-        <KnowledgeInboxStatusLabel
-          type={parentProgressStatusLabelType(parentProgressStatus)}
-          title={`${t('knowledge.lcStatus')}: ${t(`knowledge.parentReadStatus.${parentProgressStatus}`)}`}
-          screenReaderPrefix={
-            <>
-              {t('knowledge.lcStatus')}:{' '}
-            </>
-          }
-          content={t(`knowledge.parentReadStatus.${parentProgressStatus}`)}
-        />
-      ) : null}
       {studentLearningStatus != null ? (
         <span
           className={cx(
@@ -205,62 +146,34 @@ function KnowledgeCardLabels({
 }
 
 function LearningCardCompletionButton({
-  placement,
   threadId,
   role,
-  parentFeedback,
   studentFeedback,
-  persistParentPatch,
   onStudentHeaderOpenReflection,
   t,
 }: {
-  placement: 'header' | 'detail';
   threadId: string | undefined;
   role: string;
-  parentFeedback: LearningCardParentFeedback | null;
   studentFeedback: LearningCardStudentFeedback | null;
-  persistParentPatch: (patch: Partial<Omit<LearningCardParentFeedback, 'parentId'>>) => void;
   onStudentHeaderOpenReflection?: () => void;
   t: TFunction;
 }) {
-  if (placement === 'header') {
-    if (role !== 'student' || !studentFeedback) return null;
-    const done = studentFeedback.status === 'finished';
-    return (
-      <button
-        type="button"
-        className={cx(
-          'knowledge-lc-completion',
-          'knowledge-lc-completion--header',
-          done && 'knowledge-lc-completion--done',
-        )}
-        disabled={!threadId}
-        aria-pressed={done}
-        aria-haspopup="dialog"
-        onClick={() => {
-          if (!threadId) return;
-          onStudentHeaderOpenReflection?.();
-        }}
-      >
-        <span className="knowledge-lc-completion__circle" data-done={done ? 'true' : undefined} aria-hidden>
-          {done ? <Check className="knowledge-lc-completion__check" strokeWidth={3} size={14} /> : null}
-        </span>
-        <span className="knowledge-lc-completion__label">{t('knowledge.lcDone')}</span>
-      </button>
-    );
-  }
-  if (role !== 'parent' || !parentFeedback) return null;
-  const done = parentFeedback.status === 'actioned';
+  if (role !== 'student' || !studentFeedback) return null;
+  const done = studentFeedback.status === 'finished';
   return (
     <button
       type="button"
-      className={cx('knowledge-lc-completion', done && 'knowledge-lc-completion--done')}
+      className={cx(
+        'knowledge-lc-completion',
+        'knowledge-lc-completion--header',
+        done && 'knowledge-lc-completion--done',
+      )}
       disabled={!threadId}
       aria-pressed={done}
+      aria-haspopup="dialog"
       onClick={() => {
         if (!threadId) return;
-        const next = parentFeedback.status !== 'actioned';
-        void persistParentPatch({ status: next ? 'actioned' : 'read' });
+        onStudentHeaderOpenReflection?.();
       }}
     >
       <span className="knowledge-lc-completion__circle" data-done={done ? 'true' : undefined} aria-hidden>
@@ -348,12 +261,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         subject: c.subject,
         date: new Date(c.at).toISOString().slice(0, 10),
       };
-      if (role === 'parent' && parentUserId.trim()) {
-        const b = cardBackends.find((x) => x.threadId === c.threadId);
-        if (b) {
-          row.parentProgressStatus = getParentFeedbackForUser(b, parentUserId).status;
-        }
-      }
       if (role === 'student' && studentUserId) {
         const b = cardBackends.find((x) => x.threadId === c.threadId);
         if (b) {
@@ -362,14 +269,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       }
       return row;
     });
-  }, [cards, cardBackends, role, parentUserId, studentUserId]);
-
-  const { active: inboxActiveItems, done: inboxDoneItems } = useMemo(() => {
-    if (role !== 'parent' && role !== 'student') {
-      return { active: items, done: [] as KnowledgeInboxRow[] };
-    }
-    return partitionKnowledgeInbox(items, cardBackends, role, studentUserId);
-  }, [items, cardBackends, role, studentUserId]);
+  }, [cards, cardBackends, role, studentUserId]);
 
   useEffect(() => {
     if (!cards.length) {
@@ -387,27 +287,10 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const current = items.find((i) => i.id === threadId);
   const currentCard = threadId ? cards.find((c) => c.threadId === threadId) : undefined;
   const currentBackend = threadId ? cardBackends.find((c) => c.threadId === threadId) : undefined;
-  const parentFeedback =
-    role === 'parent' && currentBackend
-      ? getParentFeedbackForUser(currentBackend, parentUserId)
-      : null;
   const studentFeedback =
     role === 'student' && currentBackend && studentUserId
       ? getStudentFeedbackForUser(currentBackend, studentUserId)
       : null;
-
-  const persistParentPatch = useCallback(
-    async (patch: Partial<Omit<LearningCardParentFeedback, 'parentId'>>) => {
-      if (role !== 'parent' || !parentUserId.trim() || !threadId) return;
-      const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
-      if (!b) return;
-      const updated = upsertParentFeedbackOnCard(b, { parentId: parentUserId, ...patch });
-      await getDataLayer().learningCards.put(updated);
-      setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-      bumpLearningCards();
-    },
-    [role, parentUserId, threadId, bumpLearningCards],
-  );
 
   const persistStudentPatch = useCallback(
     async (patch: Partial<Omit<LearningCardStudentFeedback, 'studentId'>>) => {
@@ -427,26 +310,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     [currentCard],
   );
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
-
-  /** Parent: first open moves unread → read and persists. */
-  useEffect(() => {
-    if (role !== 'parent' || !threadId || !parentUserId.trim()) return;
-    const b = cardBackends.find((c) => c.threadId === threadId);
-    if (!b) return;
-    const fb = getParentFeedbackForUser(b, parentUserId);
-    if (fb.status !== 'unread') return;
-    let cancelled = false;
-    void (async () => {
-      const updated = upsertParentFeedbackOnCard(b, { parentId: parentUserId, status: 'read' });
-      await getDataLayer().learningCards.put(updated);
-      if (cancelled) return;
-      setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-      bumpLearningCards();
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [role, threadId, parentUserId, cardBackends, bumpLearningCards]);
 
   useEffect(() => {
     if (!active || !threadId) return;
@@ -471,7 +334,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     setInput('');
     clear();
     if (knowledgeFileInputRef.current) knowledgeFileInputRef.current.value = '';
-    if (role === 'parent') void persistParentPatch({ chatedWithAI: true });
     if (role === 'student' && threadId && studentUserId) {
       const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
       const fb = b ? getStudentFeedbackForUser(b, studentUserId) : null;
@@ -488,7 +350,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       setTonightActionBusy(true);
       const cmd = knowledgeTonightSlashCommand(preset);
       appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: cmd });
-      if (role === 'parent') void persistParentPatch({ chatedWithAI: true });
       if (role === 'student' && studentUserId) {
         const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
         const fb = b ? getStudentFeedbackForUser(b, studentUserId) : null;
@@ -527,7 +388,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       appendKnowledgeMessage,
       currentCard?.title,
       role,
-      persistParentPatch,
       persistStudentPatch,
       studentUserId,
     ],
@@ -549,8 +409,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const emptyHint = role === 'student' ? t('knowledge.emptyStudent') : t('knowledge.emptyParent');
   const showParentEmptyExample = role === 'parent' && items.length === 0;
 
-  /** Finished-section rows omit the status pill — the section title already says Finished. */
-  const renderKnowledgeInboxItem = (item: KnowledgeInboxRow, hideInboxStatusPill = false) => (
+  const renderKnowledgeInboxItem = (item: KnowledgeInboxRow) => (
     <button
       key={item.id}
       type="button"
@@ -561,8 +420,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       <div className="inbox-item__title">{item.title}</div>
       <KnowledgeCardLabels
         card={{ subject: item.subject }}
-        parentProgressStatus={hideInboxStatusPill ? undefined : item.parentProgressStatus}
-        studentLearningStatus={hideInboxStatusPill ? undefined : item.studentLearningStatus}
+        studentLearningStatus={item.studentLearningStatus}
       />
       <div className="inbox-item__meta">{item.date}</div>
     </button>
@@ -590,36 +448,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           <KnowledgeParentEmptyExample />
         ) : (
           <>
-            <div
-              className={cx('inbox', items.length > 0 && 'inbox--knowledge-split')}
-              id="knowledge-inbox-list"
-            >
+            <div className="inbox" id="knowledge-inbox-list" aria-label={t('knowledge.inboxListAria')}>
               {!items.length ? (
                 <p className="panel__hint" style={{ padding: '1rem' }}>
                   {emptyHint}
                 </p>
               ) : (
-                <>
-                  <div
-                    className="inbox__section inbox__section--active"
-                    aria-label={t('knowledge.inboxLearningSectionAria')}
-                  >
-                    <div className="inbox__scroll">
-                      {inboxActiveItems.map((item) => renderKnowledgeInboxItem(item))}
-                    </div>
-                  </div>
-                  <div className="inbox__section inbox__section--done">
-                    <div className="inbox__section-label" id="knowledge-inbox-done-heading">
-                      {t('knowledge.inboxFinishedArchived')}
-                    </div>
-                    <div
-                      className="inbox__scroll"
-                      aria-labelledby="knowledge-inbox-done-heading"
-                    >
-                      {inboxDoneItems.map((item) => renderKnowledgeInboxItem(item, true))}
-                    </div>
-                  </div>
-                </>
+                items.map((item) => renderKnowledgeInboxItem(item))
               )}
             </div>
             <div className="thread-pane">
@@ -634,7 +469,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                         <KnowledgeCardLabels
                           layout="thread"
                           card={currentCard}
-                          parentProgressStatus={role === 'parent' && parentFeedback ? parentFeedback.status : undefined}
                           studentLearningStatus={
                             role === 'student' && studentFeedback ? studentFeedback.status : undefined
                           }
@@ -643,12 +477,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                       {role === 'student' && studentFeedback ? (
                         <div className="thread-header__knowledge-right">
                           <LearningCardCompletionButton
-                            placement="header"
                             threadId={threadId}
                             role={role}
-                            parentFeedback={parentFeedback}
                             studentFeedback={studentFeedback}
-                            persistParentPatch={persistParentPatch}
                             onStudentHeaderOpenReflection={() => setStudentReflectionOpen(true)}
                             t={t}
                           />
@@ -683,24 +514,12 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                     )}
                   </section>
 
-                  <section className="knowledge-lc-detail__block" aria-labelledby="knowledge-status-heading">
-                    <h4 id="knowledge-status-heading" className="knowledge-lc-detail__status-heading">
-                      {t('knowledge.lcStatus')}
-                    </h4>
-                    {role === 'parent' && parentFeedback ? (
-                      <div className="knowledge-parent-fb" role="group" aria-label={t('knowledge.parentYourProgress')}>                        
-                        <label className="knowledge-parent-fb__check">
-                          <input
-                            type="checkbox"
-                            checked={parentFeedback.doNotUnderstand}
-                            onChange={() => void persistParentPatch({ doNotUnderstand: !parentFeedback.doNotUnderstand })}
-                          />
-                          {t('knowledge.parentDoNotUnderstand')}
-                        </label>
-                      </div>
-                    ) : null}
-                    {role === 'student' && studentFeedback ? (
-                      <div className="knowledge-parent-fb" role="group" aria-label={t('knowledge.studentYourProgress')}>                        
+                  {role === 'student' && studentFeedback ? (
+                    <section className="knowledge-lc-detail__block" aria-labelledby="knowledge-status-heading">
+                      <h4 id="knowledge-status-heading" className="knowledge-lc-detail__status-heading">
+                        {t('knowledge.lcStatus')}
+                      </h4>
+                      <div className="knowledge-parent-fb" role="group" aria-label={t('knowledge.studentYourProgress')}>
                         <label className="knowledge-parent-fb__check">
                           <input
                             type="checkbox"
@@ -710,17 +529,8 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                           {t('knowledge.studentWatchedVideo')}
                         </label>
                       </div>
-                    ) : null}
-                    <LearningCardCompletionButton
-                      placement="detail"
-                      threadId={threadId}
-                      role={role}
-                      parentFeedback={parentFeedback}
-                      studentFeedback={studentFeedback}
-                      persistParentPatch={persistParentPatch}
-                      t={t}
-                    />
-                  </section>
+                    </section>
+                  ) : null}
                 </div>
               ) : null}
 

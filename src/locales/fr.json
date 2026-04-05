@@ -95,15 +95,6 @@
     "lcStepsTitle": "Étapes vers la maîtrise",
     "lcStepsEmpty": "Aucune étape suggérée sur cette fiche.",
     "lcStatus": "Statut",
-    "parentYourProgress": "Votre suivi",
-    "parentReadStatus": {
-      "unread": "Non lu",
-      "read": "Lu",
-      "actioned": "Terminé"
-    },
-    "parentChatedWithAI": "Discussion avec l’IA",
-    "parentNotChatedWithAI": "Pas encore avec l’IA",
-    "parentDoNotUnderstand": "Je ne comprends pas (besoin d’aide)",
     "studentYourProgress": "Votre suivi",
     "studentLearningStatus": {
       "not_started": "Pas commencé",
@@ -130,8 +121,7 @@
     "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
     "ariaSubjectStatus": "Matière et statut",
     "ariaInboxLabels": "Matière et votre suivi",
-    "inboxLearningSectionAria": "En cours",
-    "inboxFinishedArchived": "Terminé",
+    "inboxListAria": "Fiches d’apprentissage",
     "taskShort": {
       "quiz": "Quiz",
       "parent_led_practice": "Mise en pratique",

@@ -95,15 +95,6 @@
     "lcStepsTitle": "Steps to mastery",
     "lcStepsEmpty": "No suggested steps on this card.",
     "lcStatus": "Status",
-    "parentYourProgress": "Your progress",
-    "parentReadStatus": {
-      "unread": "Unread",
-      "read": "Read",
-      "actioned": "Done"
-    },
-    "parentChatedWithAI": "Chatted with AI",
-    "parentNotChatedWithAI": "Not yet with AI",
-    "parentDoNotUnderstand": "I don’t understand (need more help)",
     "studentYourProgress": "Your progress",
     "studentLearningStatus": {
       "not_started": "Not started",
@@ -130,8 +121,7 @@
     "ariaSuggestedTasks": "Tonight’s suggested tasks",
     "ariaSubjectStatus": "Subject and status",
     "ariaInboxLabels": "Subject and your progress",
-    "inboxLearningSectionAria": "In progress",
-    "inboxFinishedArchived": "Finished",
+    "inboxListAria": "Learning cards",
     "taskShort": {
       "quiz": "Quiz",
       "parent_led_practice": "Hands-on",

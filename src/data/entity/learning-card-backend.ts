@@ -13,7 +13,7 @@ import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/br
  * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`
  */
 
-export const LEARNING_CARD_SCHEMA_VERSION = 2 as const;
+export const LEARNING_CARD_SCHEMA_VERSION = 3 as const;
 
 /** Who receives the card (maps from wizard `class` / `selected`). */
 export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
@@ -77,7 +77,6 @@ export interface LearningCardBackend {
 export type LearningCardStatusBackend = {
   status: 'draft' | 'sent' | 'archived';
   student: LearningCardStudentFeedback[];
-  parent: LearningCardParentFeedback[];
 };
 
 /** Student Knowledge progress — distinct from parent read/action workflow. */
@@ -105,21 +104,5 @@ export function getDefaultLearningCardStudentFeedback(studentId: string): Learni
     watchedVideo: false,
     chatedWithAI: false,
     status: 'not_started',
-  };
-}
-
-export type LearningCardParentFeedback = {
-  parentId: string;
-  status: 'unread' | 'read' | 'actioned';
-  chatedWithAI: boolean;
-  doNotUnderstand: boolean;
-};
-
-export function getDefaultLearningCardParentFeedback(parentId: string): LearningCardParentFeedback {
-  return {
-    parentId,
-    status: 'unread',
-    chatedWithAI: false,
-    doNotUnderstand: false,
   };
 }

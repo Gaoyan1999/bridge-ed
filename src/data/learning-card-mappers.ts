@@ -7,10 +7,8 @@ import type {
 import { LEARNING_CARD_TONIGHT_ACTION_PRESETS } from '@/bridge/types';
 import {
   LEARNING_CARD_SCHEMA_VERSION,
-  getDefaultLearningCardParentFeedback,
   getDefaultLearningCardStudentFeedback,
   type LearningCardBackend,
-  type LearningCardParentFeedback,
   type LearningCardStatusBackend,
   type LearningCardStudentFeedback,
   type LearningCardStudentFinishedType,
@@ -28,8 +26,19 @@ function defaultLearningCardStatusBackend(sentAt: string | null): LearningCardSt
   return {
     status: sent ? 'sent' : 'draft',
     student: [],
-    parent: [],
   };
+}
+
+/** Drops legacy `parent` feedback rows; normalizes `student[]`. */
+function normalizeLearningCardStatusBackend(raw: unknown, sentAt: string | null): LearningCardStatusBackend {
+  const fallback = defaultLearningCardStatusBackend(sentAt);
+  if (!raw || typeof raw !== 'object') return fallback;
+  const r = raw as Record<string, unknown>;
+  const st = r.status;
+  const status =
+    st === 'draft' || st === 'sent' || st === 'archived' ? st : fallback.status;
+  const studentArr = Array.isArray(r.student) ? r.student : [];
+  return { status, student: studentArr };
 }
 
 function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
@@ -56,7 +65,7 @@ export function normalizeLearningCardBackend(raw: LearningCardBackend): Learning
     ...raw,
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
     tonightActions: normalizeTonightActions(raw.tonightActions),
-    status: raw.status ?? defaultLearningCardStatusBackend(raw.sentAt),
+    status: normalizeLearningCardStatusBackend(raw.status, raw.sentAt),
   };
 }
 
@@ -214,32 +223,6 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
     tonightActions: normalizeTonightActions(backend.tonightActions),
-  };
-}
-
-/** Resolved row for this parent on the card, or defaults when not yet stored. */
-export function getParentFeedbackForUser(card: LearningCardBackend, parentId: string): LearningCardParentFeedback {
-  const pid = parentId.trim();
-  const row = card.status.parent.find((p) => p.parentId === pid);
-  return row ?? getDefaultLearningCardParentFeedback(pid);
-}
-
-/** Merge parent feedback into `card.status.parent` and bump `updatedAt`. */
-export function upsertParentFeedbackOnCard(
-  card: LearningCardBackend,
-  patch: Partial<Omit<LearningCardParentFeedback, 'parentId'>> & { parentId: string },
-): LearningCardBackend {
-  const pid = patch.parentId.trim();
-  const list = [...card.status.parent];
-  const i = list.findIndex((p) => p.parentId === pid);
-  const base: LearningCardParentFeedback = i >= 0 ? list[i]! : getDefaultLearningCardParentFeedback(pid);
-  const merged: LearningCardParentFeedback = { ...base, ...patch, parentId: pid };
-  if (i >= 0) list[i] = merged;
-  else list.push(merged);
-  return {
-    ...card,
-    updatedAt: new Date().toISOString(),
-    status: { ...card.status, parent: list },
   };
 }
 
