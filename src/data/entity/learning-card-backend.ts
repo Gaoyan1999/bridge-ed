@@ -13,7 +13,7 @@ import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/br
  * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`
  */
 
-export const LEARNING_CARD_SCHEMA_VERSION = 2 as const;
+export const LEARNING_CARD_SCHEMA_VERSION = 3 as const;
 
 /** Who receives the card (maps from wizard `class` / `selected`). */
 export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
@@ -73,25 +73,35 @@ export interface LearningCardBackend {
   status: LearningCardStatusBackend;
 }
 
-
 export type LearningCardStatusBackend = {
   status: 'draft' | 'sent' | 'archived';
   student: LearningCardStudentFeedback[];
-  parent: LearningCardParentFeedback[];
 };
 
-type LearningCardStudentFeedback = {
+/** Student Knowledge progress — distinct from parent read/action workflow. */
+export type LearningCardStudentLearningStatus = 'not_started' | 'learning' | 'finished';
+
+export type LearningCardStudentFinishedType = 'pretty_easy' | 'think_get_it' | 'challenge';
+
+/**
+ * Per-student progress on a card (Knowledge).
+ * Persisted under `status.student[]`.
+ */
+export type LearningCardStudentFeedback = {
   studentId: string;
-  watchedVideo: boolean;  
+  watchedVideo: boolean;
   chatedWithAI: boolean;
-  status: 'not_started' | 'learning' | 'finished';
-  finishedType?: 'pretty_easy' | 'think_get_it' | 'challenge';
-}
+  status: LearningCardStudentLearningStatus;
+  /** Set when `status === 'finished'` (how it felt / self-report). */
+  finishedType?: LearningCardStudentFinishedType;
+  feeling?: string;
+};
 
-
-type LearningCardParentFeedback = {
-  parentId: string;
-  status: 'unread' | 'read' | 'actioned';
-  chatedWithAI: boolean;
-  doNotUnderstand: boolean;
+export function getDefaultLearningCardStudentFeedback(studentId: string): LearningCardStudentFeedback {
+  return {
+    studentId,
+    watchedVideo: false,
+    chatedWithAI: false,
+    status: 'not_started',
+  };
 }

@@ -1,10 +1,109 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-04T14:54:53.867Z",
+  "exportedAt": "2026-04-05T10:51:37.942Z",
   "learningCards": [
     {
+      "id": "card-0af9c11c-57fe-444b-8b32-8d5faff69615",
+      "schemaVersion": 3,
+      "createdAt": "2026-04-05T04:39:26.819Z",
+      "updatedAt": "2026-04-05T04:39:26.819Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Science",
+      "topic": "两位数减法",
+      "teacherNotes": "",
+      "parentSummary": "This week in Grade 7 Science, we reviewed two-digit subtraction. Students practiced to strengthen their understanding of subtraction, which helps them solve science problems. Please encourage your child to keep practicing subtraction at home to reinforce their learning.",
+      "translatedSummaries": {
+        "zh": "本周我们在七年级科学课上复习了两位数减法。学生们通过练习加强了对减法的理解，这对他们解决科学问题很有帮助。请鼓励孩子在家继续练习减法，帮助他们巩固所学知识。",
+        "en": "This week in Grade 7 Science, we reviewed two-digit subtraction. Students practiced to strengthen their understanding of subtraction, which helps them solve science problems. Please encourage your child to keep practicing subtraction at home to reinforce their learning.",
+        "fr": "Cette semaine, en sciences de 7e année, nous avons révisé la soustraction à deux chiffres. Les élèves ont pratiqué pour renforcer leur compréhension de la soustraction, ce qui les aide à résoudre des problèmes scientifiques. Veuillez encourager votre enfant à continuer à pratiquer la soustraction à la maison pour consolider ses apprentissages."
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
+      "sentAt": "2026-04-05T04:39:26.819Z",
+      "threadId": "card-thread-0af9c11c-57fe-444b-8b32-8d5faff69615"
+    },
+    {
+      "id": "card-277b0c35-df52-4f5c-8f0a-cf27fbcee782",
+      "schemaVersion": 3,
+      "createdAt": "2026-04-05T05:11:44.307Z",
+      "updatedAt": "2026-04-05T05:11:44.307Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Math",
+      "topic": "DDD",
+      "teacherNotes": "",
+      "parentSummary": "[Demo] Parent summary for “DDD” (Math · G7). Edit before sending.",
+      "translatedSummaries": {
+        "en": "[Demo] Parent summary for “DDD” (Math · G7). Edit before sending.",
+        "zh": "[演示] 家长版摘要：「DDD」（Math · G7）。发送前请修改。",
+        "fr": "[Démo] Résumé parents : « DDD » (Math · G7). À relire avant envoi."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
+        "heroImageAlt": "Science and discovery — DDD (Math · G7)",
+        "content": "下面是根据「DDD」（Math · G7）为你挑的几支适合孩子看的小短片，节奏友好、画面清晰。可以和家长一起看，边看边想：这个主题和你课上学的有什么联系？\n\n1. 入门：先建立整体印象\n视频：Introduction for kids — DDD\nhttps://www.youtube.com/watch?v=87SftBC1vFo\n推荐：用简单语言搭一个“地图”，帮孩子知道今天要解决什么问题，适合第一次接触。\n\n2. 深入一点：把关键概念讲清楚\n视频：Key ideas explained — DDD\nhttps://www.youtube.com/watch?v=5vZlQe7yM8Y\n推荐：把抽象词和具体例子对上号，适合巩固理解、记几个关键词。\n\n3. 动手或延伸：试一试、说一说\n视频：Try it / mini activity — DDD\nhttps://www.youtube.com/watch?v=QFJ5QdG1J1k\n推荐：短任务或小游戏式演示，看完可以试一个小练习或讲给家长听。"
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
+      "sentAt": "2026-04-05T05:11:44.307Z",
+      "threadId": "card-thread-277b0c35-df52-4f5c-8f0a-cf27fbcee782"
+    },
+    {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-02T17:21:22.032Z",
       "updatedAt": "2026-04-02T17:21:22.032Z",
       "authorUserId": "1",
@@ -42,12 +141,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-02T17:21:22.031Z",
       "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
     },
     {
       "id": "card-55615594-c62e-41b5-86e1-93af028a1f8e",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-04T06:55:19.608Z",
       "updatedAt": "2026-04-04T06:55:19.608Z",
       "authorUserId": "teacher-2",
@@ -90,12 +193,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-04T06:55:19.608Z",
       "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
     },
     {
       "id": "card-6f78e588-38a2-4af8-8951-5071aac89ece",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-04T11:49:58.169Z",
       "updatedAt": "2026-04-04T11:49:58.169Z",
       "authorUserId": "teacher-2",
@@ -133,12 +240,68 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-04T11:49:58.169Z",
       "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece"
     },
     {
+      "id": "card-99191523-fe82-4063-b68a-93f21611b315",
+      "schemaVersion": 3,
+      "createdAt": "2026-04-05T04:50:47.477Z",
+      "updatedAt": "2026-04-05T04:50:47.477Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Math",
+      "topic": "乘法",
+      "teacherNotes": "",
+      "parentSummary": "This week in Grade 7 math, we reviewed factoring. Students learned how to break down multiplication expressions into simpler parts, which helps them understand math operations better. Please encourage your child to review multiplication tables at home and try some factoring practice problems.",
+      "translatedSummaries": {
+        "zh": "本周我们在七年级数学课上复习了因式分解的内容。学生们学习了如何将乘法表达式拆解成更简单的部分，这有助于他们更好地理解数学运算。请鼓励孩子在家复习乘法表，并尝试做一些因式分解的练习题。",
+        "en": "This week in Grade 7 math, we reviewed factoring. Students learned how to break down multiplication expressions into simpler parts, which helps them understand math operations better. Please encourage your child to review multiplication tables at home and try some factoring practice problems.",
+        "fr": "Cette semaine, en mathématiques de 7e année, nous avons révisé la factorisation. Les élèves ont appris à décomposer des expressions de multiplication en parties plus simples, ce qui les aide à mieux comprendre les opérations mathématiques. Veuillez encourager votre enfant à revoir les tables de multiplication à la maison et à essayer quelques exercices de factorisation."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80",
+        "heroImageAlt": "Learning illustration",
+        "content": "下面是根据「乘法」（Math · G7）为你挑的几支适合孩子看的小短片，节奏友好、画面清晰。可以和家长一起看，边看边想：这个主题和你课上学的有什么联系？\n\n1. 入门：先建立整体印象\n视频：Introduction for kids — 乘法\nhttps://www.youtube.com/watch?v=87SftBC1vFo\n推荐：用简单语言搭一个“地图”，帮孩子知道今天要解决什么问题，适合第一次接触。\n\n2. 深入一点：把关键概念讲清楚\n视频：Key ideas explained — 乘法\nhttps://www.youtube.com/watch?v=5vZlQe7yM8Y\n推荐：把抽象词和具体例子对上号，适合巩固理解、记几个关键词。\n\n3. 动手或延伸：试一试、说一说\n视频：Try it / mini activity — 乘法\nhttps://www.youtube.com/watch?v=QFJ5QdG1J1k\n推荐：短任务或小游戏式演示，看完可以试一个小练习或讲给家长听。"
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
+      "sentAt": "2026-04-05T04:50:47.477Z",
+      "threadId": "card-thread-99191523-fe82-4063-b68a-93f21611b315"
+    },
+    {
       "id": "card-atmospheric-pressure",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-01T22:20:00.000Z",
       "updatedAt": "2026-04-01T22:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -176,12 +339,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-01T22:20:00.000Z",
       "threadId": "card-thread-atmospheric-pressure"
     },
     {
       "id": "card-cells",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-03-30T23:50:00.000Z",
       "updatedAt": "2026-03-30T23:50:00.000Z",
       "authorUserId": "teacher-1",
@@ -224,12 +391,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-03-30T23:50:00.000Z",
       "threadId": "card-thread-cells"
     },
     {
       "id": "card-ec3591c8-b5c4-4da8-80a7-29e363682a04",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-04T14:46:04.951Z",
       "updatedAt": "2026-04-04T14:46:04.951Z",
       "authorUserId": "teacher-2",
@@ -272,12 +443,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-04T14:46:04.951Z",
       "threadId": "card-thread-ec3591c8-b5c4-4da8-80a7-29e363682a04"
     },
     {
       "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-04T03:48:48.238Z",
       "updatedAt": "2026-04-04T03:48:48.238Z",
       "authorUserId": "teacher-1",
@@ -315,12 +490,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-04-04T03:48:48.238Z",
       "threadId": "card-thread-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7"
     },
     {
       "id": "card-metaphor",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-03-31T00:20:00.000Z",
       "updatedAt": "2026-03-31T00:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -358,12 +537,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-03-31T00:20:00.000Z",
       "threadId": "card-thread-metaphor"
     },
     {
       "id": "card-renaissance",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-03-29T00:05:00.000Z",
       "updatedAt": "2026-03-29T00:05:00.000Z",
       "authorUserId": "teacher-1",
@@ -401,12 +584,16 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
+      "status": {
+        "status": "sent",
+        "student": []
+      },
       "sentAt": "2026-03-29T00:05:00.000Z",
       "threadId": "card-thread-renaissance"
     },
     {
       "id": "card-shakespeare",
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "createdAt": "2026-04-02T23:15:00.000Z",
       "updatedAt": "2026-04-02T23:15:00.000Z",
       "authorUserId": "teacher-1",
@@ -443,6 +630,10 @@
         "mode": "whole_class",
         "recipientCount": 28,
         "selectedStudentIds": []
+      },
+      "status": {
+        "status": "sent",
+        "student": []
       },
       "sentAt": "2026-04-02T23:15:00.000Z",
       "threadId": "card-thread-shakespeare"

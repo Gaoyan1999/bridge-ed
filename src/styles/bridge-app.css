@@ -1675,15 +1675,24 @@ html.theme-dark .learning-card-actions-group {
 
 .composer__actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 0.65rem;
   margin-top: 0.75rem;
   flex-wrap: wrap;
 }
 
+.composer__actions-leading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .composer__attach-btn {
-  margin-right: auto;
+  flex-shrink: 0;
 }
 
 .composer__preview {
@@ -1893,13 +1902,39 @@ html.theme-dark .learning-card-actions-group {
   border-left: 3px solid var(--link-blue);
 }
 
-/* Knowledge — subject / status chips (same blue system as Messages) */
+/* Knowledge — subject / status chips (unified blue) */
 .knowledge-inbox__labels {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem 0.35rem;
   margin: 0.35rem 0 0.25rem;
   align-items: center;
+}
+
+.knowledge-inbox__labels-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.35rem;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Parent: subject (left) + read status (right) */
+.knowledge-inbox__labels--split {
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.4rem 0.6rem;
+}
+
+.knowledge-inbox__labels--split .knowledge-inbox__labels-left {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.knowledge-inbox__labels--split .knowledge-inbox__label--rect {
+  flex-shrink: 0;
 }
 
 .inbox-item--knowledge .inbox-item__title {
@@ -1929,10 +1964,80 @@ html.theme-dark .learning-card-actions-group {
 }
 
 .panel--knowledge .knowledge-inbox__label--status {
-  font-weight: 500;
-  border-color: var(--border-light);
-  background: var(--pill-bg);
+  font-weight: 600;
+  border-color: rgba(11, 87, 208, 0.28);
+  background: var(--accent-soft);
+  color: var(--link-blue);
+}
+
+/* Parent progress in inbox / header — rectangular (not pill) */
+.panel--knowledge .knowledge-inbox__label--rect {
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.panel--knowledge .knowledge-inbox__label--student-not-started,
+.panel--knowledge .knowledge-inbox__label--student-learning,
+.panel--knowledge .knowledge-inbox__label--student-finished {
+  border-color: rgba(11, 87, 208, 0.28);
+  background: var(--accent-soft);
+  color: var(--link-blue);
+}
+
+.knowledge-parent-fb {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.knowledge-parent-fb__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.knowledge-parent-fb__hint {
+  font-size: 0.875rem;
   color: var(--text-muted);
+}
+
+.knowledge-parent-fb__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.knowledge-parent-fb__check input {
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.knowledge-student-fb-finished {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.knowledge-student-fb-finished__opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.knowledge-student-fb-finished__opt input {
+  margin-top: 0.15rem;
+  flex-shrink: 0;
 }
 
 /* Knowledge — teacher-selected tonight tasks (quiz / practice / explain) */
@@ -1986,9 +2091,168 @@ html.theme-dark .learning-card-actions-group {
   max-width: 100%;
 }
 
+/* Knowledge — LC completion (parent detail + student header): theme-aligned control */
+.knowledge-lc-completion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--btn-secondary-bg);
+  color: var(--link-blue);
+  box-shadow: var(--shadow);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.knowledge-lc-completion:hover:not(:disabled) {
+  background: var(--btn-secondary-bg-hover);
+  border-color: rgba(11, 87, 208, 0.35);
+}
+
+.knowledge-lc-completion:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.knowledge-lc-completion--done {
+  background: rgba(220, 252, 231, 0.9);
+  border-color: rgba(22, 163, 74, 0.45);
+  color: rgb(21, 128, 61);
+}
+
+.knowledge-lc-completion--done:hover:not(:disabled) {
+  background: rgba(220, 252, 231, 1);
+}
+
+.knowledge-lc-completion__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  flex-shrink: 0;
+}
+
+.knowledge-lc-completion__circle[data-done='true'] {
+  border-color: rgb(21, 128, 61);
+  background: var(--surface);
+}
+
+.knowledge-lc-completion__check {
+  color: rgb(21, 128, 61);
+}
+
+.knowledge-lc-completion__label {
+  white-space: nowrap;
+}
+
+.thread-header__knowledge-right .knowledge-lc-completion--header {
+  flex-shrink: 0;
+  align-self: center;
+}
+
 .thread-header__knowledge-right .knowledge-inbox__tasks {
   margin: 0;
   gap: 0.28rem 0.35rem;
+}
+
+.thread-header__knowledge-right .knowledge-lc-finish-wrap {
+  flex-shrink: 0;
+  max-width: min(100%, 24rem);
+}
+
+.knowledge-lc-finish-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.knowledge-lc-finish-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem 0.45rem;
+}
+
+.knowledge-lc-finish-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.2;
+  transition:
+    filter 0.12s ease,
+    box-shadow 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.knowledge-lc-finish-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.knowledge-lc-finish-btn:disabled.knowledge-lc-finish-btn--picked {
+  opacity: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.knowledge-lc-finish-btn--green {
+  background: rgba(220, 252, 231, 0.95);
+  color: rgb(21, 128, 61);
+}
+
+.knowledge-lc-finish-btn--green:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-btn--blue {
+  background: var(--accent-soft);
+  color: var(--link-blue);
+}
+
+.knowledge-lc-finish-btn--blue:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-btn--red {
+  background: rgba(254, 226, 226, 0.95);
+  color: rgb(185, 28, 28);
+}
+
+.knowledge-lc-finish-btn--red:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.knowledge-lc-finish-change {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--link-blue);
+  background: transparent;
+  border: none;
+  padding: 0.1rem 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.knowledge-lc-finish-change:hover {
+  color: var(--text);
 }
 
 /* Tonight actions — Quiz / Practice / Teach-back as one control group */
@@ -1998,6 +2262,10 @@ html.theme-dark .learning-card-actions-group {
   align-items: center;
   justify-content: flex-end;
   gap: 0.28rem 0.4rem;
+}
+
+.knowledge-tonight-actions--composer {
+  justify-content: flex-start;
 }
 
 .knowledge-tonight-actions__btn {
@@ -2689,6 +2957,36 @@ html.theme-dark .learning-card-actions-group {
   margin-top: 0.5rem;
 }
 
+.modal__box--fit {
+  height: auto;
+  max-height: min(90vh, 560px);
+  max-width: 28rem;
+}
+
+.knowledge-challenge-feedback-modal__subtitle {
+  margin-bottom: 0;
+  line-height: 1.45;
+}
+
+.knowledge-challenge-feedback-modal__body {
+  padding-top: 0.25rem;
+}
+
+.knowledge-challenge-feedback-modal__error {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(185, 28, 28);
+}
+
+.knowledge-challenge-feedback-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .main {
     padding: 0.65rem;
@@ -2708,6 +3006,10 @@ html.theme-dark .learning-card-actions-group {
     max-height: 200px;
     border-right: none;
     border-bottom: 1px solid var(--border-light);
+  }
+
+  .panel--knowledge .inbox {
+    max-height: min(52vh, 420px);
   }
 }
 
