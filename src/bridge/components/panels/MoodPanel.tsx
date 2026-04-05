@@ -157,7 +157,6 @@ export function MoodPanel({ active }: { active: boolean }) {
                         <span className="mood-checkin__emoji">{step.emoji}</span>
                       </span>
                     </button>
-                    <span className="mood-checkin__step-label">{caps}</span>
                   </div>
                 );
               })}

@@ -116,7 +116,10 @@
       "challenge": "不想学了"
     },
     "finishChange": "换一个选项",
-    "done": "完成",
+    "done": "标记为已完成",
+    "parentDoNotUnderstandButton": "需要讲解",
+    "parentDoNotUnderstandPrompt": "这个主题我还是不太懂。请用更简单的方式说明，或建议另一种可以和孩子一起练习的方法。",
+    "parentDoNotUnderstandAria": "在输入框插入一条求助草稿",
     "ariaFinishChoices": "这张卡你感觉怎么样？",
     "challengeFeedbackTitle": "写一句就好",
     "challengeFeedbackSubtitle": "哪里无聊、太难或不想学？一句话就够，老师可以更好地帮你。",

@@ -18,7 +18,7 @@ type KnowledgeInboxRow = {
 };
 
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, ImagePlus } from 'lucide-react';
+import { ChevronDown, ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
@@ -40,8 +40,10 @@ import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
 import { getLlmApi } from '@/data/api/llm-api';
 import {
+  getParentFeedbackForUser,
   getStudentFeedbackForUser,
   learningCardBackendToItem,
+  upsertParentFeedbackOnCard,
   upsertStudentFeedbackOnCard,
 } from '@/data/learning-card-mappers';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
@@ -253,7 +255,6 @@ function StudentLearningFinishRow({
             setMenuOpen((o) => !o);
           }}
         >
-          <Check className="knowledge-lc-finish-done-icon" strokeWidth={2} size={16} aria-hidden />
           <span>{triggerLabel}</span>
           {canOpenMenu ? (
             <ChevronDown
@@ -414,6 +415,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       ? getStudentFeedbackForUser(currentBackend, studentUserId)
       : null;
 
+  const parentFeedback =
+    role === 'parent' && currentBackend ? getParentFeedbackForUser(currentBackend, parentUserId) : null;
+
   const persistStudentPatch = useCallback(
     async (patch: Partial<Omit<LearningCardStudentFeedback, 'studentId'>>) => {
       if (role !== 'student' || !studentUserId || !threadId) return;
@@ -426,6 +430,21 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     },
     [role, studentUserId, threadId, bumpLearningCards],
   );
+
+  const persistParentDoNotUnderstand = useCallback(async () => {
+    if (role !== 'parent' || !parentUserId || !threadId) return;
+    const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+    if (!b) return;
+    const updated = upsertParentFeedbackOnCard(b, { parentId: parentUserId, doNotUnderstand: true });
+    await getDataLayer().learningCards.put(updated);
+    setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    bumpLearningCards();
+    const prompt = t('knowledge.parentDoNotUnderstandPrompt');
+    setInput(prompt);
+    requestAnimationFrame(() => {
+      document.getElementById('knowledge-input')?.focus();
+    });
+  }, [role, parentUserId, threadId, bumpLearningCards, t]);
 
   const finishCardEasy = useCallback(() => {
     void persistStudentPatch({ status: 'finished', finishedType: 'pretty_easy', feeling: undefined });
@@ -632,6 +651,24 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                           />
                         </div>
                       ) : null}
+                      {role === 'parent' && currentBackend && threadId ? (
+                        <div className="thread-header__knowledge-right">
+                          <Button
+                            type="button"
+                            variant="primary"
+                            pill
+                            sm
+                            id="knowledge-parent-need-help"
+                            className="knowledge-parent-need-help-btn"
+                            aria-label={t('knowledge.parentDoNotUnderstandAria')}
+                            aria-pressed={parentFeedback?.doNotUnderstand === true}
+                            disabled={!threadId}
+                            onClick={() => void persistParentDoNotUnderstand()}
+                          >
+                            {t('knowledge.parentDoNotUnderstandButton')}
+                          </Button>
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
@@ -639,7 +676,18 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
               <div className="msg-thread" id="knowledge-msg-thread">
                 {role === 'student' && currentCard?.childKnowledge ? (
-                  <KnowledgeChildDiscovery data={currentCard.childKnowledge} />
+                  <KnowledgeChildDiscovery
+                    data={currentCard.childKnowledge}
+                    onVideoLinkClick={() => {
+                      if (!studentUserId || !threadId) return;
+                      const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+                      const fb = b ? getStudentFeedbackForUser(b, studentUserId) : null;
+                      void persistStudentPatch({
+                        watchedVideo: true,
+                        ...(fb?.status === 'not_started' ? { status: 'learning' as const } : {}),
+                      });
+                    }}
+                  />
                 ) : null}
                 {role === 'student' && currentCard && !currentCard.childKnowledge && msgs.length === 0 ? (
                   <p className="panel__hint knowledge-student-fallback">{t('knowledge.studentNoChildContent')}</p>

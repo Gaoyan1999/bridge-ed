@@ -116,7 +116,10 @@
       "challenge": "Pas pour moi"
     },
     "finishChange": "Changer mon choix",
-    "done": "Terminé",
+    "done": "Marquer comme terminé",
+    "parentDoNotUnderstandButton": "Besoin d’aide",
+    "parentDoNotUnderstandPrompt": "Je ne comprends toujours pas bien ce sujet. Pouvez-vous l’expliquer plus simplement ou proposer une autre façon de le travailler avec mon enfant ?",
+    "parentDoNotUnderstandAria": "Insérer un message demandant de l’aide sur ce sujet",
     "ariaFinishChoices": "Comment s’est passée cette fiche ?",
     "challengeFeedbackTitle": "Un petit mot",
     "challengeFeedbackSubtitle": "Qu’est-ce qui était ennuyeux, dur ou pas pour toi ? Une phrase suffit — ton enseignant·e peut t’aider.",

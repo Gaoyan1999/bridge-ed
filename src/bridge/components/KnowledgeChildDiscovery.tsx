@@ -5,7 +5,26 @@ import { cx } from '@/bridge/cx';
 
 const URL_IN_TEXT = /(https?:\/\/\S+)/g;
 
-function ContentWithLinks({ text }: { text: string }) {
+/** Treat common video hosts as “video” taps for student progress (learning). */
+function isVideoUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    const h = u.hostname.replace(/^www\./, '').toLowerCase();
+    return /(?:^|\.)youtube\.com$|^youtu\.be$|^m\.youtube\.com$|(?:^|\.)vimeo\.com$|(?:^|\.)bilibili\.com$|^b23\.tv$/i.test(
+      h,
+    );
+  } catch {
+    return false;
+  }
+}
+
+function ContentWithLinks({
+  text,
+  onVideoLinkClick,
+}: {
+  text: string;
+  onVideoLinkClick?: () => void;
+}) {
   const parts = text.split(URL_IN_TEXT);
   return (
     <>
@@ -17,6 +36,9 @@ function ContentWithLinks({ text }: { text: string }) {
             target="_blank"
             rel="noopener noreferrer"
             className="knowledge-child-discovery__link"
+            onClick={() => {
+              if (onVideoLinkClick && isVideoUrl(part)) onVideoLinkClick();
+            }}
           >
             {part}
           </a>
@@ -31,9 +53,12 @@ function ContentWithLinks({ text }: { text: string }) {
 export function KnowledgeChildDiscovery({
   data,
   className,
+  onVideoLinkClick,
 }: {
   data: LearningCardChildKnowledge;
   className?: string;
+  /** Student: call when user opens a video link (marks card as in progress). */
+  onVideoLinkClick?: () => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -47,7 +72,7 @@ export function KnowledgeChildDiscovery({
       />
       <div className="knowledge-child-discovery__source">{t('common.bridgedAi')}</div>
       <div className="knowledge-child-discovery__content">
-        <ContentWithLinks text={data.content} />
+        <ContentWithLinks text={data.content} onVideoLinkClick={onVideoLinkClick} />
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import {
   LEARNING_CARD_SCHEMA_VERSION,
   getDefaultLearningCardStudentFeedback,
   type LearningCardBackend,
-  type LearningCardStatusBackend,
+  type LearningCardParentFeedback,
   type LearningCardStudentFeedback,
   type LearningCardStudentFinishedType,
   type LearningCardStudentLearningStatus,
@@ -21,24 +21,59 @@ function isStudentFinishedType(v: unknown): v is LearningCardStudentFinishedType
   return typeof v === 'string' && (STUDENT_FINISHED_TYPES as readonly string[]).includes(v);
 }
 
-function defaultLearningCardStatusBackend(sentAt: string | null): LearningCardStatusBackend {
-  const sent = sentAt != null && String(sentAt).trim() !== '';
+function normalizeStudentFeedbacksArray(raw: unknown): LearningCardStudentFeedback[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((row) => {
+    const sid =
+      row && typeof row === 'object' && typeof (row as Record<string, unknown>).studentId === 'string'
+        ? String((row as Record<string, unknown>).studentId).trim()
+        : '';
+    return normalizeStudentFeedbackRow(row, sid || 'unknown');
+  });
+}
+
+/** Reads `studentFeedbacks` (v4) or migrates legacy `status.student` when the new key is absent. */
+function extractStudentFeedbacks(rest: Record<string, unknown>): LearningCardStudentFeedback[] {
+  const hasStudentFeedbacksKey = Object.prototype.hasOwnProperty.call(rest, 'studentFeedbacks');
+  if (hasStudentFeedbacksKey && Array.isArray(rest.studentFeedbacks)) {
+    return normalizeStudentFeedbacksArray(rest.studentFeedbacks);
+  }
+  const statusObj = rest.status;
+  if (statusObj && typeof statusObj === 'object') {
+    const s = (statusObj as Record<string, unknown>).student;
+    if (Array.isArray(s)) {
+      return normalizeStudentFeedbacksArray(s);
+    }
+  }
+  return [];
+}
+
+function normalizeParentFeedbackRow(raw: unknown, parentId: string): LearningCardParentFeedback {
+  const pid = parentId.trim();
+  const def: LearningCardParentFeedback = { parentId: pid, doNotUnderstand: false };
+  if (!raw || typeof raw !== 'object') return def;
+  const r = raw as Record<string, unknown>;
+  const id = typeof r.parentId === 'string' && r.parentId.trim() ? r.parentId.trim() : pid;
   return {
-    status: sent ? 'sent' : 'draft',
-    student: [],
+    parentId: id,
+    doNotUnderstand: typeof r.doNotUnderstand === 'boolean' ? r.doNotUnderstand : false,
   };
 }
 
-/** Drops legacy `parent` feedback rows; normalizes `student[]`. */
-function normalizeLearningCardStatusBackend(raw: unknown, sentAt: string | null): LearningCardStatusBackend {
-  const fallback = defaultLearningCardStatusBackend(sentAt);
-  if (!raw || typeof raw !== 'object') return fallback;
-  const r = raw as Record<string, unknown>;
-  const st = r.status;
-  const status =
-    st === 'draft' || st === 'sent' || st === 'archived' ? st : fallback.status;
-  const studentArr = Array.isArray(r.student) ? r.student : [];
-  return { status, student: studentArr };
+function normalizeParentFeedbacksArray(raw: unknown): LearningCardParentFeedback[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((row) => {
+    const pid =
+      row && typeof row === 'object' && typeof (row as Record<string, unknown>).parentId === 'string'
+        ? String((row as Record<string, unknown>).parentId).trim()
+        : '';
+    return normalizeParentFeedbackRow(row, pid || 'unknown');
+  });
+}
+
+function extractParentFeedbacks(rest: Record<string, unknown>): LearningCardParentFeedback[] {
+  if (!Array.isArray(rest.parentFeedbacks)) return [];
+  return normalizeParentFeedbacksArray(rest.parentFeedbacks);
 }
 
 function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
@@ -59,14 +94,22 @@ export function normalizeTonightActions(raw: unknown): LearningCardTonightAction
   return out;
 }
 
-/** Normalize stored card (legacy `tonightActions` / schema v1 to current). Strips removed `sendStatus`. */
+/** Normalize stored card (legacy `tonightActions` / schema v1 to current). Strips removed `sendStatus` and legacy `status`. */
 export function normalizeLearningCardBackend(raw: LearningCardBackend): LearningCardBackend {
-  const { sendStatus: _omit, ...rest } = raw as LearningCardBackend & { sendStatus?: unknown };
+  const r = raw as LearningCardBackend & { sendStatus?: unknown; status?: unknown };
+  const rec = r as unknown as Record<string, unknown>;
+  const studentFeedbacks = extractStudentFeedbacks(rec);
+  const parentFeedbacks = extractParentFeedbacks(rec);
+  const { sendStatus: _omitSend, status: _omitStatus, ...rest } = r as unknown as LearningCardBackend & {
+    sendStatus?: unknown;
+    status?: unknown;
+  };
   return {
-    ...rest,
+    ...(rest as Omit<LearningCardBackend, 'studentFeedbacks' | 'parentFeedbacks'>),
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
     tonightActions: normalizeTonightActions(rest.tonightActions),
-    status: normalizeLearningCardStatusBackend(rest.status, rest.sentAt),
+    ...(studentFeedbacks.length > 0 ? { studentFeedbacks } : {}),
+    ...(parentFeedbacks.length > 0 ? { parentFeedbacks } : {}),
   };
 }
 
@@ -134,7 +177,6 @@ export function learningCardCreatePayloadToBackend(
     },
     sentAt: sentAtIso,
     threadId,
-    status: defaultLearningCardStatusBackend(sentAtIso),
   };
 }
 
@@ -167,7 +209,6 @@ export function sampleLearningCardBackend(): LearningCardBackend {
     },
     sentAt: now,
     threadId,
-    status: defaultLearningCardStatusBackend(now),
   };
 }
 
@@ -203,7 +244,6 @@ export function learningCardItemToBackendSnapshot(
     },
     sentAt: ts,
     threadId: item.threadId,
-    status: defaultLearningCardStatusBackend(ts),
   };
 }
 
@@ -229,7 +269,7 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
 
 /**
  * Normalize one stored row: current shape, legacy `not_started` / `learning` / `finished`,
- * or mistaken parent-like `unread` / `read` / `actioned` on `status.student[]`.
+ * or mistaken parent-like `unread` / `read` / `actioned` on stored student rows.
  */
 export function normalizeStudentFeedbackRow(
   raw: unknown,
@@ -279,17 +319,17 @@ export function normalizeStudentFeedbackRow(
 /** Resolved row for this student on the card, or defaults when not yet stored. */
 export function getStudentFeedbackForUser(card: LearningCardBackend, studentId: string): LearningCardStudentFeedback {
   const sid = studentId.trim();
-  const row = card.status.student.find((s) => s.studentId === sid);
+  const row = (card.studentFeedbacks ?? []).find((s) => s.studentId === sid);
   return row ? normalizeStudentFeedbackRow(row, sid) : getDefaultLearningCardStudentFeedback(sid);
 }
 
-/** Merge student feedback into `card.status.student` and bump `updatedAt`. */
+/** Merge student feedback into `card.studentFeedbacks` and bump `updatedAt`. */
 export function upsertStudentFeedbackOnCard(
   card: LearningCardBackend,
   patch: Partial<Omit<LearningCardStudentFeedback, 'studentId'>> & { studentId: string },
 ): LearningCardBackend {
   const sid = patch.studentId.trim();
-  const list = [...card.status.student];
+  const list = [...(card.studentFeedbacks ?? [])];
   const i = list.findIndex((s) => s.studentId === sid);
   const base = i >= 0 ? normalizeStudentFeedbackRow(list[i], sid) : getDefaultLearningCardStudentFeedback(sid);
   const merged: LearningCardStudentFeedback = { ...base, ...patch, studentId: sid };
@@ -298,6 +338,32 @@ export function upsertStudentFeedbackOnCard(
   return {
     ...card,
     updatedAt: new Date().toISOString(),
-    status: { ...card.status, student: list },
+    studentFeedbacks: list,
+  };
+}
+
+/** Resolved parent row for this card, or default when not yet stored. */
+export function getParentFeedbackForUser(card: LearningCardBackend, parentId: string): LearningCardParentFeedback {
+  const pid = parentId.trim();
+  const row = (card.parentFeedbacks ?? []).find((p) => p.parentId === pid);
+  return row ? normalizeParentFeedbackRow(row, pid) : { parentId: pid, doNotUnderstand: false };
+}
+
+/** Merge parent feedback into `card.parentFeedbacks` and bump `updatedAt`. */
+export function upsertParentFeedbackOnCard(
+  card: LearningCardBackend,
+  patch: Partial<Omit<LearningCardParentFeedback, 'parentId'>> & { parentId: string },
+): LearningCardBackend {
+  const pid = patch.parentId.trim();
+  const list = [...(card.parentFeedbacks ?? [])];
+  const i = list.findIndex((p) => p.parentId === pid);
+  const base = i >= 0 ? normalizeParentFeedbackRow(list[i], pid) : { parentId: pid, doNotUnderstand: false };
+  const merged: LearningCardParentFeedback = { ...base, ...patch, parentId: pid };
+  if (i >= 0) list[i] = merged;
+  else list.push(merged);
+  return {
+    ...card,
+    updatedAt: new Date().toISOString(),
+    parentFeedbacks: list,
   };
 }

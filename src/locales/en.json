@@ -116,7 +116,10 @@
       "challenge": "Not for me"
     },
     "finishChange": "Pick again",
-    "done": "Done",
+    "done": "Mark as Done",
+    "parentDoNotUnderstandButton": "Need help",
+    "parentDoNotUnderstandPrompt": "I still don't understand this topic. Please explain it more simply or suggest another way to practice it with my child.",
+    "parentDoNotUnderstandAria": "Insert a draft message asking for help with this topic",
     "ariaFinishChoices": "How did this card go?",
     "challengeFeedbackTitle": "Tell us a little",
     "challengeFeedbackSubtitle": "What felt boring, hard, or not your thing? One short sentence is enough — your teacher can help.",
