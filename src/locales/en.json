@@ -95,9 +95,43 @@
     "lcStepsTitle": "Steps to mastery",
     "lcStepsEmpty": "No suggested steps on this card.",
     "lcStatus": "Status",
+    "parentYourProgress": "Your progress",
+    "parentReadStatus": {
+      "unread": "Unread",
+      "read": "Read",
+      "actioned": "Done"
+    },
+    "parentChatedWithAI": "Chatted with AI",
+    "parentNotChatedWithAI": "Not yet with AI",
+    "parentDoNotUnderstand": "I don’t understand (need more help)",
+    "studentYourProgress": "Your progress",
+    "studentLearningStatus": {
+      "not_started": "Not started",
+      "learning": "Learning",
+      "finished": "Finished"
+    },
+    "studentChatedWithAI": "Chatted with AI",
+    "studentNotChatedWithAI": "Not yet with AI",
+    "studentWatchedVideo": "I watched the suggested videos",
+    "studentFinishedReflect": "How did it feel?",
+    "studentFinishedType": {
+      "pretty_easy": "Pretty easy",
+      "think_get_it": "I think I get it",
+      "challenge": "Still a challenge"
+    },
     "lcDone": "Done",
+    "studentReflectionTitle": "Mark this card complete",
+    "studentReflectionSubtitle": "Choose how it felt and add a short note (optional). Your teacher can use this to support you.",
+    "studentReflectionDifficulty": "How did it feel?",
+    "studentReflectionFeelingLabel": "Anything else to share?",
+    "studentReflectionFeelingPlaceholder": "e.g. what was tricky, what helped, or what you’d try next time…",
+    "studentReflectionSave": "Save",
+    "studentReflectionMarkIncomplete": "Mark as not done",
     "ariaSuggestedTasks": "Tonight’s suggested tasks",
     "ariaSubjectStatus": "Subject and status",
+    "ariaInboxLabels": "Subject and your progress",
+    "inboxLearningSectionAria": "In progress",
+    "inboxFinishedArchived": "Finished",
     "taskShort": {
       "quiz": "Quiz",
       "parent_led_practice": "Hands-on",

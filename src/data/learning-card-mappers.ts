@@ -7,9 +7,21 @@ import type {
 import { LEARNING_CARD_TONIGHT_ACTION_PRESETS } from '@/bridge/types';
 import {
   LEARNING_CARD_SCHEMA_VERSION,
+  getDefaultLearningCardParentFeedback,
+  getDefaultLearningCardStudentFeedback,
   type LearningCardBackend,
+  type LearningCardParentFeedback,
   type LearningCardStatusBackend,
+  type LearningCardStudentFeedback,
+  type LearningCardStudentFinishedType,
+  type LearningCardStudentLearningStatus,
 } from '@/data/entity/learning-card-backend';
+
+const STUDENT_FINISHED_TYPES = ['pretty_easy', 'think_get_it', 'challenge'] as const;
+
+function isStudentFinishedType(v: unknown): v is LearningCardStudentFinishedType {
+  return typeof v === 'string' && (STUDENT_FINISHED_TYPES as readonly string[]).includes(v);
+}
 
 function defaultLearningCardStatusBackend(sentAt: string | null): LearningCardStatusBackend {
   const sent = sentAt != null && String(sentAt).trim() !== '';
@@ -38,14 +50,13 @@ export function normalizeTonightActions(raw: unknown): LearningCardTonightAction
   return out;
 }
 
-/** Normalize stored card (legacy `tonightActions` / schema v1 to current). Strips removed `sendStatus`. */
+/** Normalize stored card (e.g. legacy `tonightActions` shape) to current schema. */
 export function normalizeLearningCardBackend(raw: LearningCardBackend): LearningCardBackend {
-  const { sendStatus: _omit, ...card } = raw as LearningCardBackend & { sendStatus?: unknown };
   return {
-    ...card,
+    ...raw,
     schemaVersion: LEARNING_CARD_SCHEMA_VERSION,
-    tonightActions: normalizeTonightActions(card.tonightActions),
-    status: card.status ?? defaultLearningCardStatusBackend(card.sentAt),
+    tonightActions: normalizeTonightActions(raw.tonightActions),
+    status: raw.status ?? defaultLearningCardStatusBackend(raw.sentAt),
   };
 }
 
@@ -203,5 +214,106 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
     tonightActions: normalizeTonightActions(backend.tonightActions),
+  };
+}
+
+/** Resolved row for this parent on the card, or defaults when not yet stored. */
+export function getParentFeedbackForUser(card: LearningCardBackend, parentId: string): LearningCardParentFeedback {
+  const pid = parentId.trim();
+  const row = card.status.parent.find((p) => p.parentId === pid);
+  return row ?? getDefaultLearningCardParentFeedback(pid);
+}
+
+/** Merge parent feedback into `card.status.parent` and bump `updatedAt`. */
+export function upsertParentFeedbackOnCard(
+  card: LearningCardBackend,
+  patch: Partial<Omit<LearningCardParentFeedback, 'parentId'>> & { parentId: string },
+): LearningCardBackend {
+  const pid = patch.parentId.trim();
+  const list = [...card.status.parent];
+  const i = list.findIndex((p) => p.parentId === pid);
+  const base: LearningCardParentFeedback = i >= 0 ? list[i]! : getDefaultLearningCardParentFeedback(pid);
+  const merged: LearningCardParentFeedback = { ...base, ...patch, parentId: pid };
+  if (i >= 0) list[i] = merged;
+  else list.push(merged);
+  return {
+    ...card,
+    updatedAt: new Date().toISOString(),
+    status: { ...card.status, parent: list },
+  };
+}
+
+/**
+ * Normalize one stored row: current shape, legacy `not_started` / `learning` / `finished`,
+ * or mistaken parent-like `unread` / `read` / `actioned` on `status.student[]`.
+ */
+export function normalizeStudentFeedbackRow(
+  raw: unknown,
+  studentId: string,
+): LearningCardStudentFeedback {
+  const sid = studentId.trim();
+  const def = getDefaultLearningCardStudentFeedback(sid);
+  if (!raw || typeof raw !== 'object') return def;
+  const r = raw as Record<string, unknown>;
+  const id = typeof r.studentId === 'string' && r.studentId.trim() ? r.studentId.trim() : sid;
+
+  if (r.status === 'unread' || r.status === 'read' || r.status === 'actioned') {
+    let status: LearningCardStudentLearningStatus = 'not_started';
+    if (r.status === 'read') status = 'learning';
+    if (r.status === 'actioned') status = 'finished';
+    const out: LearningCardStudentFeedback = {
+      studentId: id,
+      watchedVideo: typeof r.watchedVideo === 'boolean' ? r.watchedVideo : false,
+      chatedWithAI: typeof r.chatedWithAI === 'boolean' ? r.chatedWithAI : false,
+      status,
+    };
+    if (status === 'finished') {
+      out.finishedType = isStudentFinishedType(r.finishedType) ? r.finishedType : 'think_get_it';
+    }
+    if (typeof r.feeling === 'string') out.feeling = r.feeling;
+    return out;
+  }
+
+  let status: LearningCardStudentLearningStatus = 'not_started';
+  if (r.status === 'learning') status = 'learning';
+  else if (r.status === 'finished') status = 'finished';
+  else if (r.status === 'not_started') status = 'not_started';
+
+  const out: LearningCardStudentFeedback = {
+    studentId: id,
+    watchedVideo: typeof r.watchedVideo === 'boolean' ? r.watchedVideo : false,
+    chatedWithAI: typeof r.chatedWithAI === 'boolean' ? r.chatedWithAI : false,
+    status,
+  };
+  if (status === 'finished') {
+    out.finishedType = isStudentFinishedType(r.finishedType) ? r.finishedType : 'think_get_it';
+  }
+  if (typeof r.feeling === 'string') out.feeling = r.feeling;
+  return out;
+}
+
+/** Resolved row for this student on the card, or defaults when not yet stored. */
+export function getStudentFeedbackForUser(card: LearningCardBackend, studentId: string): LearningCardStudentFeedback {
+  const sid = studentId.trim();
+  const row = card.status.student.find((s) => s.studentId === sid);
+  return row ? normalizeStudentFeedbackRow(row, sid) : getDefaultLearningCardStudentFeedback(sid);
+}
+
+/** Merge student feedback into `card.status.student` and bump `updatedAt`. */
+export function upsertStudentFeedbackOnCard(
+  card: LearningCardBackend,
+  patch: Partial<Omit<LearningCardStudentFeedback, 'studentId'>> & { studentId: string },
+): LearningCardBackend {
+  const sid = patch.studentId.trim();
+  const list = [...card.status.student];
+  const i = list.findIndex((s) => s.studentId === sid);
+  const base = i >= 0 ? normalizeStudentFeedbackRow(list[i], sid) : getDefaultLearningCardStudentFeedback(sid);
+  const merged: LearningCardStudentFeedback = { ...base, ...patch, studentId: sid };
+  if (i >= 0) list[i] = merged;
+  else list.push(merged);
+  return {
+    ...card,
+    updatedAt: new Date().toISOString(),
+    status: { ...card.status, student: list },
   };
 }

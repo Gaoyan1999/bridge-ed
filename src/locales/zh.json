@@ -95,9 +95,43 @@
     "lcStepsTitle": "掌握步骤",
     "lcStepsEmpty": "此卡暂无建议步骤。",
     "lcStatus": "状态",
+    "parentYourProgress": "你的进度",
+    "parentReadStatus": {
+      "unread": "未读",
+      "read": "已读",
+      "actioned": "已完成"
+    },
+    "parentChatedWithAI": "已与 AI 对话",
+    "parentNotChatedWithAI": "尚未与 AI 对话",
+    "parentDoNotUnderstand": "我没看懂（需要更多帮助）",
+    "studentYourProgress": "你的进度",
+    "studentLearningStatus": {
+      "not_started": "未学习",
+      "learning": "学习中",
+      "finished": "已完成"
+    },
+    "studentChatedWithAI": "已与 AI 对话",
+    "studentNotChatedWithAI": "尚未与 AI 对话",
+    "studentWatchedVideo": "我已观看推荐视频",
+    "studentFinishedReflect": "感觉如何？",
+    "studentFinishedType": {
+      "pretty_easy": "比较简单",
+      "think_get_it": "大概懂了",
+      "challenge": "仍有难度"
+    },
     "lcDone": "完成",
+    "studentReflectionTitle": "完成本张学习卡",
+    "studentReflectionSubtitle": "选择难度感受，并可写几句备注（选填）。老师可以参考以便更好地帮助你。",
+    "studentReflectionDifficulty": "难度与感受",
+    "studentReflectionFeelingLabel": "其他想法",
+    "studentReflectionFeelingPlaceholder": "例如：哪里不太懂、什么帮助了你、下次想怎么试…",
+    "studentReflectionSave": "保存",
+    "studentReflectionMarkIncomplete": "标记为未完成",
     "ariaSuggestedTasks": "今晚建议任务",
     "ariaSubjectStatus": "科目与状态",
+    "ariaInboxLabels": "科目与进度状态",
+    "inboxLearningSectionAria": "学习中",
+    "inboxFinishedArchived": "已完成",
     "taskShort": {
       "quiz": "测验",
       "parent_led_practice": "实践",

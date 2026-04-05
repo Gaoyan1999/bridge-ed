@@ -80,18 +80,46 @@ export type LearningCardStatusBackend = {
   parent: LearningCardParentFeedback[];
 };
 
-type LearningCardStudentFeedback = {
+/** Student Knowledge progress — distinct from parent read/action workflow. */
+export type LearningCardStudentLearningStatus = 'not_started' | 'learning' | 'finished';
+
+export type LearningCardStudentFinishedType = 'pretty_easy' | 'think_get_it' | 'challenge';
+
+/**
+ * Per-student progress on a card (Knowledge).
+ * Persisted under `status.student[]`.
+ */
+export type LearningCardStudentFeedback = {
   studentId: string;
-  watchedVideo: boolean;  
+  watchedVideo: boolean;
   chatedWithAI: boolean;
-  status: 'not_started' | 'learning' | 'finished';
-  finishedType?: 'pretty_easy' | 'think_get_it' | 'challenge';
+  status: LearningCardStudentLearningStatus;
+  /** Set when `status === 'finished'` (how it felt / self-report). */
+  finishedType?: LearningCardStudentFinishedType;
+  feeling?: string;
+};
+
+export function getDefaultLearningCardStudentFeedback(studentId: string): LearningCardStudentFeedback {
+  return {
+    studentId,
+    watchedVideo: false,
+    chatedWithAI: false,
+    status: 'not_started',
+  };
 }
 
-
-type LearningCardParentFeedback = {
+export type LearningCardParentFeedback = {
   parentId: string;
   status: 'unread' | 'read' | 'actioned';
   chatedWithAI: boolean;
   doNotUnderstand: boolean;
+};
+
+export function getDefaultLearningCardParentFeedback(parentId: string): LearningCardParentFeedback {
+  return {
+    parentId,
+    status: 'unread',
+    chatedWithAI: false,
+    doNotUnderstand: false,
+  };
 }
