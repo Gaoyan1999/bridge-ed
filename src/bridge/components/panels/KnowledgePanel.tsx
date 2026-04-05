@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Check, ImagePlus, ListChecks } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
-import { MOCK_PRACTICE_AI_REPLY } from '@/bridge/knowledge-practice-mock';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
+import type { TFunction } from 'i18next';
 import {
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
   type LearningCardItem,
@@ -19,6 +19,7 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
+import { getLlmApi } from '@/data/api/llm-api';
 import { learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
@@ -72,26 +73,15 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'statu
   return out;
 }
 
-function KnowledgeTonightTasks({
-  card,
-  omitPresets = [],
-}: {
-  card: Pick<LearningCardItem, 'tonightActions'>;
-  omitPresets?: LearningCardTonightActionPreset[];
-}) {
-  const { t } = useTranslation();
-  const omit = new Set(omitPresets);
-  const tasks = card.tonightActions.filter((a) => a.include && !omit.has(a.preset));
-  if (!tasks.length) return null;
-  return (
-    <div className="knowledge-inbox__tasks" role="group" aria-label={t('knowledge.ariaSuggestedTasks')}>
-      {tasks.map((a) => (
-        <span key={a.preset} className="knowledge-inbox__task-chip">
-          {t(`knowledge.taskShort.${a.preset}`)}
-        </span>
-      ))}
-    </div>
-  );
+function knowledgeTonightSlashCommand(preset: LearningCardTonightActionPreset): string {
+  if (preset === 'quiz') return '/quiz';
+  if (preset === 'parent_led_practice') return '/practice';
+  return '/teach-back';
+}
+
+function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t: TFunction): string {
+  if (preset === 'parent_led_practice') return t('knowledge.practice.button');
+  return t(`knowledge.taskShort.${preset}`);
 }
 
 function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject' | 'status'> }) {
@@ -143,10 +133,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   } = useBridge();
   const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
-  const [practiceBusy, setPracticeBusy] = useState(false);
+  const [tonightActionBusy, setTonightActionBusy] = useState(false);
   const [cards, setCards] = useState<LearningCardItem[]>([]);
   const [completionDone, setCompletionDone] = useState(false);
-  const practiceReplyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const knowledgeFileInputRef = useRef<HTMLInputElement>(null);
   const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
     onReject: (reason) => {
@@ -253,31 +242,38 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     if (knowledgeFileInputRef.current) knowledgeFileInputRef.current.value = '';
   };
 
-  useEffect(() => {
-    return () => {
-      if (practiceReplyTimerRef.current) clearTimeout(practiceReplyTimerRef.current);
-    };
-  }, []);
-
-  const showPracticeAction = Boolean(
-    currentCard?.tonightActions.some((a) => a.preset === 'parent_led_practice' && a.include),
+  const runTonightActionFlow = useCallback(
+    async (preset: LearningCardTonightActionPreset) => {
+      if (!threadId || tonightActionBusy) return;
+      setTonightActionBusy(true);
+      const cmd = knowledgeTonightSlashCommand(preset);
+      appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: cmd });
+      const api = getLlmApi();
+      const title = currentCard?.title;
+      try {
+        const result =
+          preset === 'quiz'
+            ? await api.knowledgeQuiz({ cardTitle: title })
+            : preset === 'parent_led_practice'
+              ? await api.knowledgePractice({ cardTitle: title })
+              : await api.knowledgeTeachBack({ cardTitle: title });
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: result.reply,
+        });
+      } catch (e) {
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: e instanceof Error ? e.message : 'Knowledge tonight command failed.',
+        });
+      } finally {
+        setTonightActionBusy(false);
+      }
+    },
+    [threadId, tonightActionBusy, appendKnowledgeMessage, currentCard?.title],
   );
-
-  const runPracticeFlow = useCallback(() => {
-    if (!threadId || practiceBusy) return;
-    setPracticeBusy(true);
-    appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: '/practice' });
-    if (practiceReplyTimerRef.current) clearTimeout(practiceReplyTimerRef.current);
-    practiceReplyTimerRef.current = setTimeout(() => {
-      practiceReplyTimerRef.current = null;
-      appendKnowledgeMessage(threadId, {
-        who: 'BridgeEd AI',
-        type: 'in',
-        text: MOCK_PRACTICE_AI_REPLY,
-      });
-      setPracticeBusy(false);
-    }, 450);
-  }, [threadId, practiceBusy, appendKnowledgeMessage]);
 
   if (!canUseKnowledge) {
     return (
@@ -348,23 +344,29 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                     <div className="thread-header__knowledge-toolbar">
                       <div className="thread-header__knowledge-left">
                         <KnowledgeCardLabels card={currentCard} />
-                        <KnowledgeTonightTasks
-                          card={currentCard}
-                          omitPresets={showPracticeAction ? ['parent_led_practice'] : []}
-                        />
                       </div>
-                      {showPracticeAction ? (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          pill
-                          className="btn--sm thread-header__practice-btn"
-                          id="btn-knowledge-practice"
-                          disabled={practiceBusy || !threadId}
-                          onClick={runPracticeFlow}
+                      {includedSteps.length > 0 ? (
+                        <div
+                          className="thread-header__knowledge-right knowledge-tonight-actions"
+                          role="group"
+                          aria-label={t('knowledge.ariaSuggestedTasks')}
                         >
-                          {t('knowledge.practice.button')}
-                        </Button>
+                          {includedSteps.map((action) => (
+                            <Button
+                              key={action.preset}
+                              type="button"
+                              variant="secondary"
+                              pill
+                              className="btn--sm knowledge-tonight-actions__btn"
+                              id={`btn-knowledge-tonight-${action.preset}`}
+                              title={LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset].title}
+                              disabled={tonightActionBusy || !threadId}
+                              onClick={() => runTonightActionFlow(action.preset)}
+                            >
+                              {knowledgeTonightActionLabel(action.preset, t)}
+                            </Button>
+                          ))}
+                        </div>
                       ) : null}
                     </div>
                   ) : null}

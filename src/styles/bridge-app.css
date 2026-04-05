@@ -1981,6 +1981,19 @@ html.theme-dark .learning-card-actions-group {
   gap: 0.28rem 0.35rem;
 }
 
+/* Tonight actions — Quiz / Practice / Teach-back as one control group */
+.knowledge-tonight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.28rem 0.4rem;
+}
+
+.knowledge-tonight-actions__btn {
+  flex-shrink: 0;
+}
+
 .inbox-item__title {
   font-weight: 600;
   font-size: 0.88rem;
