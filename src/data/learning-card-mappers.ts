@@ -86,6 +86,9 @@ export function learningCardCreatePayloadToBackend(
     ...(payload.generated.translatedSummaries
       ? { translatedSummaries: payload.generated.translatedSummaries }
       : {}),
+    ...(payload.generated.childKnowledge
+      ? { childKnowledge: payload.generated.childKnowledge }
+      : {}),
     tonightActions: payload.generated.tonightActions.map((a) => ({
       preset: a.preset,
       include: a.include,
@@ -158,6 +161,7 @@ export function learningCardItemToBackendSnapshot(
     teacherNotes: '',
     parentSummary: item.summary,
     ...(item.translatedSummaries ? { translatedSummaries: { ...item.translatedSummaries } } : {}),
+    ...(item.childKnowledge ? { childKnowledge: item.childKnowledge } : {}),
     tonightActions: normalizeTonightActions(item.tonightActions),
     audience: {
       mode: 'whole_class',
@@ -184,6 +188,7 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
     status: 'New',
     summary: summary.length > 0 ? summary : '-',
     ...(backend.translatedSummaries ? { translatedSummaries: { ...backend.translatedSummaries } } : {}),
+    ...(backend.childKnowledge ? { childKnowledge: backend.childKnowledge } : {}),
     at: Number.isFinite(atMs) ? atMs : Date.now(),
     threadId: backend.threadId,
     tonightActions: normalizeTonightActions(backend.tonightActions),

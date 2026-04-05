@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -48,7 +49,11 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
   return out;
 }
 
-function initialKnowledgeMessagesForCard(card: LearningCardItem): ThreadMessage[] {
+function initialKnowledgeMessagesForCard(card: LearningCardItem, role: Role): ThreadMessage[] {
+  /** Students get `childKnowledge` UI + chat; never auto-seed the parent-facing summary. */
+  if (role === 'student') {
+    return [];
+  }
   const body = resolveParentSummaryFromLearningCardItem(card);
   return [{ who: 'BridgeEd AI', type: 'in', text: body }];
 }
@@ -149,6 +154,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     users.length > 0
       ? ((users.find((u) => u.id === currentUserId)?.role ?? 'teacher') as Role)
       : roleWhenNoUsers;
+
+  const prevRoleRef = useRef<Role | null>(null);
+  useEffect(() => {
+    const prev = prevRoleRef.current;
+    prevRoleRef.current = role;
+    if (role === 'student' && prev != null && prev !== 'student') {
+      setKnowledgeThreads({});
+    }
+  }, [role]);
 
   const currentUser: UserBackend | undefined =
     users.length > 0 && currentUserId ? users.find((u) => u.id === currentUserId) : undefined;
@@ -277,13 +291,16 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const seedKnowledgeThreadIfEmpty = useCallback((card: LearningCardItem) => {
-    const id = card.threadId;
-    setKnowledgeThreads((prev) => {
-      if (prev[id]?.length) return prev;
-      return { ...prev, [id]: initialKnowledgeMessagesForCard(card) };
-    });
-  }, []);
+  const seedKnowledgeThreadIfEmpty = useCallback(
+    (card: LearningCardItem) => {
+      const id = card.threadId;
+      setKnowledgeThreads((prev) => {
+        if (prev[id]?.length) return prev;
+        return { ...prev, [id]: initialKnowledgeMessagesForCard(card, role) };
+      });
+    },
+    [role],
+  );
 
   const openKnowledgeFromCard = (card: LearningCardItem) => {
     const id = card.threadId;

@@ -49,6 +49,25 @@ export type LearningCardTranslatedSummaries = {
   fr?: string;
 };
 
+/** Curated picks for the student “Knowledge” discovery view (mock / future AI). */
+export type LearningCardChildKnowledgeVideoPick = {
+  /** Section title, e.g. “全方位器官概览：适合作为 Unit Intro”. */
+  headline: string;
+  videoTitle: string;
+  url: string;
+  /** Why this clip fits (shown to the student). */
+  reason: string;
+};
+
+/** Student-only: hero + intro + external video picks (not the parent noun-summary thread). */
+export type LearningCardChildKnowledge = {
+  heroImageUrl: string;
+  heroImageAlt?: string;
+  /** Opening paragraph(s); may use newlines. */
+  intro: string;
+  picks: LearningCardChildKnowledgeVideoPick[];
+};
+
 export interface LearningCardItem {
   id: string;
   title: string;
@@ -61,6 +80,8 @@ export interface LearningCardItem {
   summary: string;
   /** When present, resolve localized text via `resolveParentSummaryForDisplay` (see `learning-card-summary.ts`). */
   translatedSummaries?: LearningCardTranslatedSummaries;
+  /** When present, student Knowledge shows discovery UI instead of seeding the parent summary. */
+  childKnowledge?: LearningCardChildKnowledge;
   /** Unix ms sort order and "Linked to ..." line in `LearningCardTile`. */
   at: number;
   threadId: string;
@@ -109,6 +130,7 @@ export type LearningCardCreatePayload = {
   generated: {
     parentSummary: string;
     translatedSummaries?: LearningCardTranslatedSummaries;
+    childKnowledge?: LearningCardChildKnowledge;
     tonightActions: LearningCardTonightAction[];
   };
   audience: {
