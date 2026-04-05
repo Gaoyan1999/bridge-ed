@@ -35,7 +35,6 @@ export function LearningCardTile({
 }: LearningCardTileProps) {
   const { t, i18n } = useTranslation();
   const showDelete = Boolean(debugDelete && onDebugDelete);
-  const statusLabel = t(`learningCard.status.${card.status}`, { defaultValue: card.status });
   const linkDate = formatCardLinkDate(card.at, i18n.language);
   const summaryText = resolveParentSummaryFromLearningCardItem(card);
   const subjectPillText =
@@ -62,7 +61,6 @@ export function LearningCardTile({
         <h4 className="parent-card__title">{card.title}</h4>
         <div className="parent-card__meta">
           <span className="parent-card__subject-pill">{subjectPillText}</span>
-          <span className="parent-card__status">{statusLabel}</span>
         </div>
         <p className="parent-card__summary">{summaryText}</p>
         <div className="parent-card__footer">

@@ -42,7 +42,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-02T17:21:22.031Z",
       "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
     },
@@ -91,7 +90,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-04T06:55:19.608Z",
       "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
     },
@@ -135,7 +133,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-04T11:49:58.169Z",
       "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece"
     },
@@ -179,7 +176,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-01T22:20:00.000Z",
       "threadId": "card-thread-atmospheric-pressure"
     },
@@ -228,7 +224,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-03-30T23:50:00.000Z",
       "threadId": "card-thread-cells"
     },
@@ -277,7 +272,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-04T14:46:04.951Z",
       "threadId": "card-thread-ec3591c8-b5c4-4da8-80a7-29e363682a04"
     },
@@ -321,7 +315,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-04T03:48:48.238Z",
       "threadId": "card-thread-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7"
     },
@@ -365,7 +358,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-03-31T00:20:00.000Z",
       "threadId": "card-thread-metaphor"
     },
@@ -409,7 +401,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-03-29T00:05:00.000Z",
       "threadId": "card-thread-renaissance"
     },
@@ -453,7 +444,6 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sendStatus": "sent",
       "sentAt": "2026-04-02T23:15:00.000Z",
       "threadId": "card-thread-shakespeare"
     }

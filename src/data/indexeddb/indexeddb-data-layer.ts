@@ -39,7 +39,7 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
     const childSet = new Set(parent.children);
     const rows = await bridgeDb.learningCards.toArray();
     const filtered = rows.filter((card) => {
-      if (card.sendStatus !== 'sent') return false;
+      if (card.sentAt == null || String(card.sentAt).trim() === '') return false;
       if (card.audience.mode === 'whole_class') return true;
       return card.audience.selectedStudentIds.some((sid) => childSet.has(sid));
     });
@@ -54,7 +54,7 @@ class IndexedDbLearningCardsRepo implements LearningCardsRepository {
 
     const rows = await bridgeDb.learningCards.toArray();
     const filtered = rows.filter((card) => {
-      if (card.sendStatus !== 'sent') return false;
+      if (card.sentAt == null || String(card.sentAt).trim() === '') return false;
       if (card.audience.mode === 'whole_class') return true;
       return card.audience.selectedStudentIds.some((id) => id === sid);
     });

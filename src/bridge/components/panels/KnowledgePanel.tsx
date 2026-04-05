@@ -45,12 +45,12 @@ function writeLcCompletion(threadId: string, done: boolean) {
 /**
  * Subject line from `learningCardBackendToItem` is often `G9 · Math` — show subject-focused text (drop grade when present).
  */
-function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'status'>): {
+function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject'>): {
   key: string;
-  kind: 'subject' | 'status';
+  kind: 'subject';
   text: string;
 }[] {
-  const out: { key: string; kind: 'subject' | 'status'; text: string }[] = [];
+  const out: { key: string; kind: 'subject'; text: string }[] = [];
   const line = card.subject.trim();
   if (line) {
     const parts = line
@@ -66,10 +66,6 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject' | 'statu
       out.push({ key: 'subject', kind: 'subject', text: subjectText });
     }
   }
-  const st = card.status.trim();
-  if (st && st !== '—') {
-    out.push({ key: 'status', kind: 'status', text: st });
-  }
   return out;
 }
 
@@ -84,23 +80,19 @@ function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t:
   return t(`knowledge.taskShort.${preset}`);
 }
 
-function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject' | 'status'> }) {
+function KnowledgeCardLabels({ card }: { card: Pick<LearningCardItem, 'subject'> }) {
   const { t } = useTranslation();
   const tags = knowledgeLabelsFromCard(card).map((row) => ({
     ...row,
-    aria: row.kind === 'subject' ? t('common.subject') : t('common.status'),
+    aria: t('common.subject'),
   }));
   if (!tags.length) return null;
   return (
-    <div className="knowledge-inbox__labels" role="group" aria-label={t('knowledge.ariaSubjectStatus')}>
+    <div className="knowledge-inbox__labels" role="group" aria-label={t('common.subject')}>
       {tags.map((row) => (
         <span
           key={row.key}
-          className={cx(
-            'knowledge-inbox__label',
-            row.kind === 'subject' && 'knowledge-inbox__label--subject',
-            row.kind === 'status' && 'knowledge-inbox__label--status',
-          )}
+          className={cx('knowledge-inbox__label', 'knowledge-inbox__label--subject')}
           title={`${row.aria}: ${row.text}`}
         >
           <span className="visually-hidden">
@@ -182,7 +174,6 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         id: c.threadId,
         title: c.title,
         subject: c.subject,
-        status: c.status,
         date: new Date(c.at).toISOString().slice(0, 10),
       })),
     [cards],
@@ -328,7 +319,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                     onClick={() => setSelectedKnowledgeThreadId(item.id)}
                   >
                     <div className="inbox-item__title">{item.title}</div>
-                    <KnowledgeCardLabels card={{ subject: item.subject, status: item.status }} />
+                    <KnowledgeCardLabels card={{ subject: item.subject }} />
                     <div className="inbox-item__meta">{item.date}</div>
                   </button>
                 ))

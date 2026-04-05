@@ -33,6 +33,11 @@ export class BridgeEdDB extends Dexie {
       studentMoods: 'id, studentId, localDate, createdAt, [studentId+localDate]',
       users: 'id, email, role',
     });
+    this.version(7).stores({
+      learningCards: 'id, authorUserId, classId, createdAt, updatedAt, sentAt',
+      studentMoods: 'id, studentId, localDate, createdAt, [studentId+localDate]',
+      users: 'id, email, role',
+    });
   }
 }
 
