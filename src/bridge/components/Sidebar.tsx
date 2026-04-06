@@ -384,7 +384,7 @@ export function Sidebar({
             </div>
           </div>
 
-          <div className="border-t border-[var(--border-light)] pt-[0.65rem]">
+          {/* <div className="border-t border-[var(--border-light)] pt-[0.65rem]">
             <p
               className={cx(
                 'mb-[0.45rem] px-2 py-0 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]',
@@ -441,7 +441,7 @@ export function Sidebar({
                 <span className={cx(sidebarCollapsed && 'sr-only')}>{t('sidebar.snippets')}</span>
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </aside>
     </>

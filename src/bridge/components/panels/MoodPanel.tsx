@@ -126,29 +126,9 @@ export function MoodPanel({ active }: { active: boolean }) {
 
       <div id="mood-student" className="mood-student-screen" hidden={role !== 'student'}>
         <div className="mood-checkin mood-checkin--blue mood-checkin--page" id="mood-checkin-root">
-          <header className="mood-checkin__toolbar">
-            <button
-              type="button"
-              className="mood-checkin__icon-btn"
-              id="mood-emotion-back"
-              aria-label={t('mood.back')}
-              onClick={() => setModule('chat')}
-            >
-              <span aria-hidden="true">‹</span>
-            </button>
-            <span className="mood-checkin__toolbar-title">{t('mood.checkin.toolbarTitle')}</span>
-            <button
-              type="button"
-              className="mood-checkin__icon-btn"
-              id="mood-emotion-close"
-              aria-label={t('mood.close')}
-              onClick={() => setModule('chat')}
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </header>
+          
 
-          <div className="mood-checkin__sheet">
+          <div className="mood-checkin__sheet mt-10">
             <div className="mood-checkin__intro">
               <h2 className="mood-checkin__title">{t('mood.checkin.title')}</h2>
               <p className="mood-checkin__subtitle mood-checkin__subtitle-line">{t('mood.checkin.subtitleLine1')}</p>
@@ -177,7 +157,6 @@ export function MoodPanel({ active }: { active: boolean }) {
                         <span className="mood-checkin__emoji">{step.emoji}</span>
                       </span>
                     </button>
-                    <span className="mood-checkin__step-label">{caps}</span>
                   </div>
                 );
               })}
@@ -222,7 +201,7 @@ export function MoodPanel({ active }: { active: boolean }) {
               </label>
             </div>
 
-            <div className="mood-checkin__actions">
+            <div className="mood-checkin__actions flex justify-center">
               <button
                 type="button"
                 className="mood-checkin__submit"

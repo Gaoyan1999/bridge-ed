@@ -1,10 +1,10 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-05T10:51:37.942Z",
+  "exportedAt": "2026-04-05T16:40:10.723Z",
   "learningCards": [
     {
       "id": "card-0af9c11c-57fe-444b-8b32-8d5faff69615",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-05T04:39:26.819Z",
       "updatedAt": "2026-04-05T04:39:26.819Z",
       "authorUserId": "teacher-2",
@@ -42,18 +42,14 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-05T04:39:26.819Z",
       "threadId": "card-thread-0af9c11c-57fe-444b-8b32-8d5faff69615"
     },
     {
       "id": "card-277b0c35-df52-4f5c-8f0a-cf27fbcee782",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-05T05:11:44.307Z",
-      "updatedAt": "2026-04-05T05:11:44.307Z",
+      "updatedAt": "2026-04-05T16:32:48.829Z",
       "authorUserId": "teacher-2",
       "classId": null,
       "classLessonTitle": "Week 14 — Factoring review",
@@ -94,16 +90,27 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-05T05:11:44.307Z",
-      "threadId": "card-thread-277b0c35-df52-4f5c-8f0a-cf27fbcee782"
+      "threadId": "card-thread-277b0c35-df52-4f5c-8f0a-cf27fbcee782",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-2",
+          "watchedVideo": false,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "pretty_easy"
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning"
+        }
+      ]
     },
     {
       "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-02T17:21:22.032Z",
       "updatedAt": "2026-04-02T17:21:22.032Z",
       "authorUserId": "1",
@@ -141,16 +148,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-02T17:21:22.031Z",
       "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
     },
     {
       "id": "card-55615594-c62e-41b5-86e1-93af028a1f8e",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-04T06:55:19.608Z",
       "updatedAt": "2026-04-04T06:55:19.608Z",
       "authorUserId": "teacher-2",
@@ -193,18 +196,14 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-04T06:55:19.608Z",
       "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
     },
     {
       "id": "card-6f78e588-38a2-4af8-8951-5071aac89ece",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-04T11:49:58.169Z",
-      "updatedAt": "2026-04-04T11:49:58.169Z",
+      "updatedAt": "2026-04-05T16:32:20.797Z",
       "authorUserId": "teacher-2",
       "classId": null,
       "classLessonTitle": "Dept week — light homework & review",
@@ -240,16 +239,20 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-04T11:49:58.169Z",
-      "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece"
+      "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning"
+        }
+      ]
     },
     {
       "id": "card-99191523-fe82-4063-b68a-93f21611b315",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-05T04:50:47.477Z",
       "updatedAt": "2026-04-05T04:50:47.477Z",
       "authorUserId": "teacher-2",
@@ -292,16 +295,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-05T04:50:47.477Z",
       "threadId": "card-thread-99191523-fe82-4063-b68a-93f21611b315"
     },
     {
       "id": "card-atmospheric-pressure",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-01T22:20:00.000Z",
       "updatedAt": "2026-04-01T22:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -339,16 +338,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-01T22:20:00.000Z",
       "threadId": "card-thread-atmospheric-pressure"
     },
     {
       "id": "card-cells",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-03-30T23:50:00.000Z",
       "updatedAt": "2026-03-30T23:50:00.000Z",
       "authorUserId": "teacher-1",
@@ -391,16 +386,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-03-30T23:50:00.000Z",
       "threadId": "card-thread-cells"
     },
     {
       "id": "card-ec3591c8-b5c4-4da8-80a7-29e363682a04",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-04T14:46:04.951Z",
       "updatedAt": "2026-04-04T14:46:04.951Z",
       "authorUserId": "teacher-2",
@@ -443,16 +434,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-04T14:46:04.951Z",
       "threadId": "card-thread-ec3591c8-b5c4-4da8-80a7-29e363682a04"
     },
     {
       "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-04T03:48:48.238Z",
       "updatedAt": "2026-04-04T03:48:48.238Z",
       "authorUserId": "teacher-1",
@@ -490,16 +477,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-04-04T03:48:48.238Z",
       "threadId": "card-thread-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7"
     },
     {
       "id": "card-metaphor",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-03-31T00:20:00.000Z",
       "updatedAt": "2026-03-31T00:20:00.000Z",
       "authorUserId": "teacher-1",
@@ -537,16 +520,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-03-31T00:20:00.000Z",
       "threadId": "card-thread-metaphor"
     },
     {
       "id": "card-renaissance",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-03-29T00:05:00.000Z",
       "updatedAt": "2026-03-29T00:05:00.000Z",
       "authorUserId": "teacher-1",
@@ -584,16 +563,12 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "status": {
-        "status": "sent",
-        "student": []
-      },
       "sentAt": "2026-03-29T00:05:00.000Z",
       "threadId": "card-thread-renaissance"
     },
     {
       "id": "card-shakespeare",
-      "schemaVersion": 3,
+      "schemaVersion": 4,
       "createdAt": "2026-04-02T23:15:00.000Z",
       "updatedAt": "2026-04-02T23:15:00.000Z",
       "authorUserId": "teacher-1",
@@ -630,10 +605,6 @@
         "mode": "whole_class",
         "recipientCount": 28,
         "selectedStudentIds": []
-      },
-      "status": {
-        "status": "sent",
-        "student": []
       },
       "sentAt": "2026-04-02T23:15:00.000Z",
       "threadId": "card-thread-shakespeare"
@@ -696,6 +667,17 @@
       "updatedAt": "2026-04-04T05:01:14.755Z"
     },
     {
+      "id": "sm:student-1:2026-04-06",
+      "schemaVersion": 4,
+      "studentId": "student-1",
+      "localDate": "2026-04-06",
+      "pleasant": 10,
+      "mood": "tired",
+      "note": "",
+      "createdAt": "2026-04-05T15:50:19.357Z",
+      "updatedAt": "2026-04-05T15:50:19.357Z"
+    },
+    {
       "id": "sm:student-2:2026-03-31",
       "schemaVersion": 4,
       "studentId": "student-2",
@@ -738,6 +720,17 @@
       "note": "",
       "createdAt": "2026-04-05T11:00:00.000Z",
       "updatedAt": "2026-04-05T11:00:00.000Z"
+    },
+    {
+      "id": "sm:student-2:2026-04-06",
+      "schemaVersion": 4,
+      "studentId": "student-2",
+      "localDate": "2026-04-06",
+      "pleasant": 70,
+      "mood": "happy",
+      "note": "111",
+      "createdAt": "2026-04-05T15:49:31.687Z",
+      "updatedAt": "2026-04-05T15:49:31.687Z"
     }
   ],
   "users": [

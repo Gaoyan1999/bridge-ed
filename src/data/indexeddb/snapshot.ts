@@ -30,7 +30,9 @@ function isLearningCardRow(v: unknown): v is LearningCardBackend {
   if (!isRecord(v)) return false;
   return (
     typeof v.id === 'string' &&
-    (v.schemaVersion === 1 || v.schemaVersion === LEARNING_CARD_SCHEMA_VERSION) &&
+    (v.schemaVersion === 1 ||
+      v.schemaVersion === 3 ||
+      v.schemaVersion === LEARNING_CARD_SCHEMA_VERSION) &&
     typeof v.createdAt === 'string' &&
     typeof v.updatedAt === 'string'
   );

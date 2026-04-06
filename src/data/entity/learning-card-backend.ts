@@ -13,7 +13,7 @@ import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/br
  * - Indexes: `authorUserId`, `classId`, `sentAt`, `updatedAt`
  */
 
-export const LEARNING_CARD_SCHEMA_VERSION = 3 as const;
+export const LEARNING_CARD_SCHEMA_VERSION = 4 as const;
 
 /** Who receives the card (maps from wizard `class` / `selected`). */
 export type LearningCardAudienceMode = 'whole_class' | 'selected_parents';
@@ -70,12 +70,16 @@ export interface LearningCardBackend {
   /** Chat / notification thread for this card. */
   threadId: string;
 
-  status: LearningCardStatusBackend;
+  /** Per-student Knowledge progress (legacy rows nested under `status.student` before v4). */
+  studentFeedbacks?: LearningCardStudentFeedback[];
+
+  parentFeedbacks?: LearningCardParentFeedback[];
 }
 
-export type LearningCardStatusBackend = {
-  status: 'draft' | 'sent' | 'archived';
-  student: LearningCardStudentFeedback[];
+export type LearningCardParentFeedback = {
+  parentId: string;
+  /** Parent tapped “still don’t understand” on this card. */
+  doNotUnderstand: boolean;
 };
 
 /** Student Knowledge progress — distinct from parent read/action workflow. */
@@ -85,7 +89,7 @@ export type LearningCardStudentFinishedType = 'pretty_easy' | 'think_get_it' | '
 
 /**
  * Per-student progress on a card (Knowledge).
- * Persisted under `status.student[]`.
+ * Persisted under `studentFeedbacks[]` (legacy: `status.student[]`).
  */
 export type LearningCardStudentFeedback = {
   studentId: string;

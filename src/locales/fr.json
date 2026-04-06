@@ -96,6 +96,11 @@
     "lcStepsEmpty": "Aucune étape suggérée sur cette fiche.",
     "lcStatus": "Statut",
     "studentYourProgress": "Votre suivi",
+    "lcProgressShort": {
+      "todo": "TODO",
+      "doing": "DOING",
+      "done": "DONE"
+    },
     "studentLearningStatus": {
       "not_started": "Pas commencé",
       "learning": "En cours",
@@ -111,6 +116,10 @@
       "challenge": "Pas pour moi"
     },
     "finishChange": "Changer mon choix",
+    "done": "Marquer comme terminé",
+    "parentDoNotUnderstandButton": "Besoin d’aide",
+    "parentDoNotUnderstandPrompt": "Je ne comprends toujours pas bien ce sujet. Pouvez-vous l’expliquer plus simplement ou proposer une autre façon de le travailler avec mon enfant ?",
+    "parentDoNotUnderstandAria": "Insérer un message demandant de l’aide sur ce sujet",
     "ariaFinishChoices": "Comment s’est passée cette fiche ?",
     "challengeFeedbackTitle": "Un petit mot",
     "challengeFeedbackSubtitle": "Qu’est-ce qui était ennuyeux, dur ou pas pour toi ? Une phrase suffit — ton enseignant·e peut t’aider.",
@@ -222,7 +231,24 @@
       "view": "Voir",
       "studentDetailTitle": "Détail élève",
       "studentDetailBody": "Démo : coordonnées, retours sur les fiches et historique des rendez-vous apparaîtraient ici.",
-      "thisWeek": "Cette semaine"
+      "thisWeek": "Cette semaine",
+      "cardPreview": {
+        "demoHint": "Données d’engagement d’exemple pour la maquette — branchement des données réelles plus tard.",
+        "feedbackTitle": "Synthèse d’engagement",
+        "studentVideos": "Ouvertures vidéo (élèves)",
+        "parentNeedHelp": "Parents ayant appuyé sur « Besoin d’aide »",
+        "studentsTitle": "Élèves",
+        "studentStatusDistribution": "Répartition des statuts",
+        "studentStatusChartAria": "Progression des élèves sur cette fiche",
+        "parentsTitle": "Parents",
+        "colName": "Nom",
+        "colStatus": "Statut",
+        "colVideos": "Vidéos vues",
+        "colNeedHelp": "Besoin d’aide",
+        "needHelpYes": "Oui",
+        "needHelpNo": "—",
+        "openKnowledge": "Ouvrir dans Savoirs"
+      }
     }
   },
   "learningCard": {

@@ -96,6 +96,11 @@
     "lcStepsEmpty": "No suggested steps on this card.",
     "lcStatus": "Status",
     "studentYourProgress": "Your progress",
+    "lcProgressShort": {
+      "todo": "TODO",
+      "doing": "DOING",
+      "done": "DONE"
+    },
     "studentLearningStatus": {
       "not_started": "Not started",
       "learning": "Learning",
@@ -111,6 +116,10 @@
       "challenge": "Not for me"
     },
     "finishChange": "Pick again",
+    "done": "Mark as Done",
+    "parentDoNotUnderstandButton": "Need help",
+    "parentDoNotUnderstandPrompt": "I still don't understand this topic. Please explain it more simply or suggest another way to practice it with my child.",
+    "parentDoNotUnderstandAria": "Insert a draft message asking for help with this topic",
     "ariaFinishChoices": "How did this card go?",
     "challengeFeedbackTitle": "Tell us a little",
     "challengeFeedbackSubtitle": "What felt boring, hard, or not your thing? One short sentence is enough — your teacher can help.",
@@ -222,7 +231,24 @@
       "view": "View",
       "studentDetailTitle": "Student detail",
       "studentDetailBody": "Demo: contact info, past learning-card feedback, and booking history would appear here.",
-      "thisWeek": "This week"
+      "thisWeek": "This week",
+      "cardPreview": {
+        "demoHint": "Sample engagement data for layout preview — will connect to live class data later.",
+        "feedbackTitle": "Engagement summary",
+        "studentVideos": "Video opens (students)",
+        "parentNeedHelp": "Parents who tapped “Need help”",
+        "studentsTitle": "Students",
+        "studentStatusDistribution": "Learning progress",
+        "studentStatusChartAria": "Student progress on this card",
+        "parentsTitle": "Parents",
+        "colName": "Name",
+        "colStatus": "Status",
+        "colVideos": "Videos watched",
+        "colNeedHelp": "Need help",
+        "needHelpYes": "Yes",
+        "needHelpNo": "—",
+        "openKnowledge": "Open in Knowledge"
+      }
     }
   },
   "learningCard": {

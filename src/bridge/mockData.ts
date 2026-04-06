@@ -366,3 +366,98 @@ export const TEACHER_MOOD_ROWS = [
   ['Betty Li', 'Calm', '—'],
   ['Carol Zhang', 'Stressed', 'Week before quiz'],
 ];
+
+/** Teacher card preview — aligns with Knowledge TODO / DOING / DONE (mock only). */
+export type TeacherCardEngagementStatus = 'todo' | 'doing' | 'done';
+
+export type TeacherCardStudentEngagementRow = {
+  id: string;
+  name: string;
+  status: TeacherCardEngagementStatus;
+  /** How many suggested videos the student marked as watched (demo aggregate). */
+  watchedVideos: number;
+};
+
+export type TeacherCardParentEngagementRow = {
+  id: string;
+  name: string;
+  status: TeacherCardEngagementStatus;
+  /** Whether this parent tapped “Need help” for this card (demo). */
+  needHelp: boolean;
+};
+
+export type TeacherCardEngagementMock = {
+  students: TeacherCardStudentEngagementRow[];
+  parents: TeacherCardParentEngagementRow[];
+};
+
+const MOCK_ENGAGEMENT_BASE: TeacherCardEngagementMock = {
+  students: [
+    { id: 's1', name: 'Alex Wang', status: 'todo', watchedVideos: 0 },
+    { id: 's2', name: 'Betty Li', status: 'todo', watchedVideos: 1 },
+    { id: 's3', name: 'Carol Zhang', status: 'todo', watchedVideos: 0 },
+    { id: 's4', name: 'David Chen', status: 'todo', watchedVideos: 1 },
+    { id: 's5', name: 'Emma Liu', status: 'todo', watchedVideos: 0 },
+    { id: 's6', name: 'Frank Wu', status: 'todo', watchedVideos: 0 },
+    { id: 's7', name: 'Grace Huang', status: 'todo', watchedVideos: 1 },
+    { id: 's8', name: 'Henry Zhao', status: 'todo', watchedVideos: 0 },
+    { id: 's9', name: 'Iris Lin', status: 'todo', watchedVideos: 0 },
+    { id: 's10', name: 'Jack Ma', status: 'doing', watchedVideos: 1 },
+    { id: 's11', name: 'Kelly Zhou', status: 'doing', watchedVideos: 2 },
+    { id: 's12', name: 'Leo Sun', status: 'doing', watchedVideos: 1 },
+    { id: 's13', name: 'Mia Xu', status: 'doing', watchedVideos: 2 },
+    { id: 's14', name: 'Nina Gao', status: 'doing', watchedVideos: 1 },
+    { id: 's15', name: 'Oscar Tang', status: 'doing', watchedVideos: 2 },
+    { id: 's16', name: 'Penny Qian', status: 'doing', watchedVideos: 1 },
+    { id: 's17', name: 'Quinn Ren', status: 'doing', watchedVideos: 2 },
+    { id: 's18', name: 'Rachel Shen', status: 'doing', watchedVideos: 1 },
+    { id: 's19', name: 'Sam Ye', status: 'doing', watchedVideos: 2 },
+    { id: 's20', name: 'Tina Yu', status: 'done', watchedVideos: 3 },
+    { id: 's21', name: 'Uma Jia', status: 'done', watchedVideos: 2 },
+    { id: 's22', name: 'Victor He', status: 'done', watchedVideos: 4 },
+    { id: 's23', name: 'Wendy Bai', status: 'done', watchedVideos: 3 },
+    { id: 's24', name: 'Xander Cai', status: 'done', watchedVideos: 2 },
+    { id: 's25', name: 'Yara Ding', status: 'done', watchedVideos: 3 },
+    { id: 's26', name: 'Zara Fang', status: 'done', watchedVideos: 4 },
+    { id: 's27', name: 'Aaron Guo', status: 'done', watchedVideos: 2 },
+    { id: 's28', name: 'Bella Hu', status: 'done', watchedVideos: 3 },
+    { id: 's29', name: 'Carl Jin', status: 'done', watchedVideos: 2 },
+    { id: 's30', name: 'Dana Kong', status: 'done', watchedVideos: 3 },
+  ],
+  parents: [
+    { id: 'p1', name: 'Ms. Wang', status: 'done', needHelp: false },
+    { id: 'p2', name: 'Mr. Li', status: 'doing', needHelp: false },
+    { id: 'p3', name: 'Ms. Zhang', status: 'todo', needHelp: true },
+    { id: 'p4', name: 'Mr. Chen', status: 'todo', needHelp: false },
+    { id: 'p5', name: 'Ms. Liu', status: 'doing', needHelp: false },
+    { id: 'p6', name: 'Mr. Wu', status: 'done', needHelp: false },
+    { id: 'p7', name: 'Ms. Huang', status: 'todo', needHelp: false },
+    { id: 'p8', name: 'Mr. Zhao', status: 'doing', needHelp: true },
+    { id: 'p9', name: 'Ms. Lin', status: 'done', needHelp: false },
+    { id: 'p10', name: 'Mr. Ma', status: 'todo', needHelp: false },
+    { id: 'p11', name: 'Ms. Zhou', status: 'doing', needHelp: false },
+    { id: 'p12', name: 'Mr. Sun', status: 'done', needHelp: false },
+    { id: 'p13', name: 'Ms. Xu', status: 'todo', needHelp: false },
+    { id: 'p14', name: 'Mr. Gao', status: 'doing', needHelp: false },
+    { id: 'p15', name: 'Ms. Tang', status: 'done', needHelp: true },
+    { id: 'p16', name: 'Mr. Qian', status: 'todo', needHelp: false },
+    { id: 'p17', name: 'Ms. Ren', status: 'doing', needHelp: false },
+    { id: 'p18', name: 'Mr. Shen', status: 'done', needHelp: false },
+    { id: 'p19', name: 'Ms. Ye', status: 'todo', needHelp: false },
+    { id: 'p20', name: 'Mr. Yu', status: 'doing', needHelp: false },
+    { id: 'p21', name: 'Ms. Jia', status: 'done', needHelp: false },
+    { id: 'p22', name: 'Mr. He', status: 'todo', needHelp: true },
+    { id: 'p23', name: 'Ms. Bai', status: 'doing', needHelp: false },
+    { id: 'p24', name: 'Mr. Cai', status: 'done', needHelp: false },
+    { id: 'p25', name: 'Ms. Ding', status: 'todo', needHelp: false },
+    { id: 'p26', name: 'Mr. Fang', status: 'doing', needHelp: false },
+    { id: 'p27', name: 'Ms. Guo', status: 'done', needHelp: false },
+    { id: 'p28', name: 'Mr. Hu', status: 'todo', needHelp: false },
+  ],
+};
+
+/** Mock engagement for the teacher “open card” dialog. Swap for API-backed aggregates later. */
+export function getMockTeacherCardEngagement(_cardId: string): TeacherCardEngagementMock {
+  void _cardId;
+  return MOCK_ENGAGEMENT_BASE;
+}
