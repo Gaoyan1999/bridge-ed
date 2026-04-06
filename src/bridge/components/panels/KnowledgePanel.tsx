@@ -25,6 +25,7 @@ import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import type { TFunction } from 'i18next';
 import {
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
+  isParentFacingTonightPreset,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
@@ -40,9 +41,12 @@ import { cx } from '@/bridge/cx';
 import { getDataLayer } from '@/data';
 import { getLlmApi } from '@/data/api/llm-api';
 import {
+  aggregateChildrenLearningStatus,
   getParentFeedbackForUser,
   getStudentFeedbackForUser,
   learningCardBackendToItem,
+  relevantChildStudentIdsForParent,
+  studentActionPatchForTonightPreset,
   upsertParentFeedbackOnCard,
   upsertStudentFeedbackOnCard,
 } from '@/data/learning-card-mappers';
@@ -343,6 +347,10 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const canUseKnowledge = role === 'parent' || role === 'student';
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
   const studentUserId = currentUser?.role === 'student' ? (currentUser?.id ?? '').trim() : '';
+  const parentChildrenIds = useMemo(() => {
+    if (role !== 'parent') return [];
+    return (currentUser?.children ?? []).map((id) => id.trim()).filter(Boolean);
+  }, [role, currentUser?.children]);
 
   useEffect(() => {
     if (!canUseKnowledge) {
@@ -390,9 +398,19 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           }
         }
       }
+      if (role === 'parent' && parentChildrenIds.length > 0) {
+        const b = cardBackends.find((x) => x.threadId === c.threadId);
+        if (b) {
+          const ids = relevantChildStudentIdsForParent(b, parentChildrenIds);
+          const agg = aggregateChildrenLearningStatus(b, ids);
+          if (agg != null) {
+            row.studentLearningStatus = agg;
+          }
+        }
+      }
       return row;
     });
-  }, [cards, cardBackends, role, studentUserId]);
+  }, [cards, cardBackends, role, studentUserId, parentChildrenIds]);
 
   useEffect(() => {
     if (!cards.length) {
@@ -446,6 +464,35 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     });
   }, [role, parentUserId, threadId, bumpLearningCards, t]);
 
+  /**
+   * Parent chat → children DOING + chat flag. Optional `tonightPreset` when parent ran a suggested action
+   * (sets the matching `action*` on each relevant child).
+   */
+  const persistParentEngagementToChildren = useCallback(
+    async (tonightPreset?: LearningCardTonightActionPreset) => {
+      if (role !== 'parent' || !threadId || parentChildrenIds.length === 0) return;
+      const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+      if (!b) return;
+      const ids = relevantChildStudentIdsForParent(b, parentChildrenIds);
+      if (ids.length === 0) return;
+      const actionPatch = tonightPreset ? studentActionPatchForTonightPreset(tonightPreset) : {};
+      let updated = b;
+      for (const sid of ids) {
+        const fb = getStudentFeedbackForUser(updated, sid);
+        updated = upsertStudentFeedbackOnCard(updated, {
+          studentId: sid,
+          chatedWithAI: true,
+          ...(fb.status === 'not_started' ? { status: 'learning' as const } : {}),
+          ...actionPatch,
+        });
+      }
+      await getDataLayer().learningCards.put(updated);
+      setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      bumpLearningCards();
+    },
+    [role, threadId, parentChildrenIds, bumpLearningCards],
+  );
+
   const finishCardEasy = useCallback(() => {
     void persistStudentPatch({ status: 'finished', finishedType: 'pretty_easy', feeling: undefined });
   }, [persistStudentPatch]);
@@ -458,10 +505,11 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     void persistStudentPatch({ status: 'learning', finishedType: undefined, feeling: undefined });
   }, [persistStudentPatch]);
 
-  const includedSteps = useMemo(
-    () => currentCard?.tonightActions.filter((a) => a.include) ?? [],
-    [currentCard],
-  );
+  const includedSteps = useMemo(() => {
+    const steps = currentCard?.tonightActions.filter((a) => a.include) ?? [];
+    if (role === 'parent') return steps.filter((a) => isParentFacingTonightPreset(a.preset));
+    return steps;
+  }, [currentCard, role]);
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
 
   useEffect(() => {
@@ -499,6 +547,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         ...(fb?.status === 'not_started' ? { status: 'learning' as const } : {}),
       });
     }
+    if (role === 'parent') {
+      void persistParentEngagementToChildren();
+    }
   };
 
   const runTonightActionFlow = useCallback(
@@ -513,7 +564,11 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         void persistStudentPatch({
           chatedWithAI: true,
           ...(fb?.status === 'not_started' ? { status: 'learning' as const } : {}),
+          ...studentActionPatchForTonightPreset(preset),
         });
+      }
+      if (role === 'parent') {
+        void persistParentEngagementToChildren(preset);
       }
       const api = getLlmApi();
       const title = currentCard?.title;
@@ -546,6 +601,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       currentCard?.title,
       role,
       persistStudentPatch,
+      persistParentEngagementToChildren,
       studentUserId,
     ],
   );

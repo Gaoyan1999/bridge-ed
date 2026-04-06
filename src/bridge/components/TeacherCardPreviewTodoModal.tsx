@@ -21,7 +21,6 @@ export function TeacherCardPreviewTodoModal({
     () => engagement.parents.filter((p) => p.needHelp).length,
     [engagement.parents],
   );
-  const parentTotal = engagement.parents.length;
 
   const studentStatusCounts = useMemo(() => {
     const c = { todo: 0, doing: 0, done: 0 };
@@ -55,6 +54,8 @@ export function TeacherCardPreviewTodoModal({
       }) satisfies Record<LearningCardStudentFinishedType, string>,
     [t],
   );
+
+  const { quizFamilyCount, practiceFamilyCount, teachBackFamilyCount } = engagement.tonightActionUptake;
 
   return (
     <>
@@ -117,8 +118,7 @@ export function TeacherCardPreviewTodoModal({
               </h5>
               <p className="teacher-card-preview__feedback-stat">
                 {t('dashboard.teacher.cardPreview.parentNeedHelpLine', {
-                  count: needHelpCount,
-                  total: parentTotal,
+                  count: needHelpCount
                 })}
               </p>
             </div>
@@ -142,6 +142,34 @@ export function TeacherCardPreviewTodoModal({
               ) : (
                 <p className="teacher-card-preview__feedback-empty">{t('dashboard.teacher.cardPreview.studentFeedbackEmpty')}</p>
               )}
+            </div>
+          </div>
+
+          <div
+            className="teacher-card-preview__section teacher-card-preview__tonight-actions"
+            aria-labelledby="teacher-card-preview-tonight-actions"
+          >
+            <h5 id="teacher-card-preview-tonight-actions" className="teacher-card-preview__section-title">
+              {t('dashboard.teacher.cardPreview.tonightActionUptakeTitle')}
+            </h5>
+            <p className="teacher-card-preview__subsection-lede">{t('dashboard.teacher.cardPreview.tonightActionUptakeLede')}</p>
+            <div className="teacher-card-preview__stats" role="list">
+              <div className="teacher-card-preview__stat" role="listitem">
+                <div className="teacher-card-preview__stat-value">{quizFamilyCount}</div>
+                <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.tonightActionUptakeQuiz')}</div>
+              </div>
+              <div className="teacher-card-preview__stat" role="listitem">
+                <div className="teacher-card-preview__stat-value">{practiceFamilyCount}</div>
+                <div className="teacher-card-preview__stat-label">
+                  {t('dashboard.teacher.cardPreview.tonightActionUptakePractice')}
+                </div>
+              </div>
+              <div className="teacher-card-preview__stat" role="listitem">
+                <div className="teacher-card-preview__stat-value">{teachBackFamilyCount}</div>
+                <div className="teacher-card-preview__stat-label">
+                  {t('dashboard.teacher.cardPreview.tonightActionUptakeTeachBack')}
+                </div>
+              </div>
             </div>
           </div>
         </section>

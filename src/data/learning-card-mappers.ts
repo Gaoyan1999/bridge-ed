@@ -267,6 +267,24 @@ export function learningCardBackendToItem(backend: LearningCardBackend): Learnin
   };
 }
 
+function mergeStudentActionFlags(
+  r: Record<string, unknown>,
+  out: LearningCardStudentFeedback,
+): void {
+  if (typeof r.actionQuiz === 'boolean') out.actionQuiz = r.actionQuiz;
+  if (typeof r.actionPractice === 'boolean') out.actionPractice = r.actionPractice;
+  if (typeof r.actionTeachBack === 'boolean') out.actionTeachBack = r.actionTeachBack;
+}
+
+/** Sets the matching `action*` flag when a student (or parent on behalf of children) runs a tonight preset. */
+export function studentActionPatchForTonightPreset(
+  preset: LearningCardTonightActionPreset,
+): Partial<Pick<LearningCardStudentFeedback, 'actionQuiz' | 'actionPractice' | 'actionTeachBack'>> {
+  if (preset === 'quiz') return { actionQuiz: true };
+  if (preset === 'parent_led_practice') return { actionPractice: true };
+  return { actionTeachBack: true };
+}
+
 /**
  * Normalize one stored row: current shape, legacy `not_started` / `learning` / `finished`,
  * or mistaken parent-like `unread` / `read` / `actioned` on stored student rows.
@@ -295,6 +313,7 @@ export function normalizeStudentFeedbackRow(
       out.finishedType = isStudentFinishedType(r.finishedType) ? r.finishedType : 'think_get_it';
     }
     if (typeof r.feeling === 'string') out.feeling = r.feeling;
+    mergeStudentActionFlags(r, out);
     return out;
   }
 
@@ -313,6 +332,7 @@ export function normalizeStudentFeedbackRow(
     out.finishedType = isStudentFinishedType(r.finishedType) ? r.finishedType : 'think_get_it';
   }
   if (typeof r.feeling === 'string') out.feeling = r.feeling;
+  mergeStudentActionFlags(r, out);
   return out;
 }
 
@@ -321,6 +341,36 @@ export function getStudentFeedbackForUser(card: LearningCardBackend, studentId: 
   const sid = studentId.trim();
   const row = (card.studentFeedbacks ?? []).find((s) => s.studentId === sid);
   return row ? normalizeStudentFeedbackRow(row, sid) : getDefaultLearningCardStudentFeedback(sid);
+}
+
+/**
+ * Student ids on this card that count for the parent: whole class → all linked children;
+ * selected parents → intersection with `selectedStudentIds`.
+ */
+export function relevantChildStudentIdsForParent(
+  card: LearningCardBackend,
+  parentChildren: string[],
+): string[] {
+  const childSet = new Set(parentChildren.map((id) => id.trim()).filter(Boolean));
+  if (childSet.size === 0) return [];
+  if (card.audience.mode === 'whole_class') {
+    return [...childSet];
+  }
+  return card.audience.selectedStudentIds.map((id) => id.trim()).filter((id) => childSet.has(id));
+}
+
+/**
+ * Parent-facing aggregate over those children: any DOING → DOING; all DONE → DONE; otherwise TODO.
+ */
+export function aggregateChildrenLearningStatus(
+  card: LearningCardBackend,
+  relevantChildIds: string[],
+): LearningCardStudentLearningStatus | null {
+  if (relevantChildIds.length === 0) return null;
+  const statuses = relevantChildIds.map((id) => getStudentFeedbackForUser(card, id).status);
+  if (statuses.some((s) => s === 'learning')) return 'learning';
+  if (statuses.every((s) => s === 'finished')) return 'finished';
+  return 'not_started';
 }
 
 /** Merge student feedback into `card.studentFeedbacks` and bump `updatedAt`. */

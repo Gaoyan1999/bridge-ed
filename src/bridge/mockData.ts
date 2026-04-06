@@ -414,9 +414,18 @@ export type TeacherCardParentEngagementRow = {
   needHelp: boolean;
 };
 
+/** Mock: families (parent accounts) that used each suggested “tonight” action for this card — demo only. */
+export type TeacherCardTonightActionUptakeMock = {
+  quizFamilyCount: number;
+  practiceFamilyCount: number;
+  teachBackFamilyCount: number;
+};
+
 export type TeacherCardEngagementMock = {
   students: TeacherCardStudentEngagementRow[];
   parents: TeacherCardParentEngagementRow[];
+  /** Suggested-action uptake; replace with aggregates from `studentFeedbacks` later. */
+  tonightActionUptake: TeacherCardTonightActionUptakeMock;
 };
 
 const MOCK_ENGAGEMENT_BASE: TeacherCardEngagementMock = {
@@ -482,6 +491,11 @@ const MOCK_ENGAGEMENT_BASE: TeacherCardEngagementMock = {
     { id: 'p27', name: 'Ms. Guo', status: 'done', needHelp: false },
     { id: 'p28', name: 'Mr. Hu', status: 'todo', needHelp: false },
   ],
+  tonightActionUptake: {
+    quizFamilyCount: 12,
+    practiceFamilyCount: 8,
+    teachBackFamilyCount: 3,
+  },
 };
 
 /** Mock engagement for the teacher “open card” dialog. Swap for API-backed aggregates later. */

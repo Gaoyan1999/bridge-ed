@@ -37,6 +37,11 @@ export type ParentMoodChildProfile = {
 export const LEARNING_CARD_TONIGHT_ACTION_PRESETS = ['quiz', 'parent_led_practice', 'explain_to_parent'] as const;
 export type LearningCardTonightActionPreset = (typeof LEARNING_CARD_TONIGHT_ACTION_PRESETS)[number];
 
+/** Parent Knowledge only lists quiz + practice; teach-back is teacher-facing / not shown to parents. */
+export function isParentFacingTonightPreset(preset: LearningCardTonightActionPreset): boolean {
+  return preset !== 'explain_to_parent';
+}
+
 /** One row per preset; `text` is optional teacher notes (stored, not shown in UI yet). */
 export type LearningCardTonightAction = {
   preset: LearningCardTonightActionPreset;

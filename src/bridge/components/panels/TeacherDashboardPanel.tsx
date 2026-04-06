@@ -13,7 +13,16 @@ import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
   const { t } = useTranslation();
-  const { showGeneric, openModal, learningCardsEpoch, bumpLearningCards, currentUser } = useBridge();
+  const {
+    showGeneric,
+    openModal,
+    closeModal,
+    modal,
+    learningCardsEpoch,
+    bumpLearningCards,
+    removeKnowledgeThreadForDeletedCard,
+    currentUser,
+  } = useBridge();
   const teacherAuthorId = currentUser?.role === 'teacher' ? currentUser.id : '';
   const [studentFilter, setStudentFilter] = useState('');
   const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
@@ -24,12 +33,16 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
       if (!window.confirm(t('learningCard.deleteConfirm', { title: card.title }))) return;
       try {
         await getDataLayer().learningCards.delete(card.id);
+        removeKnowledgeThreadForDeletedCard(card.threadId);
+        if (modal.type === 'teacherCardPreviewTodo' && modal.card.id === card.id) {
+          closeModal();
+        }
         bumpLearningCards();
       } catch (e) {
         console.error('[LearningCard] delete failed', e);
       }
     },
-    [bumpLearningCards, t],
+    [bumpLearningCards, closeModal, modal, removeKnowledgeThreadForDeletedCard, t],
   );
 
   useEffect(() => {

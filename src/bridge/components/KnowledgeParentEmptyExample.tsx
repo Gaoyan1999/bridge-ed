@@ -3,8 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Check, ListChecks } from 'lucide-react';
 import { Markdown } from '@/bridge/components/Markdown';
 import { Button } from '@/bridge/components/ui/Button';
-import type { LearningCardItem, LearningCardTonightActionPreset } from '@/bridge/types';
-import { LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
+import {
+  LEARNING_CARD_TONIGHT_PRESET_LABELS,
+  isParentFacingTonightPreset,
+  type LearningCardItem,
+  type LearningCardTonightActionPreset,
+} from '@/bridge/types';
 import { normalizeTonightActions } from '@/data/learning-card-mappers';
 
 /**
@@ -41,7 +45,7 @@ export function KnowledgeParentEmptyExample() {
   const { t } = useTranslation();
   const [completionDone, setCompletionDone] = useState(false);
   const card = EXAMPLE_CARD;
-  const includedSteps = card.tonightActions.filter((a) => a.include);
+  const includedSteps = card.tonightActions.filter((a) => a.include && isParentFacingTonightPreset(a.preset));
 
   return (
     <>
