@@ -1,12 +1,11 @@
 import os
 import sys
-from typing import Optional
 
 import requests
 from backend.config import load_dotenv
 
 
-def read_env(name: str, default: Optional[str] = None) -> str:
+def read_env(name: str, default: str | None = None) -> str:
     value = os.getenv(name, default)
     if not value:
         raise RuntimeError(f"{name} is not set")

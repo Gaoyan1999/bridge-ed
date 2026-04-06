@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from uuid import uuid4
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any
 
 from .models import LearningCard, LearningCardCreate
 
@@ -30,7 +30,7 @@ def list_cards() -> list[LearningCard]:
     return sorted(cards, key=lambda item: item.createdAt, reverse=True)
 
 
-def get_card(card_id: str) -> Optional[LearningCard]:
+def get_card(card_id: str) -> LearningCard | None:
     for card in list_cards():
         if card.id == card_id:
             return card
@@ -60,9 +60,7 @@ def _normalize_legacy_fields(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
-def _build_learning_card(
-    payload: dict[str, Any], *, card_id: Optional[str] = None, keep_created_at: Optional[str] = None
-) -> LearningCard:
+def _build_learning_card(payload: dict[str, Any], *, card_id: str | None = None, keep_created_at: str | None = None) -> LearningCard:
     now = utc_now_iso()
     payload = _normalize_legacy_fields(payload)
     payload["id"] = card_id or str(payload.get("id") or uuid4())
@@ -82,7 +80,7 @@ def create_card(input_data: LearningCardCreate) -> LearningCard:
 
 def update_card(card_id: str, input_data: LearningCardCreate) -> LearningCard:
     cards = list_cards()
-    updated: Optional[LearningCard] = None
+    updated: LearningCard | None = None
     next_cards: list[LearningCard] = []
     payload = input_data.model_dump(exclude_none=True)
     for card in cards:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Optional
 
 
 def load_dotenv() -> None:
@@ -24,7 +23,7 @@ def load_dotenv() -> None:
 load_dotenv()
 
 
-def get_env(name: str, default: Optional[str] = None) -> str:
+def get_env(name: str, default: str | None = None) -> str:
     value = os.getenv(name, default)
     if value is None or value == "":
         raise RuntimeError(f"{name} is not set")

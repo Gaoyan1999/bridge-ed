@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 from urllib.parse import quote_plus
 
 import requests
@@ -351,7 +351,7 @@ def _extract_notes_keywords(notes: str, max_terms: int = 6) -> list[str]:
     return out
 
 
-def _parse_duration_seconds(text: str) -> Optional[int]:
+def _parse_duration_seconds(text: str) -> int | None:
     s = text.strip()
     if not s:
         return None
@@ -394,9 +394,9 @@ def pick_first_qualified_youtube_video(
     topic: str,
     subject: str,
     grade: str,
-    notes_keywords: Optional[list[str]] = None,
-    exclude_video_ids: Optional[set[str]] = None,
-) -> Optional[str]:
+    notes_keywords: list[str] | None = None,
+    exclude_video_ids: set[str] | None = None,
+) -> str | None:
     url = "https://www.youtube.com/results"
     headers = {"User-Agent": "Mozilla/5.0 (BridgeEd/1.0)"}
     try:
@@ -423,7 +423,7 @@ def pick_first_qualified_youtube_video(
     preferred_tokens = {"cute", "animation", "animated", "kids", "student", "cartoon"}
 
     best_score = -999
-    best_video_id: Optional[str] = None
+    best_video_id: str | None = None
     seen: set[str] = set()
 
     excluded = exclude_video_ids or set()
@@ -491,7 +491,7 @@ def pick_first_qualified_youtube_video(
 
 def build_child_knowledge_safe_content(
     input_data: LearningCardChildKnowledgeGenerateRequest,
-    intro_override: Optional[str] = None,
+    intro_override: str | None = None,
 ) -> str:
     topic = input_data.topic.strip() or "this topic"
     subject = input_data.subject.strip() or "the subject"
@@ -509,7 +509,7 @@ def build_child_knowledge_safe_content(
 
     used_ids: set[str] = set()
 
-    def _video_id_from_url(url: Optional[str]) -> Optional[str]:
+    def _video_id_from_url(url: str | None) -> str | None:
         if not url:
             return None
         m = re.search(r"[?&]v=([A-Za-z0-9_-]{11})", url)
@@ -660,7 +660,7 @@ def generate_child_knowledge(input_data: LearningCardChildKnowledgeGenerateReque
         return build_child_knowledge_fallback(input_data).model_copy(update={"warning": str(exc)})
 
 
-def normalize_ui_lang(raw: Optional[str]) -> str:
+def normalize_ui_lang(raw: str | None) -> str:
     short = (raw or "en").strip().lower().split("-")[0]
     if short in {"zh", "fr"}:
         return short
