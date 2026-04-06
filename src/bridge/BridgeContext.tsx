@@ -96,6 +96,10 @@ function initialKnowledgeMessagesForCard(card: LearningCardItem, role: Role): Th
   if (role === 'student') {
     return [];
   }
+  /** Parent summary is shown in `LearningCardParentKnowledgeView`; do not duplicate it as the first thread message. */
+  if (role === 'parent') {
+    return [];
+  }
   const body = resolveParentSummaryFromLearningCardItem(card);
   return [{ who: 'BridgeEd AI', type: 'in', text: body }];
 }

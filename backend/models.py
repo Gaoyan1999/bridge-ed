@@ -16,31 +16,31 @@ class TranslatedSummaries(BaseModel):
 class LearningCardCreate(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    id: str | None = None
+    id: Optional[str] = None
     schemaVersion: int = 3
-    createdAt: str | None = None
-    updatedAt: str | None = None
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
     authorUserId: str = ""
-    classId: str | None = None
+    classId: Optional[str] = None
     classLessonTitle: str = ""
     grade: str = ""
     subject: str = ""
     topic: str = ""
     teacherNotes: str = ""
     parentSummary: str = ""
-    translatedSummaries: TranslatedSummaries | None = None
-    childKnowledge: dict[str, Any] | None = None
+    translatedSummaries: Optional[TranslatedSummaries] = None
+    childKnowledge: Optional[dict[str, Any]] = None
     tonightActions: list[dict[str, Any]] = Field(default_factory=list)
     audience: dict[str, Any] = Field(default_factory=dict)
-    sentAt: str | None = None
+    sentAt: Optional[str] = None
     threadId: str = ""
     status: dict[str, Any] = Field(default_factory=dict)
 
     # Legacy fields kept for backward compatibility with early payloads.
-    title: str | None = None
-    teacherSummary: str | None = None
-    parentActions: list[str] | None = None
+    title: Optional[str] = None
+    teacherSummary: Optional[str] = None
+    parentActions: Optional[list[str]] = None
 
 
 class LearningCard(LearningCardCreate):
@@ -120,7 +120,7 @@ class ChatRespondRequest(BaseModel):
     threadId: str = Field(min_length=1)
     message: str = Field(min_length=1)
     history: list[ChatMessage] = Field(default_factory=list)
-    cardContext: ChatCardContext | None = None
+    cardContext: Optional[ChatCardContext] = None
 
 
 class ChatRespondResponse(BaseModel):

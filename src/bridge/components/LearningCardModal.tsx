@@ -13,6 +13,7 @@ import { getDataLayer, getLlmApi } from '@/data';
 import { resolveParentSummaryForDisplay, uiLangFromI18n } from '@/data';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
+import { LearningCardParentPanelTeacher } from '@/bridge/components/LearningCardParentPanel';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 import { cx } from '@/bridge/cx';
@@ -22,10 +23,7 @@ import type {
   LearningCardTonightAction,
   LearningCardTranslatedSummaries,
 } from '@/bridge/types';
-import {
-  LEARNING_CARD_TONIGHT_ACTION_PRESETS,
-  LEARNING_CARD_TONIGHT_PRESET_LABELS,
-} from '@/bridge/types';
+import { LEARNING_CARD_TONIGHT_ACTION_PRESETS } from '@/bridge/types';
 import {
   HARDCODED_LEARNING_CARD_AUTHOR_USER_ID,
   learningCardCreatePayloadToBackend,
@@ -475,69 +473,21 @@ export function LearningCardModal({
                   aria-labelledby="lc-tab-parent"
                   className="learning-card-review-tabs__panel learning-card-review-tabs__panel--parent"
                 >
-                  <div className="learning-card-review-summary">
-                    <p className="field__label">{t('learningCard.wizard.parentSummary')}</p>
-                    {warning && (
-                      <p className="field__hint" role="status">
-                        {warning}
-                      </p>
-                    )}
-                    <div className="learning-card-ai-hint" role="note">
-                      <div className="learning-card-ai-hint__icon-wrap" aria-hidden="true">
-                        <Sparkles className="learning-card-ai-hint__icon" strokeWidth={2} size={14} />
-                      </div>
-                      <p className="learning-card-ai-hint__text">{t('learningCard.wizard.aiHint')}</p>
-                    </div>
-                    <FieldTextArea
-                      id="lc-summary"
-                      label={t('learningCard.wizard.parentSummary')}
-                      labelHidden
-                      value={summary}
-                      onChange={setSummary}
-                      rows={4}
-                    />
-                  </div>
-                  <fieldset
-                    className="field field--actions-pick field--actions-pick--grouped"
-                    aria-labelledby="lc-tonight-heading"
-                  >
-                    <p id="lc-tonight-heading" className="learning-card-actions-section__kicker">
-                      {t('learningCard.wizard.tonightActions')}
-                    </p>
-                    <div className="learning-card-actions-group">
-                      <ul className="learning-card-actions learning-card-actions--presets">
-                        {tonightActions.map((row, idx) => {
-                          const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
-                          const isLast = idx === tonightActions.length - 1;
-                          return (
-                            <li
-                              key={row.preset}
-                              className={cx(
-                                'learning-card-actions__row',
-                                'learning-card-actions__row--preset',
-                                isLast && 'learning-card-actions__row--last',
-                              )}
-                            >
-                              <Checkbox
-                                isSelected={row.include}
-                                onChange={(v) => {
-                                  setTonightActions((prev) =>
-                                    prev.map((x) => (x.preset === row.preset ? { ...x, include: v } : x)),
-                                  );
-                                }}
-                                className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
-                                aria-label={t('learningCard.wizard.includePresetAria', { title: copy.title })}
-                              />
-                              <div className="learning-card-actions__preset-body">
-                                <span className="learning-card-actions__preset-title">{copy.title}</span>
-                                <span className="learning-card-actions__preset-desc">{copy.description}</span>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  </fieldset>
+                  <LearningCardParentPanelTeacher
+                    summary={summary}
+                    onSummaryChange={setSummary}
+                    warning={warning}
+                    tonightActions={tonightActions}
+                    onTonightIncludeChange={(preset, include) =>
+                      setTonightActions((prev) =>
+                        prev.map((x) => (x.preset === preset ? { ...x, include } : x)),
+                      )
+                    }
+                    summaryKicker={t('learningCard.wizard.parentSummary')}
+                    tonightKicker={t('learningCard.wizard.tonightActions')}
+                    aiHintText={t('learningCard.wizard.aiHint')}
+                    presetIncludeAriaLabel={(title) => t('learningCard.wizard.includePresetAria', { title })}
+                  />
                 </div>
               )}
 

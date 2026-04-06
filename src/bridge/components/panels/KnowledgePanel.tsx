@@ -18,17 +18,17 @@ type KnowledgeInboxRow = {
 };
 
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ImagePlus } from 'lucide-react';
+import { Check, ChevronDown, ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import type { TFunction } from 'i18next';
 import {
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
-  isParentFacingTonightPreset,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
+import { LearningCardParentKnowledgeView } from '@/bridge/components/LearningCardParentPanel';
 import { KnowledgeChildDiscovery } from '@/bridge/components/KnowledgeChildDiscovery';
 import { Markdown } from '@/bridge/components/Markdown';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
@@ -38,7 +38,7 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { StudentChallengeFeedbackModal } from '@/bridge/components/ui/StudentChallengeFeedbackModal';
 import { cx } from '@/bridge/cx';
-import { getDataLayer } from '@/data';
+import { getDataLayer, resolveParentSummaryFromParts, uiLangFromI18n } from '@/data';
 import { getLlmApi } from '@/data/api/llm-api';
 import {
   aggregateChildrenLearningStatus,
@@ -88,12 +88,6 @@ function knowledgeTonightSlashCommand(preset: LearningCardTonightActionPreset): 
 function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t: TFunction): string {
   if (preset === 'parent_led_practice') return t('knowledge.practice.button');
   return t(`knowledge.taskShort.${preset}`);
-}
-
-function uiLangFromI18n(raw: string): 'en' | 'zh' | 'fr' {
-  const short = raw.split('-')[0]?.toLowerCase() ?? 'en';
-  if (short === 'zh' || short === 'fr') return short;
-  return 'en';
 }
 
 /** Inbox rows keep subject + status on opposite ends; thread header shows subject tags only (status stays in the list). */
@@ -242,11 +236,12 @@ function StudentLearningFinishRow({
         <Button
           id="knowledge-lc-finish-trigger"
           type="button"
-          variant="primary"
+          variant="secondary"
           pill
           sm
           className={cx(
             'knowledge-lc-finish-done-trigger',
+            finished && 'knowledge-lc-finish-done-trigger--finished',
             finished &&
               ft &&
               cx(
@@ -265,7 +260,14 @@ function StudentLearningFinishRow({
             setMenuOpen((o) => !o);
           }}
         >
-          <span>{triggerLabel}</span>
+          {!finished ? (
+            <span className="knowledge-lc-finish-done-trigger__icon" aria-hidden>
+              <Check className="knowledge-lc-finish-done-trigger__check" strokeWidth={2.5} size={18} />
+            </span>
+          ) : null}
+          <span className={cx('knowledge-lc-finish-done-trigger__label', !finished && 'sr-only')}>
+            {triggerLabel}
+          </span>
           {canOpenMenu ? (
             <ChevronDown
               className={cx('knowledge-lc-finish-done-chevron', menuOpen && 'is-open')}
@@ -472,6 +474,26 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     });
   }, [role, parentUserId, threadId, bumpLearningCards, t]);
 
+  const persistParentTonightDone = useCallback(
+    async (preset: LearningCardTonightActionPreset) => {
+      if (role !== 'parent' || !parentUserId || !threadId) return;
+      const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+      if (!b) return;
+      const fb = getParentFeedbackForUser(b, parentUserId);
+      const cur = new Set(fb.tonightActionsDone ?? []);
+      if (cur.has(preset)) cur.delete(preset);
+      else cur.add(preset);
+      const updated = upsertParentFeedbackOnCard(b, {
+        parentId: parentUserId,
+        tonightActionsDone: Array.from(cur),
+      });
+      await getDataLayer().learningCards.put(updated);
+      setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      bumpLearningCards();
+    },
+    [role, parentUserId, threadId, bumpLearningCards],
+  );
+
   /**
    * Parent chat 鈫?children DOING + chat flag. Optional `tonightPreset` when parent ran a suggested action
    * (sets the matching `action*` on each relevant child).
@@ -513,11 +535,11 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     void persistStudentPatch({ status: 'learning', finishedType: undefined, feeling: undefined });
   }, [persistStudentPatch]);
 
-  const includedSteps = useMemo(() => {
-    const steps = currentCard?.tonightActions.filter((a) => a.include) ?? [];
-    if (role === 'parent') return steps.filter((a) => isParentFacingTonightPreset(a.preset));
-    return steps;
-  }, [currentCard, role]);
+  /** Teacher-included presets only. Parents see quiz, hands-on, and teach-back when selected (teach-back is confirmed on the parent side). */
+  const includedSteps = useMemo(
+    () => currentCard?.tonightActions.filter((a) => a.include) ?? [],
+    [currentCard],
+  );
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
   const buildCardContext = useCallback(
     (historyRows: Array<{ who: string; type: 'in' | 'out'; text: string }>) => {
@@ -830,6 +852,23 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 </div>
               </div>
 
+              {role === 'parent' && currentBackend && currentCard ? (
+                <LearningCardParentKnowledgeView
+                  summaryText={resolveParentSummaryFromParts(
+                    {
+                      parentSummary: currentBackend.parentSummary,
+                      translatedSummaries: currentBackend.translatedSummaries,
+                    },
+                    uiLangFromI18n(i18n.resolvedLanguage ?? i18n.language),
+                  )}
+                  tonightActionsIncluded={includedSteps}
+                  tonightActionsDone={parentFeedback?.tonightActionsDone}
+                  onToggleTonightDone={(preset) => void persistParentTonightDone(preset)}
+                  tonightKicker={t('learningCard.wizard.tonightActions')}
+                  bridgedAiLabel={t('common.bridgedAi')}
+                />
+              ) : null}
+
               <div className="msg-thread" id="knowledge-msg-thread">
                 {role === 'student' && currentCard?.childKnowledge ? (
                   <KnowledgeChildDiscovery
@@ -848,7 +887,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 {role === 'student' && currentCard && !currentCard.childKnowledge && msgs.length === 0 ? (
                   <p className="panel__hint knowledge-student-fallback">{t('knowledge.studentNoChildContent')}</p>
                 ) : null}
-                {!msgs.length && role === 'parent' ? <p className="panel__hint">{t('knowledge.demoThread')}</p> : null}
+                {!msgs.length && role === 'parent' && !currentCard ? (
+                  <p className="panel__hint">{t('knowledge.demoThread')}</p>
+                ) : null}
                 {msgs.length > 0
                   ? msgs.map((m, idx) => (
                       <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>

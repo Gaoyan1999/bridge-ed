@@ -1,4 +1,8 @@
-import type { LearningCardChildKnowledge, LearningCardTonightAction } from '@/bridge/types';
+import type {
+  LearningCardChildKnowledge,
+  LearningCardTonightAction,
+  LearningCardTonightActionPreset,
+} from '@/bridge/types';
 
 /**
  * Backend contract for Learning Cards intended for REST/JSON APIs and IndexedDB documents.
@@ -80,6 +84,8 @@ export type LearningCardParentFeedback = {
   parentId: string;
   /** Parent tapped “still don’t understand” on this card. */
   doNotUnderstand: boolean;
+  /** Teacher-included tonight presets the parent marked done (strikethrough) in Knowledge. */
+  tonightActionsDone?: LearningCardTonightActionPreset[];
 };
 
 /** Student Knowledge progress — distinct from parent read/action workflow. */

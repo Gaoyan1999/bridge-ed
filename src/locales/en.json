@@ -117,7 +117,7 @@
       "challenge": "Not for me"
     },
     "finishChange": "Pick again",
-    "done": "Mark as Done",
+    "done": "Done",
     "parentDoNotUnderstandButton": "Need help",
     "parentDoNotUnderstandPrompt": "I still don't understand this topic. Please explain it more simply or suggest another way to practice it with my child.",
     "parentDoNotUnderstandAria": "Insert a draft message asking for help with this topic",
@@ -138,7 +138,7 @@
       "explain_to_parent": "Teach-back"
     },
     "practice": {
-      "button": "Practice",
+      "button": "Hands-on",
       "mockReply": "**Mini practice**\n\nLet’s use **Van Gogh’s approach** for a quick exercise: **paint a sunflower**.\n\n- **Brushwork:** Use thick paint and short strokes—leave visible marks like Van Gogh; it doesn’t need to be perfectly smooth.\n- **Color:** Bright yellow as the main hue; add a little deep green and ochre for the center and shadows.\n- **Head and petals:** Start with a flat oval for the flower head, then use radiating strokes for petal direction—add a hint of swirl or movement if you like.\n\nWhen you’re done, share the three colors you used, what you’d tweak next—or upload a photo."
     }
   },
