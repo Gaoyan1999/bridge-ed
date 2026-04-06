@@ -27,6 +27,14 @@ export type TeacherReportPayload = {
   toParents: boolean;
 };
 
+/** Class broadcast — persisted as `BroadcastBackend` in IndexedDB. */
+export type TeacherBroadcastPayload = {
+  title: string;
+  body: string;
+  toStudents: boolean;
+  toParents: boolean;
+};
+
 export interface ThreadMessage {
   who: string;
   type: 'in' | 'out';
@@ -36,6 +44,8 @@ export interface ThreadMessage {
   learningCard?: LearningCardItem;
   /** Full report layout when the teacher sends a class report to Messages. */
   teacherReport?: TeacherReportPayload;
+  /** One broadcast in the unified broadcast thread (title + body shown as a card). `sentAt` is ISO 8601 for the time row. */
+  broadcastPost?: { title: string; body: string; sentAt?: string };
 }
 
 /** Parent dashboard children linked to mood check-ins (demo roster). */
@@ -48,7 +58,10 @@ export type ParentMoodChildProfile = {
 export const LEARNING_CARD_TONIGHT_ACTION_PRESETS = ['quiz', 'parent_led_practice', 'explain_to_parent'] as const;
 export type LearningCardTonightActionPreset = (typeof LEARNING_CARD_TONIGHT_ACTION_PRESETS)[number];
 
-/** Parent Knowledge only lists quiz + practice; teach-back is teacher-facing / not shown to parents. */
+/**
+ * Presets shown in some compact parent UIs that omit teach-back (e.g. empty-state example, teacher uptake chips).
+ * Parent Knowledge “Tonight’s actions” todo lists all teacher-selected presets including `explain_to_parent`.
+ */
 export function isParentFacingTonightPreset(preset: LearningCardTonightActionPreset): boolean {
   return preset !== 'explain_to_parent';
 }
@@ -99,7 +112,7 @@ export interface LearningCardItem {
 /** Short chip labels for Knowledge / compact UI. */
 export const LEARNING_CARD_TONIGHT_PRESET_SHORT: Record<LearningCardTonightActionPreset, string> = {
   quiz: 'Quiz',
-  parent_led_practice: 'Practice',
+  parent_led_practice: 'Hands-on',
   explain_to_parent: 'Teach-back',
 };
 

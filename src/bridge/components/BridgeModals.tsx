@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
+import type { TeacherBroadcastPayload } from '@/bridge/types';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
 import { ReportModal } from '@/bridge/components/ReportModal';
 import { TeacherCardPreviewTodoModal } from '@/bridge/components/TeacherCardPreviewTodoModal';
@@ -84,10 +85,30 @@ function BookModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function BroadcastModal({ onClose }: { onClose: () => void }) {
-  const [success, setSuccess] = useState(false);
+function BroadcastModal({
+  onClose,
+  pushBroadcast,
+  onSent,
+}: {
+  onClose: () => void;
+  pushBroadcast: (payload: TeacherBroadcastPayload) => void;
+  onSent?: () => void;
+}) {
   const [bcTitle, setBcTitle] = useState('');
   const [bcBody, setBcBody] = useState('');
+  const send = () => {
+    const title = bcTitle.trim();
+    const body = bcBody.trim();
+    if (!title || !body) return;
+    pushBroadcast({
+      title,
+      body,
+      toStudents: true,
+      toParents: true,
+    });
+    onSent?.();
+    onClose();
+  };
   return (
     <>
       <div className="modal__header">
@@ -95,66 +116,58 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
           Broadcast
         </h3>
       </div>
-      {!success ? (
-        <form
-          className="book-form"
-          id="form-broadcast"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSuccess(true);
-          }}
-        >
-          <div className="modal__scroll">
-            <FieldTextInput
-              id="bc-title"
-              label="Title"
-              value={bcTitle}
-              onChange={setBcTitle}
-              isRequired
-              placeholder="e.g. This week’s practice set"
-            />
-            <FieldTextArea
-              id="bc-body"
-              label="Message"
-              value={bcBody}
-              onChange={setBcBody}
-              rows={4}
-              isRequired
-              placeholder="Your message to the class…"
-            />
-          </div>
-          <div className="modal__footer">
-            <div className="modal__actions">
-              <Button variant="text" type="button" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button variant="primary" pill type="submit">
-                Send to class
-              </Button>
-            </div>
-          </div>
-        </form>
-      ) : (
+      <form
+        className="book-form"
+        id="form-broadcast"
+        onSubmit={(e) => {
+          e.preventDefault();
+          send();
+        }}
+      >
         <div className="modal__scroll">
-          <p className="form-success" id="bc-success" role="status" hidden={!success}>
-            Sent (demo).
-          </p>
+          <FieldTextInput
+            id="bc-title"
+            label="Title"
+            value={bcTitle}
+            onChange={setBcTitle}
+            isRequired
+            placeholder="e.g. This week’s practice set"
+          />
+          <FieldTextArea
+            id="bc-body"
+            label="Message"
+            value={bcBody}
+            onChange={setBcBody}
+            rows={4}
+            isRequired
+            placeholder="Your message to the class…"
+          />
         </div>
-      )}
+        <div className="modal__footer">
+          <div className="modal__actions">
+            <Button variant="text" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" pill type="submit">
+              Send to class
+            </Button>
+          </div>
+        </div>
+      </form>
     </>
   );
 }
 
 export function BridgeModals() {
   const { t } = useTranslation();
-  const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
-  const [reportToast, setReportToast] = useState<string | null>(null);
+  const { modal, closeModal, pushTeacherReport, pushBroadcast, bumpLearningCards } = useBridge();
+  const [bridgeToast, setBridgeToast] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!reportToast) return;
-    const id = window.setTimeout(() => setReportToast(null), 4500);
+    if (!bridgeToast) return;
+    const id = window.setTimeout(() => setBridgeToast(null), 4500);
     return () => clearTimeout(id);
-  }, [reportToast]);
+  }, [bridgeToast]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -173,9 +186,9 @@ export function BridgeModals() {
   const withToast = (node: ReactNode) => (
     <>
       {node}
-      {reportToast ? (
+      {bridgeToast ? (
         <div className="bridge-toast" role="status" aria-live="polite">
-          {reportToast}
+          {bridgeToast}
         </div>
       ) : null}
     </>
@@ -222,7 +235,11 @@ export function BridgeModals() {
       <div className="modal" id="modal-broadcast" role="dialog" aria-modal="true" aria-labelledby="modal-broadcast-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
-          <BroadcastModal onClose={onBackdropClose} />
+          <BroadcastModal
+            onClose={onBackdropClose}
+            pushBroadcast={pushBroadcast}
+            onSent={() => setBridgeToast(t('chat.broadcastSent'))}
+          />
         </div>
       </div>,
     );
@@ -253,7 +270,7 @@ export function BridgeModals() {
           <ReportModal
             onClose={onBackdropClose}
             pushTeacherReport={pushTeacherReport}
-            onSent={() => setReportToast(t('dashboard.teacher.reportModal.previewSuccess'))}
+            onSent={() => setBridgeToast(t('dashboard.teacher.reportModal.previewSuccess'))}
           />
         </div>
       </div>,

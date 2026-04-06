@@ -12,13 +12,28 @@ import {
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import {
+  BROADCAST_FEED_THREAD_ID_PARENT,
+  BROADCAST_FEED_THREAD_ID_STUDENT,
+} from '@/bridge/broadcast-inbox-ids';
+import { threadMessageFromBroadcastBackend, threadMessageFromTeacherBroadcastPayload } from '@/bridge/broadcast-thread';
+import {
   threadMessageFromReportBackend,
   threadMessageFromTeacherReportPayload,
 } from '@/bridge/teacher-report-thread';
-import type { InboxItem, LearningCardItem, ModalState, Module, Role, TeacherReportPayload, ThreadMessage } from '@/bridge/types';
+import type {
+  InboxItem,
+  LearningCardItem,
+  ModalState,
+  Module,
+  Role,
+  TeacherBroadcastPayload,
+  TeacherReportPayload,
+  ThreadMessage,
+} from '@/bridge/types';
 import { resolveParentSummaryFromLearningCardItem } from '@/data';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
+import { BROADCAST_SCHEMA_VERSION, type BroadcastBackend } from '@/data/entity/broadcast-backend';
 import { REPORT_SCHEMA_VERSION, type ReportBackend } from '@/data/entity/report-backend';
 import type { UserBackend } from '@/data/entity/user-backend';
 
@@ -70,6 +85,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
       attachments: m.attachments?.map((a) => ({ ...a })),
       learningCard: m.learningCard ? { ...m.learningCard } : undefined,
       teacherReport: m.teacherReport ? { ...m.teacherReport } : undefined,
+      broadcastPost: m.broadcastPost ? { ...m.broadcastPost } : undefined,
     }));
   }
   return out;
@@ -78,6 +94,10 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
 function initialKnowledgeMessagesForCard(card: LearningCardItem, role: Role): ThreadMessage[] {
   /** Students get `childKnowledge` UI + chat; never auto-seed the parent-facing summary. */
   if (role === 'student') {
+    return [];
+  }
+  /** Parent summary is shown in `LearningCardParentKnowledgeView`; do not duplicate it as the first thread message. */
+  if (role === 'parent') {
     return [];
   }
   const body = resolveParentSummaryFromLearningCardItem(card);
@@ -99,6 +119,7 @@ interface BridgeContextValue {
   selectedInboxId: string | null;
   setSelectedInboxId: Dispatch<SetStateAction<string | null>>;
   pushTeacherReport: (payload: TeacherReportPayload) => void;
+  pushBroadcast: (payload: TeacherBroadcastPayload) => void;
   /** Parent (or teacher “preview as parent”): open AI chat for a learning card in Knowledge. */
   openKnowledgeFromCard: (card: LearningCardItem) => void;
   appendChatMessage: (threadId: string, msg: ThreadMessage) => void;
@@ -226,6 +247,68 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
             ...prev,
             parent: dedupeInboxByIdKeepFirst([...parentAdds, ...prev.parent]),
             student: dedupeInboxByIdKeepFirst([...studentAdds, ...prev.student]),
+          };
+        });
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** Restore broadcast threads + inbox from IndexedDB after refresh. */
+  useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .broadcasts.listAll()
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        const bySentAsc = (a: BroadcastBackend, b: BroadcastBackend) =>
+          a.sentAt.localeCompare(b.sentAt) || a.id.localeCompare(b.id);
+        const parentRows = rows.filter((r) => r.audience.toParents).sort(bySentAsc);
+        const studentRows = rows.filter((r) => r.audience.toStudents).sort(bySentAsc);
+
+        setThreads((prev) => {
+          const next = { ...prev };
+          if (parentRows.length > 0) {
+            next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({ ...threadMessageFromBroadcastBackend(b) }));
+          }
+          if (studentRows.length > 0) {
+            next[BROADCAST_FEED_THREAD_ID_STUDENT] = studentRows.map((b) => ({
+              ...threadMessageFromBroadcastBackend(b),
+            }));
+          }
+          return next;
+        });
+        setInboxByRole((prev) => {
+          const parentAdds: InboxItem[] = [];
+          const studentAdds: InboxItem[] = [];
+          if (parentRows.length > 0) {
+            const latest = parentRows[parentRows.length - 1]!.sentAt.slice(0, 10);
+            parentAdds.push({
+              id: BROADCAST_FEED_THREAD_ID_PARENT,
+              title: '',
+              date: latest,
+              kind: 'broadcast',
+            });
+          }
+          if (studentRows.length > 0) {
+            const latest = studentRows[studentRows.length - 1]!.sentAt.slice(0, 10);
+            studentAdds.push({
+              id: BROADCAST_FEED_THREAD_ID_STUDENT,
+              title: '',
+              date: latest,
+              kind: 'broadcast',
+            });
+          }
+          const parentNoBroadcast = prev.parent.filter((i) => i.kind !== 'broadcast');
+          const studentNoBroadcast = prev.student.filter((i) => i.kind !== 'broadcast');
+          return {
+            ...prev,
+            parent: dedupeInboxByIdKeepFirst([...parentAdds, ...parentNoBroadcast]),
+            student: dedupeInboxByIdKeepFirst([...studentAdds, ...studentNoBroadcast]),
           };
         });
       })
@@ -397,6 +480,73 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const pushBroadcast = (payload: TeacherBroadcastPayload) => {
+    const { title, body, toStudents, toParents } = payload;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const baseId = `bc-${Date.now()}`;
+    const threadLine = threadMessageFromTeacherBroadcastPayload(payload);
+
+    const iso = new Date().toISOString();
+    const record: BroadcastBackend = {
+      id: baseId,
+      schemaVersion: BROADCAST_SCHEMA_VERSION,
+      createdAt: iso,
+      updatedAt: iso,
+      authorUserId: resolveTeacherAuthorId(users, currentUserId),
+      sentAt: iso,
+      title,
+      body,
+      audience: { toStudents, toParents },
+      messageThreadIds: {
+        ...(toStudents ? { student: BROADCAST_FEED_THREAD_ID_STUDENT } : {}),
+        ...(toParents ? { parent: BROADCAST_FEED_THREAD_ID_PARENT } : {}),
+      },
+    };
+    void getDataLayer()
+      .broadcasts.put(record)
+      .catch(() => {
+        /* ignore IndexedDB write errors */
+      });
+
+    setThreads((prev) => {
+      const next = { ...prev };
+      if (toParents) {
+        const pid = BROADCAST_FEED_THREAD_ID_PARENT;
+        const existing = next[pid] ?? [];
+        next[pid] = [...existing, { ...threadLine }];
+      }
+      if (toStudents) {
+        const sid = BROADCAST_FEED_THREAD_ID_STUDENT;
+        const existing = next[sid] ?? [];
+        next[sid] = [...existing, { ...threadLine }];
+      }
+      return next;
+    });
+
+    setInboxByRole((prev) => {
+      const next = { ...prev, parent: [...prev.parent], student: [...prev.student], teacher: [...prev.teacher] };
+      if (toParents) {
+        next.parent = next.parent.filter((i) => i.kind !== 'broadcast');
+        next.parent.unshift({
+          id: BROADCAST_FEED_THREAD_ID_PARENT,
+          title: '',
+          date: dateStr,
+          kind: 'broadcast',
+        });
+      }
+      if (toStudents) {
+        next.student = next.student.filter((i) => i.kind !== 'broadcast');
+        next.student.unshift({
+          id: BROADCAST_FEED_THREAD_ID_STUDENT,
+          title: '',
+          date: dateStr,
+          kind: 'broadcast',
+        });
+      }
+      return next;
+    });
+  };
+
   const seedKnowledgeThreadIfEmpty = useCallback(
     (card: LearningCardItem) => {
       const id = card.threadId;
@@ -482,6 +632,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     selectedKnowledgeThreadId,
     setSelectedKnowledgeThreadId,
     pushTeacherReport,
+    pushBroadcast,
     openKnowledgeFromCard,
     appendChatMessage,
     appendKnowledgeMessage,

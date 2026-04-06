@@ -48,15 +48,29 @@ function extractStudentFeedbacks(rest: Record<string, unknown>): LearningCardStu
   return [];
 }
 
+function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
+  return typeof v === 'string' && (LEARNING_CARD_TONIGHT_ACTION_PRESETS as readonly string[]).includes(v);
+}
+
+function normalizeTonightActionsDone(raw: unknown): LearningCardTonightActionPreset[] {
+  if (!Array.isArray(raw)) return [];
+  const out: LearningCardTonightActionPreset[] = [];
+  for (const v of raw) {
+    if (isTonightPreset(v) && !out.includes(v)) out.push(v);
+  }
+  return out;
+}
+
 function normalizeParentFeedbackRow(raw: unknown, parentId: string): LearningCardParentFeedback {
   const pid = parentId.trim();
-  const def: LearningCardParentFeedback = { parentId: pid, doNotUnderstand: false };
+  const def: LearningCardParentFeedback = { parentId: pid, doNotUnderstand: false, tonightActionsDone: [] };
   if (!raw || typeof raw !== 'object') return def;
   const r = raw as Record<string, unknown>;
   const id = typeof r.parentId === 'string' && r.parentId.trim() ? r.parentId.trim() : pid;
   return {
     parentId: id,
     doNotUnderstand: typeof r.doNotUnderstand === 'boolean' ? r.doNotUnderstand : false,
+    tonightActionsDone: normalizeTonightActionsDone(r.tonightActionsDone),
   };
 }
 
@@ -74,10 +88,6 @@ function normalizeParentFeedbacksArray(raw: unknown): LearningCardParentFeedback
 function extractParentFeedbacks(rest: Record<string, unknown>): LearningCardParentFeedback[] {
   if (!Array.isArray(rest.parentFeedbacks)) return [];
   return normalizeParentFeedbacksArray(rest.parentFeedbacks);
-}
-
-function isTonightPreset(v: unknown): v is LearningCardTonightActionPreset {
-  return typeof v === 'string' && (LEARNING_CARD_TONIGHT_ACTION_PRESETS as readonly string[]).includes(v);
 }
 
 /** Ensures exactly three fixed presets; migrates legacy rows that only had `text` + `include`. */
@@ -276,13 +286,22 @@ function mergeStudentActionFlags(
   if (typeof r.actionTeachBack === 'boolean') out.actionTeachBack = r.actionTeachBack;
 }
 
-/** Sets the matching `action*` flag when a student (or parent on behalf of children) runs a tonight preset. */
+/** Sets the matching `action*` flag when a student runs a tonight preset from the composer. */
 export function studentActionPatchForTonightPreset(
   preset: LearningCardTonightActionPreset,
 ): Partial<Pick<LearningCardStudentFeedback, 'actionQuiz' | 'actionPractice' | 'actionTeachBack'>> {
   if (preset === 'quiz') return { actionQuiz: true };
   if (preset === 'parent_led_practice') return { actionPractice: true };
   return { actionTeachBack: true };
+}
+
+/** Clears one `action*` flag when a parent unmarks that item in Tonight's actions. */
+export function studentActionClearPatchForTonightPreset(
+  preset: LearningCardTonightActionPreset,
+): Partial<Pick<LearningCardStudentFeedback, 'actionQuiz' | 'actionPractice' | 'actionTeachBack'>> {
+  if (preset === 'quiz') return { actionQuiz: false };
+  if (preset === 'parent_led_practice') return { actionPractice: false };
+  return { actionTeachBack: false };
 }
 
 /**
@@ -396,7 +415,7 @@ export function upsertStudentFeedbackOnCard(
 export function getParentFeedbackForUser(card: LearningCardBackend, parentId: string): LearningCardParentFeedback {
   const pid = parentId.trim();
   const row = (card.parentFeedbacks ?? []).find((p) => p.parentId === pid);
-  return row ? normalizeParentFeedbackRow(row, pid) : { parentId: pid, doNotUnderstand: false };
+  return row ? normalizeParentFeedbackRow(row, pid) : { parentId: pid, doNotUnderstand: false, tonightActionsDone: [] };
 }
 
 /** Merge parent feedback into `card.parentFeedbacks` and bump `updatedAt`. */
@@ -407,7 +426,7 @@ export function upsertParentFeedbackOnCard(
   const pid = patch.parentId.trim();
   const list = [...(card.parentFeedbacks ?? [])];
   const i = list.findIndex((p) => p.parentId === pid);
-  const base = i >= 0 ? normalizeParentFeedbackRow(list[i], pid) : { parentId: pid, doNotUnderstand: false };
+  const base = i >= 0 ? normalizeParentFeedbackRow(list[i], pid) : { parentId: pid, doNotUnderstand: false, tonightActionsDone: [] };
   const merged: LearningCardParentFeedback = { ...base, ...patch, parentId: pid };
   if (i >= 0) list[i] = merged;
   else list.push(merged);

@@ -2041,7 +2041,8 @@ html.theme-dark .knowledge-child-discovery-md.markdown-content strong {
   padding-right: 1.2rem;
 }
 
-#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary {
+#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary,
+.knowledge-parent-lc-preview .learning-card-parent-panel .learning-card-review-summary {
   margin-bottom: 0.5rem;
   padding: 0.55rem 0.65rem 0.65rem;
   border-radius: var(--radius-sm);
@@ -2054,39 +2055,46 @@ html.theme-dark .knowledge-child-discovery-md.markdown-content strong {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--link-blue) 10%, transparent);
 }
 
-#form-learning-card-review .learning-card-review-summary > .field__label {
+#form-learning-card-review .learning-card-review-summary > .field__label,
+.knowledge-parent-lc-preview .learning-card-review-summary > .field__label {
   margin-bottom: 0.2rem;
 }
 
-#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill {
+#form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill,
+.knowledge-parent-lc-preview .learning-card-review-summary .field__input--pill {
   background: color-mix(in srgb, var(--link-blue) 5%, #fff);
   border-color: color-mix(in srgb, var(--link-blue) 20%, var(--border-light));
 }
 
-html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill {
+html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary .field__input--pill,
+html.theme-dark .knowledge-parent-lc-preview .learning-card-review-summary .field__input--pill {
   background: color-mix(in srgb, var(--link-blue) 10%, var(--surface));
   border-color: color-mix(in srgb, var(--link-blue) 28%, var(--border-light));
 }
 
-#form-learning-card-review .learning-card-ai-hint {
+#form-learning-card-review .learning-card-ai-hint,
+.knowledge-parent-lc-preview .learning-card-ai-hint {
   margin-top: 0.2rem;
   margin-bottom: 0.4rem;
   padding: 0.38rem 0.5rem;
   gap: 0.4rem;
 }
 
-#form-learning-card-review .learning-card-ai-hint__icon-wrap {
+#form-learning-card-review .learning-card-ai-hint__icon-wrap,
+.knowledge-parent-lc-preview .learning-card-ai-hint__icon-wrap {
   width: 1.45rem;
   height: 1.45rem;
 }
 
-#form-learning-card-review .learning-card-ai-hint__text {
+#form-learning-card-review .learning-card-ai-hint__text,
+.knowledge-parent-lc-preview .learning-card-ai-hint__text {
   font-size: 0.75rem;
   line-height: 1.32;
   font-weight: 500;
 }
 
-#form-learning-card-review .field--actions-pick--grouped {
+#form-learning-card-review .field--actions-pick--grouped,
+.knowledge-parent-lc-preview .field--actions-pick--grouped {
   margin-top: 0.65rem;
   padding: 0.55rem 0.65rem 0.6rem;
   border-radius: var(--radius-sm);
@@ -2099,13 +2107,15 @@ html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--pa
   box-shadow: 0 1px 2px color-mix(in srgb, var(--link-blue) 10%, transparent);
 }
 
-#form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group {
+#form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group,
+.knowledge-parent-lc-preview .field--actions-pick--grouped .learning-card-actions-group {
   border: 1px solid var(--border-light);
   background: color-mix(in srgb, var(--link-blue) 4%, var(--surface));
   box-shadow: none;
 }
 
-html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary {
+html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--parent .learning-card-review-summary,
+html.theme-dark .knowledge-parent-lc-preview .learning-card-parent-panel .learning-card-review-summary {
   border: none;
   background: linear-gradient(
     180deg,
@@ -2114,7 +2124,8 @@ html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--pa
   );
 }
 
-html.theme-dark #form-learning-card-review .field--actions-pick--grouped {
+html.theme-dark #form-learning-card-review .field--actions-pick--grouped,
+html.theme-dark .knowledge-parent-lc-preview .field--actions-pick--grouped {
   border: none;
   background: linear-gradient(
     180deg,
@@ -2123,9 +2134,119 @@ html.theme-dark #form-learning-card-review .field--actions-pick--grouped {
   );
 }
 
-html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group {
+html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learning-card-actions-group,
+html.theme-dark .knowledge-parent-lc-preview .field--actions-pick--grouped .learning-card-actions-group {
   background: color-mix(in srgb, var(--link-blue) 8%, var(--surface));
   border-color: var(--border-light);
+}
+
+.knowledge-parent-lc-preview {
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  box-sizing: border-box;
+  padding: 0.55rem 1rem 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+  max-height: min(52vh, 28rem);
+  overflow-y: auto;
+}
+
+.knowledge-parent-lc-preview .learning-card-parent-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.knowledge-parent-lc-preview .learning-card-parent-panel .learning-card-review-summary {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.knowledge-parent-lc-preview .knowledge-parent-summary__source {
+  margin: 0 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.knowledge-parent-lc-preview .learning-card-parent-summary-markdown {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 3rem;
+  margin-top: 0.25rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.knowledge-parent-lc-preview .learning-card-parent-summary-markdown .markdown-content {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.knowledge-parent-lc-preview .knowledge-parent-summary-md.markdown-content {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.knowledge-parent-lc-preview .knowledge-parent-summary-md.markdown-content p {
+  margin: 0 0 0.5em;
+}
+
+.knowledge-parent-lc-preview .knowledge-parent-summary-md.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.knowledge-parent-lc-preview .knowledge-parent-summary-md.markdown-content ul,
+.knowledge-parent-lc-preview .knowledge-parent-summary-md.markdown-content ol {
+  margin: 0.35em 0 0.5em;
+}
+
+.learning-card-actions--presets .learning-card-actions__row--preset.learning-card-actions__row--parent-track {
+  display: block;
+  padding: 0;
+}
+
+.learning-card-actions__parent-row-btn {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  border-radius: 0;
+}
+
+.learning-card-actions__parent-row-btn:focus-visible {
+  outline: 2px solid var(--link-blue);
+  outline-offset: -2px;
+}
+
+.learning-card-actions__parent-row-btn .learning-card-actions__check.learning-card-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  min-height: 1.35rem;
+  padding-top: 0;
+  pointer-events: none;
+}
+
+.learning-card-actions__parent-row-btn--done .learning-card-actions__preset-title,
+.learning-card-actions__parent-row-btn--done .learning-card-actions__preset-desc {
+  text-decoration: line-through;
+  color: var(--text-muted);
 }
 
 #form-learning-card-review .modal__footer {
@@ -3453,11 +3574,25 @@ html.theme-dark .learning-card-confirm__highlight {
 
 .knowledge-lc-finish-done-trigger {
   gap: 0.35rem;
+  border: 1px solid transparent;
+}
+
+.knowledge-lc-finish-done-trigger__icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.knowledge-lc-finish-done-trigger__check {
+  display: block;
+  color: var(--link-blue);
 }
 
 .knowledge-lc-finish-done-chevron {
   flex-shrink: 0;
   margin-left: 0.1rem;
+  color: var(--link-blue);
   opacity: 0.9;
   transition: transform 0.18s ease;
 }
@@ -3466,37 +3601,48 @@ html.theme-dark .learning-card-confirm__highlight {
   transform: rotate(180deg);
 }
 
+.knowledge-lc-finish-done-trigger--finished:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
 .knowledge-lc-finish-done-trigger--result:disabled {
   opacity: 1;
   cursor: default;
 }
 
-/* Finished state 鈥?color matches the chosen feedback */
+/* Finished state 鈥?label color reflects the chosen feedback; check stays theme blue */
 .knowledge-lc-finish-done-trigger--result-easy:disabled {
-  background: rgb(21, 128, 61);
-  color: #fff;
+  background: var(--surface);
+  border-color: var(--border-light);
+  color: rgb(21, 128, 61);
 }
 
 .knowledge-lc-finish-done-trigger--result-easy:disabled:hover {
-  background: rgb(21, 128, 61);
+  background: var(--surface);
+  color: rgb(21, 128, 61);
 }
 
 .knowledge-lc-finish-done-trigger--result-think:disabled {
-  background: var(--link-blue);
-  color: #fff;
+  background: var(--surface);
+  border-color: var(--border-light);
+  color: var(--link-blue);
 }
 
 .knowledge-lc-finish-done-trigger--result-think:disabled:hover {
-  background: var(--link-blue);
+  background: var(--surface);
+  color: var(--link-blue);
 }
 
 .knowledge-lc-finish-done-trigger--result-challenge:disabled {
-  background: rgb(185, 28, 28);
-  color: #fff;
+  background: var(--surface);
+  border-color: var(--border-light);
+  color: rgb(185, 28, 28);
 }
 
 .knowledge-lc-finish-done-trigger--result-challenge:disabled:hover {
-  background: rgb(185, 28, 28);
+  background: var(--surface);
+  color: rgb(185, 28, 28);
 }
 
 .knowledge-lc-finish-menu {
@@ -3789,6 +3935,52 @@ html.theme-dark .inbox-item__kind--broadcast {
 
 .msg--teacher-report {
   max-width: 100%;
+}
+
+.msg--broadcast {
+  max-width: 100%;
+}
+
+.msg__broadcast-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.msg__broadcast-meta .msg__who {
+  margin-bottom: 0;
+}
+
+.msg__time {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.msg__broadcast-card {
+  min-width: 0;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  color: #1a1a1e;
+}
+
+.msg__broadcast-title {
+  font-weight: 600;
+  font-size: 0.95em;
+  margin-bottom: 0.35rem;
+}
+
+.msg__broadcast-body {
+  white-space: pre-wrap;
+  font-size: inherit;
+  line-height: 1.45;
 }
 
 .teacher-report-msg {

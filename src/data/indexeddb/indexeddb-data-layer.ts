@@ -1,20 +1,23 @@
 import { bridgeDb } from './bridge-db';
 import type {
+  BroadcastsRepository,
   DataLayer,
   LearningCardsRepository,
   ReportsRepository,
   StudentMoodsRepository,
   UsersRepository,
 } from '../repositories';
+import type { BroadcastBackend } from '../entity/broadcast-backend';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { ReportBackend } from '../entity/report-backend';
+import { normalizeBroadcastBackend } from '../broadcast-mappers';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import { normalizeReportBackend } from '../report-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { UserBackend } from '../entity/user-backend';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
-function sortBySentAtDesc(a: ReportBackend, b: ReportBackend): number {
+function sortBySentAtDesc<T extends { sentAt: string }>(a: T, b: T): number {
   const ta = Date.parse(a.sentAt);
   const tb = Date.parse(b.sentAt);
   const na = Number.isFinite(ta) ? ta : 0;
@@ -182,10 +185,45 @@ class IndexedDbReportsRepo implements ReportsRepository {
   }
 }
 
+class IndexedDbBroadcastsRepo implements BroadcastsRepository {
+  async listAll(): Promise<BroadcastBackend[]> {
+    const rows = await bridgeDb.broadcasts.toArray();
+    return rows.map((r) => normalizeBroadcastBackend(r)).sort(sortBySentAtDesc);
+  }
+
+  async listByAuthorUserId(authorUserId: string): Promise<BroadcastBackend[]> {
+    const id = authorUserId.trim();
+    if (!id) return [];
+    const rows = await bridgeDb.broadcasts.toArray();
+    return rows
+      .filter((r) => {
+        if (r.authorUserId === id) return true;
+        if (id === 'teacher-1' && r.authorUserId === '1') return true;
+        return false;
+      })
+      .map((r) => normalizeBroadcastBackend(r))
+      .sort(sortBySentAtDesc);
+  }
+
+  async get(id: string): Promise<BroadcastBackend | undefined> {
+    const raw = await bridgeDb.broadcasts.get(id);
+    return raw ? normalizeBroadcastBackend(raw) : undefined;
+  }
+
+  async put(broadcast: BroadcastBackend): Promise<void> {
+    await bridgeDb.broadcasts.put(normalizeBroadcastBackend(broadcast));
+  }
+
+  async delete(id: string): Promise<void> {
+    await bridgeDb.broadcasts.delete(id);
+  }
+}
+
 export class IndexedDbDataLayer implements DataLayer {
   readonly mode = 'indexeddb' as const;
   readonly learningCards = new IndexedDbLearningCardsRepo();
   readonly studentMoods = new IndexedDbStudentMoodsRepo();
   readonly users = new IndexedDbUsersRepo();
   readonly reports = new IndexedDbReportsRepo();
+  readonly broadcasts = new IndexedDbBroadcastsRepo();
 }

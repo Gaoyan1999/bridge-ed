@@ -117,7 +117,7 @@
       "challenge": "不想学了"
     },
     "finishChange": "换一个选项",
-    "done": "标记为已完成",
+    "done": "完成",
     "parentDoNotUnderstandButton": "需要讲解",
     "parentDoNotUnderstandPrompt": "这个主题我还是不太懂。请用更简单的方式说明，或建议另一种可以和孩子一起练习的方法。",
     "parentDoNotUnderstandAria": "在输入框插入一条求助草稿",
@@ -138,7 +138,7 @@
       "explain_to_parent": "讲给家长听"
     },
     "practice": {
-      "button": "练习",
+      "button": "动手",
       "mockReply": "**小练习**\n\n我们用**梵高的画法**来做一个小练习：**画一朵向日葵**。\n\n- **笔触：** 厚涂与短笔触——像梵高一样留下清晰颜料痕迹，不必涂得很平。\n- **颜色：** 以明亮黄色为主，用少量深绿、赭石点缀花心与阴影。\n- **花盘与花瓣：** 先画扁圆花盘，再用放射状笔触勾出花瓣方向，可加一点旋转感。\n\n画完后可以说说你用的三种颜色、想改进的地方——或上传照片。"
     }
   },
@@ -147,12 +147,14 @@
     "placeholderTeacher": "给该家庭或班级发消息…",
     "placeholderStudent": "输入消息…",
     "emptyInbox": "暂无消息。",
+    "inboxBroadcastFeedTitle": "广播",
     "broadcast": "广播",
     "inboxKindReport": "报告",
     "inboxKindBroadcast": "广播",
     "selectThread": "选择会话",
     "bookTime": "预约时间",
-    "noMessagesInThread": "此会话暂无消息。"
+    "noMessagesInThread": "此会话暂无消息。",
+    "broadcastSent": "广播已发送。"
   },
   "mood": {
     "emotion": "情绪",

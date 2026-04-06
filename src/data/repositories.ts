@@ -1,4 +1,5 @@
 import type { DataSourceMode } from './config';
+import type { BroadcastBackend } from './entity/broadcast-backend';
 import type { LearningCardBackend } from './entity/learning-card-backend';
 import type { ReportBackend } from './entity/report-backend';
 import type { StudentMoodBackend } from './entity/student-mood-backend';
@@ -42,6 +43,14 @@ export interface ReportsRepository {
   delete(id: string): Promise<void>;
 }
 
+export interface BroadcastsRepository {
+  listByAuthorUserId(authorUserId: string): Promise<BroadcastBackend[]>;
+  listAll(): Promise<BroadcastBackend[]>;
+  get(id: string): Promise<BroadcastBackend | undefined>;
+  put(broadcast: BroadcastBackend): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
 /** App data — swap implementation via `VITE_DATA_SOURCE`. */
 export interface DataLayer {
   readonly mode: DataSourceMode;
@@ -49,4 +58,5 @@ export interface DataLayer {
   readonly studentMoods: StudentMoodsRepository;
   readonly users: UsersRepository;
   readonly reports: ReportsRepository;
+  readonly broadcasts: BroadcastsRepository;
 }

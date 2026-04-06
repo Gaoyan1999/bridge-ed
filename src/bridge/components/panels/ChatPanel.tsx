@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import type { InboxItem } from '@/bridge/types';
+import { isBroadcastFeedThreadId } from '@/bridge/broadcast-inbox-ids';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
@@ -13,9 +14,32 @@ import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
+function formatBroadcastClockLabel(iso: string, locale: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+}
+
+/** One broadcast row + other threads (broadcasts are merged into a single feed per role). */
+function buildDisplayInboxItems(items: InboxItem[]): InboxItem[] {
+  const byDateDesc = (a: InboxItem, b: InboxItem) => {
+    const c = b.date.localeCompare(a.date);
+    return c !== 0 ? c : b.id.localeCompare(a.id);
+  };
+  const broadcast =
+    items.find((i) => i.kind === 'broadcast' && isBroadcastFeedThreadId(i.id)) ??
+    items.find((i) => i.kind === 'broadcast');
+  const others = items.filter((i) => i.kind !== 'broadcast').sort(byDateDesc);
+  return broadcast ? [broadcast, ...others] : others;
+}
+
 function ChatInboxItemContent({ item }: { item: InboxItem }) {
   const { t } = useTranslation();
   const showKind = item.kind === 'report' || item.kind === 'broadcast';
+  const headline =
+    item.kind === 'broadcast' && isBroadcastFeedThreadId(item.id)
+      ? t('chat.inboxBroadcastFeedTitle')
+      : item.title;
   return (
     <div className="inbox-item__block">
       <div className="inbox-item__meta-row">
@@ -33,13 +57,17 @@ function ChatInboxItemContent({ item }: { item: InboxItem }) {
           {item.date}
         </time>
       </div>
-      <span className="inbox-item__headline">{item.title}</span>
+      <span className="inbox-item__headline">{headline}</span>
     </div>
   );
 }
 
 export function ChatPanel({ active }: { active: boolean }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const formatBroadcastTime = useMemo(
+    () => (iso: string) => formatBroadcastClockLabel(iso, i18n.language),
+    [i18n.language],
+  );
   const {
     role,
     inboxByRole,
@@ -59,20 +87,25 @@ export function ChatPanel({ active }: { active: boolean }) {
       else if (reason === 'type') window.alert(t('common.imagesOnly'));
     },
   });
-  const items = inboxByRole[role];
-  const inboxKey = items.map((i) => i.id).join(',');
+  const inboxItems = inboxByRole[role];
+  const inboxKey = inboxItems.map((i) => i.id).join(',');
+  const displayItems = useMemo(() => buildDisplayInboxItems(inboxItems), [inboxItems]);
 
   useEffect(() => {
-    const list = inboxByRole[role];
-    if (!list.length) {
+    if (!displayItems.length) {
       setSelectedInboxId(null);
       return;
     }
-    setSelectedInboxId((cur) => (cur && list.some((i) => i.id === cur) ? cur : list[0]!.id));
-  }, [role, inboxKey, inboxByRole, setSelectedInboxId]);
+    setSelectedInboxId((cur) =>
+      cur && displayItems.some((i) => i.id === cur) ? cur : displayItems[0]!.id,
+    );
+  }, [role, inboxKey, inboxByRole, displayItems, setSelectedInboxId]);
 
-  const threadId = selectedInboxId && items.some((i) => i.id === selectedInboxId) ? selectedInboxId : items[0]?.id;
-  const current = items.find((i) => i.id === threadId);
+  const threadId =
+    selectedInboxId && displayItems.some((i) => i.id === selectedInboxId)
+      ? selectedInboxId
+      : displayItems[0]?.id;
+  const current = displayItems.find((i) => i.id === threadId);
   const msgs = threadId ? threads[threadId] ?? [] : [];
 
   const placeholder =
@@ -131,12 +164,12 @@ export function ChatPanel({ active }: { active: boolean }) {
 
       <div className="chat-layout chat-layout--rounded">
         <div className="inbox" id="inbox-list">
-          {!items.length ? (
+          {!displayItems.length ? (
             <p className="panel__hint" style={{ padding: '1rem' }}>
               {t('chat.emptyInbox')}
             </p>
           ) : (
-            items.map((item) => (
+            displayItems.map((item) => (
               <button
                 key={item.id}
                 type="button"
@@ -174,7 +207,11 @@ export function ChatPanel({ active }: { active: boolean }) {
                       </span>
                     </div>
                   )}
-                  <span className="thread-title__text">{current.title}</span>
+                  <span className="thread-title__text">
+                    {current.kind === 'broadcast' && isBroadcastFeedThreadId(current.id)
+                      ? t('chat.inboxBroadcastFeedTitle')
+                      : current.title}
+                  </span>
                 </>
               ) : (
                 t('chat.selectThread')
@@ -195,29 +232,48 @@ export function ChatPanel({ active }: { active: boolean }) {
             {!msgs.length ? (
               <p className="panel__hint">{t('chat.noMessagesInThread')}</p>
             ) : (
-              msgs.map((m, idx) => (
+              msgs.map((m, idx) => {
+                const whoLabel =
+                  m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who;
+                return (
                 <div
-                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
+                  key={`${idx}-${m.who}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
                   className={cx(
                     'msg',
                     m.type === 'out' ? 'msg--out' : 'msg--in',
                     m.learningCard && 'msg--learning-card',
                     m.teacherReport && 'msg--teacher-report',
+                    m.broadcastPost && 'msg--broadcast',
                   )}
                 >
-                  <div className="msg__who">
-                    {m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who}
-                  </div>
+                  {m.broadcastPost ? (
+                    <div className="msg__broadcast-meta">
+                      <span className="msg__who">{whoLabel}</span>
+                      {m.broadcastPost.sentAt ? (
+                        <time className="msg__time" dateTime={m.broadcastPost.sentAt}>
+                          {formatBroadcastTime(m.broadcastPost.sentAt)}
+                        </time>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="msg__who">{whoLabel}</div>
+                  )}
                   <MessageAttachmentGrid attachments={m.attachments} />
                   {m.learningCard ? (
                     <ChatLearningCardMessage card={m.learningCard} />
                   ) : m.teacherReport ? (
                     <ChatTeacherReportMessage report={m.teacherReport} />
+                  ) : m.broadcastPost ? (
+                    <div className="msg__broadcast-card">
+                      <div className="msg__broadcast-title">{m.broadcastPost.title}</div>
+                      <div className="msg__broadcast-body">{m.broadcastPost.body}</div>
+                    </div>
                   ) : m.text?.trim() ? (
                     <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
                   ) : null}
                 </div>
-              ))
+                );
+              })
             )}
           </div>
           <input
