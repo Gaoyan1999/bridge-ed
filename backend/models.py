@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,9 +14,33 @@ class TranslatedSummaries(BaseModel):
 
 
 class LearningCardCreate(BaseModel):
-    title: str = Field(min_length=1)
-    teacherSummary: str = Field(min_length=1)
-    parentActions: list[str] = Field(min_length=1)
+    model_config = ConfigDict(extra="allow")
+
+    id: str | None = None
+    schemaVersion: int = 3
+    createdAt: str | None = None
+    updatedAt: str | None = None
+
+    authorUserId: str = ""
+    classId: str | None = None
+    classLessonTitle: str = ""
+    grade: str = ""
+    subject: str = ""
+    topic: str = ""
+    teacherNotes: str = ""
+    parentSummary: str = ""
+    translatedSummaries: TranslatedSummaries | None = None
+    childKnowledge: dict[str, Any] | None = None
+    tonightActions: list[dict[str, Any]] = Field(default_factory=list)
+    audience: dict[str, Any] = Field(default_factory=dict)
+    sentAt: str | None = None
+    threadId: str = ""
+    status: dict[str, Any] = Field(default_factory=dict)
+
+    # Legacy fields kept for backward compatibility with early payloads.
+    title: str | None = None
+    teacherSummary: str | None = None
+    parentActions: list[str] | None = None
 
 
 class LearningCard(LearningCardCreate):
@@ -42,18 +66,61 @@ class LearningCardGenerateResponse(BaseModel):
     warning: Optional[str] = None
 
 
+class LearningCardChildKnowledgeGenerateRequest(BaseModel):
+    classTitle: str = ""
+    topic: str = Field(min_length=1)
+    grade: str = Field(min_length=1)
+    subject: str = Field(min_length=1)
+    notes: str = ""
+
+
+class LearningCardChildKnowledgeHeroResponse(BaseModel):
+    heroImageUrl: str
+    heroImageAlt: str
+    source: Literal["curricullm", "demo-fallback"] = "demo-fallback"
+    warning: Optional[str] = None
+
+
+class LearningCardChildKnowledgeResponse(BaseModel):
+    content: str
+    source: Literal["curricullm", "demo-fallback"]
+    warning: Optional[str] = None
+
+
+class KnowledgeTonightCommandRequest(BaseModel):
+    cardTitle: str = ""
+
+
+class KnowledgeTonightCommandResponse(BaseModel):
+    reply: str
+    source: Literal["curricullm", "demo-fallback"]
+    warning: Optional[str] = None
+
+
 class ChatMessage(BaseModel):
     who: str = Field(min_length=1)
     type: Literal["in", "out"]
     text: str = Field(min_length=1)
 
 
+class ChatCardContext(BaseModel):
+    topic: str = ""
+    grade: str = ""
+    subject: str = ""
+    classLessonTitle: str = ""
+    parentSummary: str = ""
+    tonightActions: list[dict[str, Any]] = Field(default_factory=list)
+    isFirstExplanation: bool = False
+
+
 class ChatRespondRequest(BaseModel):
     role: Literal["parent", "student", "teacher"]
+    uiLang: Literal["en", "zh", "fr"] = "en"
     threadTitle: str = ""
     threadId: str = Field(min_length=1)
     message: str = Field(min_length=1)
     history: list[ChatMessage] = Field(default_factory=list)
+    cardContext: ChatCardContext | None = None
 
 
 class ChatRespondResponse(BaseModel):

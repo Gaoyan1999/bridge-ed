@@ -1,4 +1,4 @@
-/* BridgeEd — Bard / Gemini–inspired shell (Material-like, light) */
+﻿/* BridgeEd 鈥?Bard / Gemini鈥搃nspired shell (Material-like, light) */
 
 :root {
   /* Cool blue-forward shell (was neutral gray-blue) */
@@ -17,14 +17,14 @@
   --link-blue-hover: #0842a0;
   --accent-primary: #0b57d0;
   --accent-soft: rgba(11, 87, 208, 0.1);
-  /* Knowledge — student list TODO / DOING / DONE (matches inbox labels + teacher doughnut) */
+  /* Knowledge 鈥?student list TODO / DOING / DONE (matches inbox labels + teacher doughnut) */
   --knowledge-student-status-todo-bg: rgba(243, 244, 246, 0.96);
   --knowledge-student-status-todo-border: rgba(107, 114, 128, 0.42);
   --knowledge-student-status-doing-bg: var(--accent-soft);
   --knowledge-student-status-doing-border: rgba(11, 87, 208, 0.32);
   --knowledge-student-status-done-bg: rgba(220, 252, 231, 0.95);
   --knowledge-student-status-done-border: rgba(22, 163, 74, 0.38);
-  /* Mood check-in — blue theme */
+  /* Mood check-in 鈥?blue theme */
   --mood-bg-top: #e3f0ff;
   --mood-bg-mid: #e8f2fc;
   --mood-bg-bottom: #dceaf8;
@@ -33,7 +33,7 @@
   --mood-submit-bg: #0b57d0;
   --mood-submit-bg-hover: #0842a0;
   --mood-face-selected-bg: #ffffff;
-  /* Secondary buttons — soft cool-gray fill + blue label (Knowledge chips, Book time, etc.) */
+  /* Secondary buttons 鈥?soft cool-gray fill + blue label (Knowledge chips, Book time, etc.) */
   --btn-secondary-bg: #eef2f8;
   --btn-secondary-bg-hover: #e4eaf4;
   --accent-warm: #c5221f;
@@ -1011,7 +1011,7 @@ body {
   font-weight: 600;
 }
 
-/* Report modal — grade doughnut (Chart.js) */
+/* Report modal 鈥?grade doughnut (Chart.js) */
 .report-grades-pie {
   display: flex;
   flex-wrap: wrap;
@@ -1089,7 +1089,7 @@ body {
   color: var(--text-muted);
 }
 
-/* Teacher — learning card engagement preview (mock data) */
+/* Teacher 鈥?learning card engagement preview (mock data) */
 .modal__box--teacher-card-preview {
   max-width: min(880px, 99vw);
 }
@@ -1317,7 +1317,7 @@ html.theme-dark .teacher-card-preview__module {
   border: 1px solid var(--knowledge-student-status-done-border);
 }
 
-/* Dashboard-style student status doughnut (Chart.js — Knowledge inbox chip colors) */
+/* Dashboard-style student status doughnut (Chart.js 鈥?Knowledge inbox chip colors) */
 .student-status-pie {
   display: flex;
   flex-wrap: wrap;
@@ -1608,7 +1608,7 @@ html.theme-dark .teacher-card-preview__module {
   }
 }
 
-/* Learning card wizard — student preview + promo strip (class input step) */
+/* Learning card wizard 鈥?student preview + promo strip (class input step) */
 .learning-card-wizard-student-section {
   margin-top: 0.5rem;
   margin-bottom: 0.65rem;
@@ -1862,7 +1862,7 @@ html.theme-dark .learning-card-wizard-promo__icon {
   margin-bottom: 0.35rem;
 }
 
-/* Generate & review — Parents / Students as compact blue pills */
+/* Generate & review 鈥?Parents / Students as compact blue pills */
 .learning-card-review-tabs {
   display: flex;
   flex-direction: column;
@@ -1943,7 +1943,7 @@ html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tab
   margin-bottom: 0.25rem;
 }
 
-/* Image on top, text below — full-width banner, cover to lay flat across */
+/* Image on top, text below 鈥?full-width banner, cover to lay flat across */
 .learning-card-student-preview__body {
   display: flex;
   flex-direction: column;
@@ -1953,24 +1953,25 @@ html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tab
 
 .learning-card-student-preview__hero-wrap {
   width: 100%;
-  height: min(12rem, 32vh);
-  min-height: 7.5rem;
+  height: auto;
+  min-height: 0;
   border-radius: var(--radius-sm);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: var(--shadow);
-  background: color-mix(in srgb, var(--border-light) 50%, var(--surface));
+  background: transparent;
 }
 
 .learning-card-student-preview .learning-card-student-preview__hero {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: min(28rem, 56vh);
   margin: 0;
-  object-fit: cover;
-  object-position: center;
+  object-fit: contain;
+  object-position: center top;
 }
 
-/* Student tab — read-only markdown preview (compact) */
+/* Student tab 鈥?read-only markdown preview (compact) */
 .learning-card-student-md {
   margin-top: 0;
   padding: 0.4rem 0.55rem;
@@ -1999,7 +2000,7 @@ html.theme-dark .learning-card-review-tabs__bar--pills .learning-card-review-tab
   line-height: 1.2;
 }
 
-/* Section kickers (Getting started / Going deeper / Hands-on) — dark blue, semibold */
+/* Section kickers (Getting started / Going deeper / Hands-on) 鈥?dark blue, semibold */
 .learning-card-student-md .markdown-content h3,
 .knowledge-child-discovery-md.markdown-content h3 {
   margin: 0.4em 0 0.15em;
@@ -2014,7 +2015,7 @@ html.theme-dark .knowledge-child-discovery-md.markdown-content h3 {
   color: #7ab3f0;
 }
 
-/* “Why we picked it” — bold label, muted yellow (low saturation) */
+/* 鈥淲hy we picked it鈥?鈥?bold label, muted yellow (low saturation) */
 .learning-card-student-md .markdown-content strong {
   font-weight: 650;
   color: hsl(44, 28%, 44%);
@@ -2033,7 +2034,7 @@ html.theme-dark .knowledge-child-discovery-md.markdown-content strong {
   color: hsl(46, 22%, 68%);
 }
 
-/* Generate & review — tighter scroll + parent panel */
+/* Generate & review 鈥?tighter scroll + parent panel */
 #form-learning-card-review > .modal__scroll {
   padding-top: 0.45rem;
   padding-left: 1.2rem;
@@ -2346,7 +2347,7 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   box-sizing: border-box;
 }
 
-/* iOS-style circular check for “Tonight’s actions” preset list */
+/* iOS-style circular check for 鈥淭onight鈥檚 actions鈥?preset list */
 .learning-card-checkbox--round.learning-card-checkbox::before {
   width: 1.35rem;
   height: 1.35rem;
@@ -2662,7 +2663,7 @@ html.theme-dark .learning-card-confirm__highlight {
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
-/* React Aria TextField — see `FieldTextInput` / `FieldTextArea` */
+/* React Aria TextField 鈥?see `FieldTextInput` / `FieldTextArea` */
 .field--rac {
   display: block;
   width: 100%;
@@ -2682,7 +2683,7 @@ html.theme-dark .learning-card-confirm__highlight {
   margin-bottom: 0;
 }
 
-/* Radix UI Select — see `FieldSelect` */
+/* Radix UI Select 鈥?see `FieldSelect` */
 .field-select__trigger.field__input {
   max-width: none;
   display: inline-flex;
@@ -3009,7 +3010,7 @@ html.theme-dark .learning-card-confirm__highlight {
   width: auto;
   height: auto;
   border-radius: var(--radius-sm);
-  object-fit: contain;
+  object-fit: cover;
   background: var(--pill-bg);
 }
 
@@ -3149,7 +3150,7 @@ html.theme-dark .learning-card-confirm__highlight {
   border-left: 3px solid var(--link-blue);
 }
 
-/* Knowledge — subject / status chips (unified blue) */
+/* Knowledge 鈥?subject / status chips (unified blue) */
 .knowledge-inbox__labels {
   display: flex;
   flex-wrap: wrap;
@@ -3217,7 +3218,7 @@ html.theme-dark .learning-card-confirm__highlight {
   color: var(--link-blue);
 }
 
-/* Parent progress in inbox / header — rectangular (not pill) */
+/* Parent progress in inbox / header 鈥?rectangular (not pill) */
 .panel--knowledge .knowledge-inbox__label--rect {
   border-radius: 4px;
   padding: 0.2rem 0.5rem;
@@ -3225,7 +3226,7 @@ html.theme-dark .learning-card-confirm__highlight {
   letter-spacing: 0.01em;
 }
 
-/* Student list / header: TODO (gray) · DOING (blue) · DONE (green) */
+/* Student list / header: TODO (gray) 路 DOING (blue) 路 DONE (green) */
 .panel--knowledge .knowledge-inbox__label--student-not-started {
   border-color: var(--knowledge-student-status-todo-border);
   background: var(--knowledge-student-status-todo-bg);
@@ -3298,7 +3299,7 @@ html.theme-dark .learning-card-confirm__highlight {
   flex-shrink: 0;
 }
 
-/* Knowledge — teacher-selected tonight tasks (quiz / practice / explain) */
+/* Knowledge 鈥?teacher-selected tonight tasks (quiz / practice / explain) */
 .knowledge-inbox__tasks {
   display: flex;
   flex-wrap: wrap;
@@ -3349,7 +3350,7 @@ html.theme-dark .learning-card-confirm__highlight {
   max-width: 100%;
 }
 
-/* Knowledge — LC completion (parent detail + student header): theme-aligned control */
+/* Knowledge 鈥?LC completion (parent detail + student header): theme-aligned control */
 .knowledge-lc-completion {
   display: inline-flex;
   align-items: center;
@@ -3434,7 +3435,7 @@ html.theme-dark .learning-card-confirm__highlight {
   gap: 0.35rem;
 }
 
-/* "Pick again" — absolute so it does not reserve vertical space above Done */
+/* "Pick again" 鈥?absolute so it does not reserve vertical space above Done */
 .knowledge-lc-finish-wrap > .knowledge-lc-finish-change {
   position: absolute;
   right: 0;
@@ -3470,7 +3471,7 @@ html.theme-dark .learning-card-confirm__highlight {
   cursor: default;
 }
 
-/* Finished state — color matches the chosen feedback */
+/* Finished state 鈥?color matches the chosen feedback */
 .knowledge-lc-finish-done-trigger--result-easy:disabled {
   background: rgb(21, 128, 61);
   color: #fff;
@@ -3564,7 +3565,7 @@ html.theme-dark .learning-card-confirm__highlight {
   color: var(--text);
 }
 
-/* Tonight actions — Quiz / Practice / Teach-back as one control group */
+/* Tonight actions 鈥?Quiz / Practice / Teach-back as one control group */
 .knowledge-tonight-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3714,7 +3715,7 @@ html.theme-dark .inbox-item__kind--broadcast {
 }
 
 /*
- * Markdown — lists (Tailwind preflight sets ul/ol { list-style: none }).
+ * Markdown 鈥?lists (Tailwind preflight sets ul/ol { list-style: none }).
  * Restore markers for rendered GFM everywhere `.markdown-content` is used.
  */
 .markdown-content ul,
@@ -3889,7 +3890,7 @@ html.theme-dark .inbox-item__kind--broadcast {
 }
 
 /*
- * Knowledge — assistant messages: flat transcript (no bubble), like ChatGPT / Gemini.
+ * Knowledge 鈥?assistant messages: flat transcript (no bubble), like ChatGPT / Gemini.
  * User bubbles (.msg--out) unchanged.
  */
 .panel--knowledge #knowledge-msg-thread .msg--in {
@@ -3911,6 +3912,53 @@ html.theme-dark .inbox-item__kind--broadcast {
 .panel--knowledge #knowledge-msg-thread .msg--in .markdown-content--msg-in {
   font-size: 0.92rem;
   line-height: 1.6;
+}
+
+.knowledge-ai-thinking__row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.knowledge-ai-thinking__label {
+  letter-spacing: 0.01em;
+}
+
+.knowledge-ai-thinking__dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.knowledge-ai-thinking__dots span {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--accent-primary);
+  opacity: 0.35;
+  animation: knowledge-thinking-dot 1s ease-in-out infinite;
+}
+
+.knowledge-ai-thinking__dots span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.knowledge-ai-thinking__dots span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes knowledge-thinking-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
 }
 
 /* Mood */
@@ -3951,7 +3999,7 @@ html.theme-dark .inbox-item__kind--broadcast {
   margin: 0;
 }
 
-/* Student Mood: one full page inside the canvas — no inner scroll, no “card” rounding on the blue block */
+/* Student Mood: one full page inside the canvas 鈥?no inner scroll, no 鈥渃ard鈥?rounding on the blue block */
 .main__canvas-inner:has(#panel-mood.panel--mood.panel--student-fill.is-visible) {
   overflow-y: hidden;
 }
@@ -4516,7 +4564,7 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
   background: transparent;
 }
 
-/* Student Knowledge — discovery (hero + curated videos), distinct from parent summary thread */
+/* Student Knowledge 鈥?discovery (hero + curated videos), distinct from parent summary thread */
 .knowledge-child-discovery {
   margin-bottom: 1rem;
   padding: 0.75rem 0.85rem 1rem;
@@ -4528,11 +4576,13 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
 .knowledge-child-discovery__hero {
   display: block;
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+  height: auto;
+  max-height: min(28rem, 56vh);
+  object-fit: contain;
   border-radius: var(--radius-sm);
   margin-bottom: 0.65rem;
   box-shadow: var(--shadow);
+  background: transparent;
 }
 
 .knowledge-child-discovery__source {
@@ -4570,14 +4620,14 @@ html.theme-dark .knowledge-child-discovery {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Mood — student check-in (blue theme, design reference) */
+/* Mood 鈥?student check-in (blue theme, design reference) */
 /* -------------------------------------------------------------------------- */
 
 .mood-checkin--blue {
   --mood-bg-top: #e3f0ff;
   --mood-bg-mid: #e8f4fc;
   --mood-bg-bottom: #d8e8f8;
-  /* Outer-only shadow — avoid inset white line / toolbar drop-shadow that reads as a bright band */
+  /* Outer-only shadow 鈥?avoid inset white line / toolbar drop-shadow that reads as a bright band */
   --mood-surface-shadow:
     0 8px 32px rgba(11, 87, 208, 0.09),
     0 2px 10px rgba(60, 64, 67, 0.04);
