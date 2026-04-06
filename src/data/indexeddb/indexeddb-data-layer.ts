@@ -1,10 +1,26 @@
 import { bridgeDb } from './bridge-db';
-import type { DataLayer, LearningCardsRepository, StudentMoodsRepository, UsersRepository } from '../repositories';
+import type {
+  DataLayer,
+  LearningCardsRepository,
+  ReportsRepository,
+  StudentMoodsRepository,
+  UsersRepository,
+} from '../repositories';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
+import type { ReportBackend } from '../entity/report-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
+import { normalizeReportBackend } from '../report-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { UserBackend } from '../entity/user-backend';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
+
+function sortBySentAtDesc(a: ReportBackend, b: ReportBackend): number {
+  const ta = Date.parse(a.sentAt);
+  const tb = Date.parse(b.sentAt);
+  const na = Number.isFinite(ta) ? ta : 0;
+  const nb = Number.isFinite(tb) ? tb : 0;
+  return nb - na;
+}
 
 function sortByCreatedAtDesc(a: LearningCardBackend, b: LearningCardBackend): number {
   const ta = Date.parse(a.createdAt);
@@ -132,9 +148,44 @@ class IndexedDbUsersRepo implements UsersRepository {
   }
 }
 
+class IndexedDbReportsRepo implements ReportsRepository {
+  async listAll(): Promise<ReportBackend[]> {
+    const rows = await bridgeDb.reports.toArray();
+    return rows.map((r) => normalizeReportBackend(r)).sort(sortBySentAtDesc);
+  }
+
+  async listByAuthorUserId(authorUserId: string): Promise<ReportBackend[]> {
+    const id = authorUserId.trim();
+    if (!id) return [];
+    const rows = await bridgeDb.reports.toArray();
+    return rows
+      .filter((r) => {
+        if (r.authorUserId === id) return true;
+        if (id === 'teacher-1' && r.authorUserId === '1') return true;
+        return false;
+      })
+      .map((r) => normalizeReportBackend(r))
+      .sort(sortBySentAtDesc);
+  }
+
+  async get(id: string): Promise<ReportBackend | undefined> {
+    const raw = await bridgeDb.reports.get(id);
+    return raw ? normalizeReportBackend(raw) : undefined;
+  }
+
+  async put(report: ReportBackend): Promise<void> {
+    await bridgeDb.reports.put(normalizeReportBackend(report));
+  }
+
+  async delete(id: string): Promise<void> {
+    await bridgeDb.reports.delete(id);
+  }
+}
+
 export class IndexedDbDataLayer implements DataLayer {
   readonly mode = 'indexeddb' as const;
   readonly learningCards = new IndexedDbLearningCardsRepo();
   readonly studentMoods = new IndexedDbStudentMoodsRepo();
   readonly users = new IndexedDbUsersRepo();
+  readonly reports = new IndexedDbReportsRepo();
 }

@@ -11,11 +11,35 @@ import {
   type SetStateAction,
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
-import type { InboxItem, LearningCardItem, ModalState, Module, Role, ThreadMessage } from '@/bridge/types';
+import {
+  threadMessageFromReportBackend,
+  threadMessageFromTeacherReportPayload,
+} from '@/bridge/teacher-report-thread';
+import type { InboxItem, LearningCardItem, ModalState, Module, Role, TeacherReportPayload, ThreadMessage } from '@/bridge/types';
 import { resolveParentSummaryFromLearningCardItem } from '@/data';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
+import { REPORT_SCHEMA_VERSION, type ReportBackend } from '@/data/entity/report-backend';
 import type { UserBackend } from '@/data/entity/user-backend';
+
+function resolveTeacherAuthorId(users: UserBackend[], currentUserId: string | null): string {
+  if (currentUserId) {
+    const u = users.find((x) => x.id === currentUserId);
+    if (u?.role === 'teacher') return u.id;
+  }
+  return users.find((u) => u.role === 'teacher')?.id ?? 'teacher-1';
+}
+
+function dedupeInboxByIdKeepFirst(items: InboxItem[]): InboxItem[] {
+  const seen = new Set<string>();
+  const out: InboxItem[] = [];
+  for (const item of items) {
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    out.push(item);
+  }
+  return out;
+}
 
 function pickDefaultUserId(list: UserBackend[]): string | null {
   if (list.length === 0) return null;
@@ -45,6 +69,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
       ...m,
       attachments: m.attachments?.map((a) => ({ ...a })),
       learningCard: m.learningCard ? { ...m.learningCard } : undefined,
+      teacherReport: m.teacherReport ? { ...m.teacherReport } : undefined,
     }));
   }
   return out;
@@ -73,7 +98,7 @@ interface BridgeContextValue {
   threads: Record<string, ThreadMessage[]>;
   selectedInboxId: string | null;
   setSelectedInboxId: Dispatch<SetStateAction<string | null>>;
-  pushTeacherReport: (title: string, body: string, toStudents: boolean, toParents: boolean) => void;
+  pushTeacherReport: (payload: TeacherReportPayload) => void;
   /** Parent (or teacher “preview as parent”): open AI chat for a learning card in Knowledge. */
   openKnowledgeFromCard: (card: LearningCardItem) => void;
   appendChatMessage: (threadId: string, msg: ThreadMessage) => void;
@@ -147,6 +172,65 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
           setUsers([]);
           setCurrentUserIdState(null);
         }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** Restore report threads + inbox from IndexedDB after refresh. */
+  useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .reports.listAll()
+      .then((reports) => {
+        if (cancelled || reports.length === 0) return;
+        setThreads((prev) => {
+          const next = { ...prev };
+          for (const r of reports) {
+            const msg = threadMessageFromReportBackend(r);
+            if (r.audience.toStudents) {
+              const tid = r.messageThreadIds?.student ?? `${r.id}-s`;
+              if (!next[tid]) next[tid] = [{ ...msg }];
+            }
+            if (r.audience.toParents) {
+              const tid = r.messageThreadIds?.parent ?? `${r.id}-p`;
+              if (!next[tid]) next[tid] = [{ ...msg }];
+            }
+          }
+          return next;
+        });
+        setInboxByRole((prev) => {
+          const parentSeen = new Set(prev.parent.map((i) => i.id));
+          const studentSeen = new Set(prev.student.map((i) => i.id));
+          const parentAdds: InboxItem[] = [];
+          const studentAdds: InboxItem[] = [];
+          for (const r of reports) {
+            const dateStr = r.sentAt.slice(0, 10);
+            if (r.audience.toParents) {
+              const pid = r.messageThreadIds?.parent ?? `${r.id}-p`;
+              if (!parentSeen.has(pid)) {
+                parentSeen.add(pid);
+                parentAdds.push({ id: pid, title: r.title, date: dateStr, kind: 'report' });
+              }
+            }
+            if (r.audience.toStudents) {
+              const sid = r.messageThreadIds?.student ?? `${r.id}-s`;
+              if (!studentSeen.has(sid)) {
+                studentSeen.add(sid);
+                studentAdds.push({ id: sid, title: r.title, date: dateStr, kind: 'report' });
+              }
+            }
+          }
+          return {
+            ...prev,
+            parent: dedupeInboxByIdKeepFirst([...parentAdds, ...prev.parent]),
+            student: dedupeInboxByIdKeepFirst([...studentAdds, ...prev.student]),
+          };
+        });
+      })
+      .catch(() => {
+        /* ignore */
       });
     return () => {
       cancelled = true;
@@ -241,12 +325,40 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     applyRoleNavigation(r);
   };
 
-  const pushTeacherReport = (title: string, body: string, toStudents: boolean, toParents: boolean) => {
+  const pushTeacherReport = (payload: TeacherReportPayload) => {
+    const { title, summary, body, toStudents, toParents } = payload;
     const dateStr = new Date().toISOString().slice(0, 10);
     const baseId = `rep-${Date.now()}`;
-    const trimmed = body.trim();
-    const excerpt = trimmed.length > 600 ? `${trimmed.slice(0, 600)}…` : trimmed;
-    const threadLine: ThreadMessage = { who: 'Ms. Lee', type: 'in', text: excerpt };
+    const threadLine = threadMessageFromTeacherReportPayload({
+      title,
+      summary,
+      body,
+      toStudents,
+      toParents,
+    });
+
+    const iso = new Date().toISOString();
+    const reportRecord: ReportBackend = {
+      id: baseId,
+      schemaVersion: REPORT_SCHEMA_VERSION,
+      createdAt: iso,
+      updatedAt: iso,
+      authorUserId: resolveTeacherAuthorId(users, currentUserId),
+      sentAt: iso,
+      title,
+      summary,
+      body,
+      audience: { toStudents, toParents },
+      messageThreadIds: {
+        ...(toStudents ? { student: `${baseId}-s` } : {}),
+        ...(toParents ? { parent: `${baseId}-p` } : {}),
+      },
+    };
+    void getDataLayer()
+      .reports.put(reportRecord)
+      .catch(() => {
+        /* ignore IndexedDB write errors */
+      });
 
     setThreads((prev) => {
       const next = { ...prev };
@@ -256,7 +368,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       }
       if (toParents) {
         const pid = `${baseId}-p`;
-        next[pid] = [{ who: threadLine.who, type: threadLine.type, text: threadLine.text }];
+        next[pid] = [{ ...threadLine }];
       }
       return next;
     });
@@ -267,7 +379,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         const sid = `${baseId}-s`;
         next.student.unshift({
           id: sid,
-          title: `[Report] ${title}`,
+          title,
           date: dateStr,
           kind: 'report',
         });
@@ -276,7 +388,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         const pid = `${baseId}-p`;
         next.parent.unshift({
           id: pid,
-          title: `[Report] ${title}`,
+          title,
           date: dateStr,
           kind: 'report',
         });

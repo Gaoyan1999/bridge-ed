@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
 import { ReportModal } from '@/bridge/components/ReportModal';
@@ -145,7 +146,15 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
 }
 
 export function BridgeModals() {
+  const { t } = useTranslation();
   const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
+  const [reportToast, setReportToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!reportToast) return;
+    const id = window.setTimeout(() => setReportToast(null), 4500);
+    return () => clearTimeout(id);
+  }, [reportToast]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -161,8 +170,19 @@ export function BridgeModals() {
     closeModal();
   };
 
+  const withToast = (node: ReactNode) => (
+    <>
+      {node}
+      {reportToast ? (
+        <div className="bridge-toast" role="status" aria-live="polite">
+          {reportToast}
+        </div>
+      ) : null}
+    </>
+  );
+
   if (modal.type === 'generic') {
-    return (
+    return withToast(
       <div className="modal" id="modal-generic" role="dialog" aria-modal="true" aria-labelledby="modal-generic-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
@@ -182,34 +202,34 @@ export function BridgeModals() {
             </div>
           </div>
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (modal.type === 'book') {
-    return (
+    return withToast(
       <div className="modal" id="modal-book" role="dialog" aria-modal="true" aria-labelledby="modal-book-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
           <BookModal onClose={onBackdropClose} />
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (modal.type === 'broadcast') {
-    return (
+    return withToast(
       <div className="modal" id="modal-broadcast" role="dialog" aria-modal="true" aria-labelledby="modal-broadcast-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded">
           <BroadcastModal onClose={onBackdropClose} />
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (modal.type === 'learningCard') {
-    return (
+    return withToast(
       <div
         className="modal"
         id="modal-learning-card"
@@ -221,24 +241,28 @@ export function BridgeModals() {
         <div className="modal__box modal__box--rounded modal__box--xlarge">
           <LearningCardModal onClose={onBackdropClose} onSaved={bumpLearningCards} />
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (modal.type === 'report') {
-    return (
+    return withToast(
       <div className="modal" id="modal-report" role="dialog" aria-modal="true" aria-labelledby="modal-report-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded modal__box--report">
-          <ReportModal onClose={onBackdropClose} pushTeacherReport={pushTeacherReport} />
+          <ReportModal
+            onClose={onBackdropClose}
+            pushTeacherReport={pushTeacherReport}
+            onSent={() => setReportToast(t('dashboard.teacher.reportModal.previewSuccess'))}
+          />
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (modal.type === 'teacherCardPreviewTodo') {
     const { card } = modal;
-    return (
+    return withToast(
       <div
         className="modal"
         id="modal-teacher-card-preview"
@@ -250,9 +274,9 @@ export function BridgeModals() {
         <div className="modal__box modal__box--rounded modal__box--xlarge modal__box--teacher-card-preview">
           <TeacherCardPreviewTodoModal card={card} onClose={onBackdropClose} />
         </div>
-      </div>
+      </div>,
     );
   }
 
-  return null;
+  return withToast(null);
 }

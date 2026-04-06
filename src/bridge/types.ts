@@ -18,6 +18,15 @@ export type ThreadMessageAttachment = {
   name?: string;
 };
 
+/** Payload for a class report shown in Messages (same layout as the teacher preview modal). */
+export type TeacherReportPayload = {
+  title: string;
+  summary: string;
+  body: string;
+  toStudents: boolean;
+  toParents: boolean;
+};
+
 export interface ThreadMessage {
   who: string;
   type: 'in' | 'out';
@@ -25,6 +34,8 @@ export interface ThreadMessage {
   attachments?: ThreadMessageAttachment[];
   /** Rich preview when a learning card is pushed into Messages (demo / future API). */
   learningCard?: LearningCardItem;
+  /** Full report layout when the teacher sends a class report to Messages. */
+  teacherReport?: TeacherReportPayload;
 }
 
 /** Parent dashboard children linked to mood check-ins (demo roster). */

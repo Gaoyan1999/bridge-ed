@@ -1,15 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
+import type { InboxItem } from '@/bridge/types';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
+import { ChatTeacherReportMessage } from '@/bridge/components/ChatTeacherReportMessage';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
+
+function ChatInboxItemContent({ item }: { item: InboxItem }) {
+  const { t } = useTranslation();
+  const showKind = item.kind === 'report' || item.kind === 'broadcast';
+  return (
+    <div className="inbox-item__block">
+      <div className="inbox-item__meta-row">
+        {showKind ? (
+          <span
+            className={cx(
+              'inbox-item__kind',
+              item.kind === 'report' ? 'inbox-item__kind--report' : 'inbox-item__kind--broadcast',
+            )}
+          >
+            {item.kind === 'report' ? t('chat.inboxKindReport') : t('chat.inboxKindBroadcast')}
+          </span>
+        ) : null}
+        <time className="inbox-item__meta" dateTime={item.date}>
+          {item.date}
+        </time>
+      </div>
+      <span className="inbox-item__headline">{item.title}</span>
+    </div>
+  );
+}
 
 export function ChatPanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
@@ -117,16 +144,41 @@ export function ChatPanel({ active }: { active: boolean }) {
                 data-id={item.id}
                 onClick={() => setSelectedInboxId(item.id)}
               >
-                <div className="inbox-item__title">{item.title}</div>
-                <div className="inbox-item__meta">{item.date}</div>
+                <ChatInboxItemContent item={item} />
               </button>
             ))
           )}
         </div>
         <div className="thread-pane">
           <div className="thread-header">
-            <h3 className="thread-title" id="thread-title">
-              {current?.title ?? t('chat.selectThread')}
+            <h3
+              className={cx(
+                'thread-title',
+                current &&
+                  (current.kind === 'report' || current.kind === 'broadcast') &&
+                  'thread-title--stacked',
+              )}
+              id="thread-title"
+            >
+              {current ? (
+                <>
+                  {(current.kind === 'report' || current.kind === 'broadcast') && (
+                    <div className="thread-title__meta-row">
+                      <span
+                        className={cx(
+                          'inbox-item__kind',
+                          current.kind === 'report' ? 'inbox-item__kind--report' : 'inbox-item__kind--broadcast',
+                        )}
+                      >
+                        {current.kind === 'report' ? t('chat.inboxKindReport') : t('chat.inboxKindBroadcast')}
+                      </span>
+                    </div>
+                  )}
+                  <span className="thread-title__text">{current.title}</span>
+                </>
+              ) : (
+                t('chat.selectThread')
+              )}
             </h3>
             <Button
               variant="secondary"
@@ -145,11 +197,12 @@ export function ChatPanel({ active }: { active: boolean }) {
             ) : (
               msgs.map((m, idx) => (
                 <div
-                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}`}
+                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
                   className={cx(
                     'msg',
                     m.type === 'out' ? 'msg--out' : 'msg--in',
                     m.learningCard && 'msg--learning-card',
+                    m.teacherReport && 'msg--teacher-report',
                   )}
                 >
                   <div className="msg__who">
@@ -158,6 +211,8 @@ export function ChatPanel({ active }: { active: boolean }) {
                   <MessageAttachmentGrid attachments={m.attachments} />
                   {m.learningCard ? (
                     <ChatLearningCardMessage card={m.learningCard} />
+                  ) : m.teacherReport ? (
+                    <ChatTeacherReportMessage report={m.teacherReport} />
                   ) : m.text?.trim() ? (
                     <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
                   ) : null}

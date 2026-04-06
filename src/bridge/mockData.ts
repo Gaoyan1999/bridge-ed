@@ -303,7 +303,7 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 
 export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
   parent: [
-    { id: 'n1', title: '[Broadcast] Practice set: quadratics', date: '2026-04-01', kind: 'broadcast' },
+    { id: 'n1', title: 'Practice set: quadratics', date: '2026-04-01', kind: 'broadcast' },
     { id: 'n2', title: 'Ms. Lee: note on next week’s quiz', date: '2026-03-30', kind: 'dm' },
   ],
   student: [{ id: 's1', title: 'Class: submit homework by Friday', date: '2026-04-02', kind: 'broadcast' }],
@@ -350,7 +350,7 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
 export const REPORT_DEMO_EXAM_LABEL =
   'Math 9 — Unit test: Quadratic functions (Apr 4, 2026) · 28 students · 45 min';
 
-export const REPORT_DRAFT_TITLE = 'Math 9 — Unit test: Quadratic functions (class report)';
+export const REPORT_DRAFT_TITLE = 'Math 9 — Unit test: Quadratic functions';
 
 export const REPORT_DRAFT_SUMMARY =
   'Mean score sits in the mid band; students who did well handled vertex form and the discriminant. The most common slip was sign errors when moving terms across the equals sign—worth one short review before the next quiz.';
