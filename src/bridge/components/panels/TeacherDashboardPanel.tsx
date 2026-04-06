@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
-import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS, DASH_TODOS } from '@/bridge/mockData';
+import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS } from '@/bridge/mockData';
 import { getDataLayer, getDebugMode } from '@/data';
 import { HARDCODED_LEARNING_CARD_AUTHOR_USER_ID, learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
 import { LearningCardTile } from '@/bridge/components/LearningCardTile';
 import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
+import { TeacherDashboardTodoList } from '@/bridge/components/TeacherDashboardTodoList';
 import { Button } from '@/bridge/components/ui/Button';
 
 export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
@@ -118,17 +119,7 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
     </DashboardCard>,
 
     <DashboardCard key="todo" span={6} id="dash-todo-title" title={t('dashboard.teacher.today')} titleColor="warm">
-      <ul className="todo-list" id="dash-todo-list">
-        {DASH_TODOS.map((todo) => {
-          const id = `todo-${todo.id}`;
-          return (
-            <li key={todo.id}>
-              <input type="checkbox" id={id} checked={todo.done} readOnly disabled />
-              <label htmlFor={id}>{todo.text}</label>
-            </li>
-          );
-        })}
-      </ul>
+      <TeacherDashboardTodoList authorUserId={teacherAuthorId} />
     </DashboardCard>,
 
     <DashboardCard key="publish" span={6} id="dash-publish-title" title={t('dashboard.teacher.recentPosts')} titleColor="lavender">

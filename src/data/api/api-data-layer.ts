@@ -13,6 +13,7 @@ import type {
   LearningCardsRepository,
   ReportsRepository,
   StudentMoodsRepository,
+  TeacherTodoListsRepository,
   UsersRepository,
 } from '../repositories';
 import type { BroadcastBackend } from '../entity/broadcast-backend';
@@ -20,6 +21,7 @@ import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { ReportBackend } from '../entity/report-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
+import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
 import type { UserBackend } from '../entity/user-backend';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
@@ -166,6 +168,18 @@ class ApiBroadcastsRepo implements BroadcastsRepository {
   }
 }
 
+/** Future: GET/PUT `/teacher-todo-lists/:userId` — local demo uses IndexedDB only. */
+class ApiTeacherTodoListsRepo implements TeacherTodoListsRepository {
+  async get(userId: string): Promise<TeacherTodoListBackend | undefined> {
+    void userId;
+    return undefined;
+  }
+
+  async put(doc: TeacherTodoListBackend): Promise<void> {
+    void doc;
+  }
+}
+
 export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
@@ -173,4 +187,5 @@ export class ApiDataLayer implements DataLayer {
   readonly users = new ApiUsersRepo();
   readonly reports = new ApiReportsRepo();
   readonly broadcasts = new ApiBroadcastsRepo();
+  readonly teacherTodoLists = new ApiTeacherTodoListsRepo();
 }

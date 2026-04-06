@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import type { InboxItem } from '@/bridge/types';
 import { isBroadcastFeedThreadId } from '@/bridge/broadcast-inbox-ids';
+import { buildChatInboxItems, buildFeedInboxItems, type ChatInboxRow } from '@/bridge/chat-inbox-mock';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
@@ -14,23 +15,10 @@ import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
-function formatBroadcastClockLabel(iso: string, locale: string): string {
+function formatClockLabel(iso: string, locale: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
-}
-
-/** One broadcast row + other threads (broadcasts are merged into a single feed per role). */
-function buildDisplayInboxItems(items: InboxItem[]): InboxItem[] {
-  const byDateDesc = (a: InboxItem, b: InboxItem) => {
-    const c = b.date.localeCompare(a.date);
-    return c !== 0 ? c : b.id.localeCompare(a.id);
-  };
-  const broadcast =
-    items.find((i) => i.kind === 'broadcast' && isBroadcastFeedThreadId(i.id)) ??
-    items.find((i) => i.kind === 'broadcast');
-  const others = items.filter((i) => i.kind !== 'broadcast').sort(byDateDesc);
-  return broadcast ? [broadcast, ...others] : others;
 }
 
 function ChatInboxItemContent({ item }: { item: InboxItem }) {
@@ -62,10 +50,32 @@ function ChatInboxItemContent({ item }: { item: InboxItem }) {
   );
 }
 
+function ChatInboxChatRowContent({ row }: { row: ChatInboxRow }) {
+  const { t } = useTranslation();
+  return (
+    <div className="inbox-item__block">
+      <div className="inbox-item__meta-row">
+        <span
+          className={cx(
+            'inbox-item__kind',
+            row.section === 'group' ? 'inbox-item__kind--group' : 'inbox-item__kind--private',
+          )}
+        >
+          {row.section === 'group' ? t('chat.inboxKindGroup') : t('chat.inboxKindPrivate')}
+        </span>
+        <time className="inbox-item__meta" dateTime={row.date}>
+          {row.date}
+        </time>
+      </div>
+      <span className="inbox-item__headline">{row.title}</span>
+    </div>
+  );
+}
+
 export function ChatPanel({ active }: { active: boolean }) {
   const { t, i18n } = useTranslation();
-  const formatBroadcastTime = useMemo(
-    () => (iso: string) => formatBroadcastClockLabel(iso, i18n.language),
+  const formatClockTime = useMemo(
+    () => (iso: string) => formatClockLabel(iso, i18n.language),
     [i18n.language],
   );
   const {
@@ -89,28 +99,34 @@ export function ChatPanel({ active }: { active: boolean }) {
   });
   const inboxItems = inboxByRole[role];
   const inboxKey = inboxItems.map((i) => i.id).join(',');
-  const displayItems = useMemo(() => buildDisplayInboxItems(inboxItems), [inboxItems]);
+  const feedItems = useMemo(() => buildFeedInboxItems(inboxItems), [inboxItems]);
+  const chatItems = useMemo(() => buildChatInboxItems(role, inboxItems), [role, inboxItems]);
+  const orderedIds = useMemo(() => {
+    return [
+      ...feedItems.map((i) => i.id),
+      ...chatItems.map((r) => r.id),
+    ];
+  }, [feedItems, chatItems]);
 
   useEffect(() => {
-    if (!displayItems.length) {
+    if (!orderedIds.length) {
       setSelectedInboxId(null);
       return;
     }
-    setSelectedInboxId((cur) =>
-      cur && displayItems.some((i) => i.id === cur) ? cur : displayItems[0]!.id,
-    );
-  }, [role, inboxKey, inboxByRole, displayItems, setSelectedInboxId]);
+    setSelectedInboxId((cur) => (cur && orderedIds.includes(cur) ? cur : orderedIds[0]!));
+  }, [role, inboxKey, orderedIds, setSelectedInboxId]);
 
   const threadId =
-    selectedInboxId && displayItems.some((i) => i.id === selectedInboxId)
-      ? selectedInboxId
-      : displayItems[0]?.id;
-  const current = displayItems.find((i) => i.id === threadId);
+    selectedInboxId && orderedIds.includes(selectedInboxId) ? selectedInboxId : orderedIds[0];
+  const currentFeed = feedItems.find((i) => i.id === threadId);
+  const currentChat = chatItems.find((r) => r.id === threadId);
+  const isGroupThread = currentChat?.section === 'group';
   const msgs = threadId ? threads[threadId] ?? [] : [];
 
-  /** Report + broadcast feeds are read-only (no back-and-forth in this panel). */
   const showComposer =
-    !!current && current.kind !== 'report' && current.kind !== 'broadcast';
+    !!threadId &&
+    (currentChat != null ||
+      (!!currentFeed && currentFeed.kind !== 'report' && currentFeed.kind !== 'broadcast'));
 
   const placeholder =
     role === 'parent'
@@ -136,6 +152,8 @@ export function ChatPanel({ active }: { active: boolean }) {
     clear();
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  const hasChatBlock = chatItems.length > 0;
 
   return (
     <section
@@ -167,23 +185,54 @@ export function ChatPanel({ active }: { active: boolean }) {
       />
 
       <div className="chat-layout chat-layout--rounded">
-        <div className="inbox" id="inbox-list">
-          {!displayItems.length ? (
+        <div className="inbox inbox--split" id="inbox-list">
+          {!orderedIds.length ? (
             <p className="panel__hint" style={{ padding: '1rem' }}>
               {t('chat.emptyInbox')}
             </p>
           ) : (
-            displayItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={cx('inbox-item', item.id === threadId && 'is-active')}
-                data-id={item.id}
-                onClick={() => setSelectedInboxId(item.id)}
-              >
-                <ChatInboxItemContent item={item} />
-              </button>
-            ))
+            <>
+              {feedItems.length > 0 ? (
+                <div className="inbox-feed" role="group" aria-label={t('chat.inboxFeedAria')}>
+                  {feedItems.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={cx(
+                        'inbox-item',
+                        item.id === threadId && 'is-active',
+                        item.kind === 'broadcast' &&
+                          isBroadcastFeedThreadId(item.id) &&
+                          'inbox-item--broadcast-feed',
+                      )}
+                      data-id={item.id}
+                      onClick={() => setSelectedInboxId(item.id)}
+                    >
+                      <ChatInboxItemContent item={item} />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {hasChatBlock ? (
+                <div className="inbox-chat-wrap">
+                  <div className="inbox-split-heading">{t('chat.inboxSectionChats')}</div>
+                  <div role="group" aria-label={t('chat.inboxChatAria')}>
+                    {chatItems.map((row) => (
+                      <button
+                        key={row.id}
+                        type="button"
+                        className={cx('inbox-item', 'inbox-item--chat', row.id === threadId && 'is-active')}
+                        data-id={row.id}
+                        onClick={() => setSelectedInboxId(row.id)}
+                      >
+                        <ChatInboxChatRowContent row={row} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </>
           )}
         </div>
         <div className="thread-pane">
@@ -191,31 +240,53 @@ export function ChatPanel({ active }: { active: boolean }) {
             <h3
               className={cx(
                 'thread-title',
-                current &&
-                  (current.kind === 'report' || current.kind === 'broadcast') &&
+                currentFeed &&
+                  (currentFeed.kind === 'report' || currentFeed.kind === 'broadcast') &&
                   'thread-title--stacked',
               )}
               id="thread-title"
             >
-              {current ? (
+              {currentFeed ? (
                 <>
-                  {(current.kind === 'report' || current.kind === 'broadcast') && (
+                  {(currentFeed.kind === 'report' || currentFeed.kind === 'broadcast') && (
                     <div className="thread-title__meta-row">
                       <span
                         className={cx(
                           'inbox-item__kind',
-                          current.kind === 'report' ? 'inbox-item__kind--report' : 'inbox-item__kind--broadcast',
+                          currentFeed.kind === 'report'
+                            ? 'inbox-item__kind--report'
+                            : 'inbox-item__kind--broadcast',
                         )}
                       >
-                        {current.kind === 'report' ? t('chat.inboxKindReport') : t('chat.inboxKindBroadcast')}
+                        {currentFeed.kind === 'report'
+                          ? t('chat.inboxKindReport')
+                          : t('chat.inboxKindBroadcast')}
                       </span>
                     </div>
                   )}
                   <span className="thread-title__text">
-                    {current.kind === 'broadcast' && isBroadcastFeedThreadId(current.id)
+                    {currentFeed.kind === 'broadcast' && isBroadcastFeedThreadId(currentFeed.id)
                       ? t('chat.inboxBroadcastFeedTitle')
-                      : current.title}
+                      : currentFeed.title}
                   </span>
+                </>
+              ) : currentChat ? (
+                <>
+                  <div className="thread-title__meta-row">
+                    <span
+                      className={cx(
+                        'inbox-item__kind',
+                        currentChat.section === 'group'
+                          ? 'inbox-item__kind--group'
+                          : 'inbox-item__kind--private',
+                      )}
+                    >
+                      {currentChat.section === 'group'
+                        ? t('chat.inboxKindGroup')
+                        : t('chat.inboxKindPrivate')}
+                    </span>
+                  </div>
+                  <span className="thread-title__text">{currentChat.title}</span>
                 </>
               ) : (
                 t('chat.selectThread')
@@ -239,43 +310,66 @@ export function ChatPanel({ active }: { active: boolean }) {
               msgs.map((m, idx) => {
                 const whoLabel =
                   m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who;
+                const showTeacherSpeakerLabel =
+                  isGroupThread &&
+                  (m.speakerRole === 'teacher' ||
+                    (m.who === 'You'
+                      ? role === 'teacher'
+                      : /^(Ms\.?|Mr\.?|Mrs\.?|Teacher\b)/i.test(m.who.trim())));
                 return (
-                <div
-                  key={`${idx}-${m.who}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
-                  className={cx(
-                    'msg',
-                    m.type === 'out' ? 'msg--out' : 'msg--in',
-                    m.learningCard && 'msg--learning-card',
-                    m.teacherReport && 'msg--teacher-report',
-                    m.broadcastPost && 'msg--broadcast',
-                  )}
-                >
-                  {m.broadcastPost ? (
-                    <div className="msg__broadcast-meta">
-                      <span className="msg__who">{whoLabel}</span>
-                      {m.broadcastPost.sentAt ? (
-                        <time className="msg__time" dateTime={m.broadcastPost.sentAt}>
-                          {formatBroadcastTime(m.broadcastPost.sentAt)}
-                        </time>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div className="msg__who">{whoLabel}</div>
-                  )}
-                  <MessageAttachmentGrid attachments={m.attachments} />
-                  {m.learningCard ? (
-                    <ChatLearningCardMessage card={m.learningCard} />
-                  ) : m.teacherReport ? (
-                    <ChatTeacherReportMessage report={m.teacherReport} />
-                  ) : m.broadcastPost ? (
-                    <div className="msg__broadcast-card">
-                      <div className="msg__broadcast-title">{m.broadcastPost.title}</div>
-                      <div className="msg__broadcast-body">{m.broadcastPost.body}</div>
-                    </div>
-                  ) : m.text?.trim() ? (
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
-                  ) : null}
-                </div>
+                  <div
+                    key={`${idx}-${m.who}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
+                    className={cx(
+                      'msg',
+                      m.type === 'out' ? 'msg--out' : 'msg--in',
+                      m.learningCard && 'msg--learning-card',
+                      m.teacherReport && 'msg--teacher-report',
+                      m.broadcastPost && 'msg--broadcast',
+                    )}
+                  >
+                    {m.broadcastPost ? (
+                      <div className="msg__broadcast-meta">
+                        <span className="msg__who-meta">
+                          <span className="msg__who">{whoLabel}</span>
+                          {showTeacherSpeakerLabel ? (
+                            <span className="msg__role-tag">{t('roles.teacher')}</span>
+                          ) : null}
+                        </span>
+                        {m.broadcastPost.sentAt ? (
+                          <time className="msg__time" dateTime={m.broadcastPost.sentAt}>
+                            {formatClockTime(m.broadcastPost.sentAt)}
+                          </time>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="msg__broadcast-meta">
+                        <span className="msg__who-meta">
+                          <span className="msg__who">{whoLabel}</span>
+                          {showTeacherSpeakerLabel ? (
+                            <span className="msg__role-tag">{t('roles.teacher')}</span>
+                          ) : null}
+                        </span>
+                        {m.sentAt ? (
+                          <time className="msg__time" dateTime={m.sentAt}>
+                            {formatClockTime(m.sentAt)}
+                          </time>
+                        ) : null}
+                      </div>
+                    )}
+                    <MessageAttachmentGrid attachments={m.attachments} />
+                    {m.learningCard ? (
+                      <ChatLearningCardMessage card={m.learningCard} />
+                    ) : m.teacherReport ? (
+                      <ChatTeacherReportMessage report={m.teacherReport} />
+                    ) : m.broadcastPost ? (
+                      <div className="msg__broadcast-card">
+                        <div className="msg__broadcast-title">{m.broadcastPost.title}</div>
+                        <div className="msg__broadcast-body">{m.broadcastPost.body}</div>
+                      </div>
+                    ) : m.text?.trim() ? (
+                      <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+                    ) : null}
+                  </div>
                 );
               })
             )}
@@ -334,13 +428,7 @@ export function ChatPanel({ active }: { active: boolean }) {
                     >
                       <ImagePlus strokeWidth={2} size={20} aria-hidden />
                     </Button>
-                    <Button
-                      variant="primary"
-                      pill
-                      className="btn--sm"
-                      id="chat-send"
-                      onClick={() => send()}
-                    >
+                    <Button variant="primary" pill className="btn--sm" id="chat-send" onClick={() => send()}>
                       {t('common.send')}
                     </Button>
                   </>

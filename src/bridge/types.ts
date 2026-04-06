@@ -39,6 +39,10 @@ export interface ThreadMessage {
   who: string;
   type: 'in' | 'out';
   text: string;
+  /** Optional message time (ISO 8601) for chat-like threads. */
+  sentAt?: string;
+  /** Optional speaker role for chat labeling (mock/demo first). */
+  speakerRole?: Role;
   attachments?: ThreadMessageAttachment[];
   /** Rich preview when a learning card is pushed into Messages (demo / future API). */
   learningCard?: LearningCardItem;

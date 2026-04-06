@@ -5,6 +5,7 @@ import type {
   LearningCardsRepository,
   ReportsRepository,
   StudentMoodsRepository,
+  TeacherTodoListsRepository,
   UsersRepository,
 } from '../repositories';
 import type { BroadcastBackend } from '../entity/broadcast-backend';
@@ -14,7 +15,9 @@ import { normalizeBroadcastBackend } from '../broadcast-mappers';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import { normalizeReportBackend } from '../report-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
+import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
 import type { UserBackend } from '../entity/user-backend';
+import { normalizeTeacherTodoListBackend } from '../teacher-todo-list-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
 function sortBySentAtDesc<T extends { sentAt: string }>(a: T, b: T): number {
@@ -219,6 +222,19 @@ class IndexedDbBroadcastsRepo implements BroadcastsRepository {
   }
 }
 
+class IndexedDbTeacherTodoListsRepo implements TeacherTodoListsRepository {
+  async get(userId: string): Promise<TeacherTodoListBackend | undefined> {
+    const id = userId.trim();
+    if (!id) return undefined;
+    const raw = await bridgeDb.teacherTodoLists.get(id);
+    return raw ? normalizeTeacherTodoListBackend(raw) : undefined;
+  }
+
+  async put(doc: TeacherTodoListBackend): Promise<void> {
+    await bridgeDb.teacherTodoLists.put(normalizeTeacherTodoListBackend(doc));
+  }
+}
+
 export class IndexedDbDataLayer implements DataLayer {
   readonly mode = 'indexeddb' as const;
   readonly learningCards = new IndexedDbLearningCardsRepo();
@@ -226,4 +242,5 @@ export class IndexedDbDataLayer implements DataLayer {
   readonly users = new IndexedDbUsersRepo();
   readonly reports = new IndexedDbReportsRepo();
   readonly broadcasts = new IndexedDbBroadcastsRepo();
+  readonly teacherTodoLists = new IndexedDbTeacherTodoListsRepo();
 }

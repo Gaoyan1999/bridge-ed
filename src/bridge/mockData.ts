@@ -136,6 +136,67 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
     },
   ],
   t2: [{ who: 'You', type: 'in', text: 'Draft not sent yet. Open Broadcast to continue editing.' }],
+  'mock-chat-parent-g1': [
+    {
+      who: 'Ms. Lee',
+      type: 'in',
+      speakerRole: 'teacher',
+      sentAt: '2026-04-05T08:40:00.000Z',
+      text: 'Reminder: review pack for Thursday. Optional extra problems are in the pinned PDF.',
+    },
+    { who: 'Sam', type: 'in', sentAt: '2026-04-05T09:15:00.000Z', text: 'Thanks — will print the PDF tonight.' },
+  ],
+  'mock-chat-parent-p1': [
+    {
+      who: 'PTA',
+      type: 'in',
+      sentAt: '2026-04-01T11:10:00.000Z',
+      text: 'Spring picnic signup closes Friday. Volunteers needed for setup at 10 AM.',
+    },
+  ],
+  'mock-chat-student-g1': [
+    { who: 'Alex', type: 'in', sentAt: '2026-04-04T15:25:00.000Z', text: 'Anyone free to check Q4 on the practice sheet?' },
+    { who: 'You', type: 'out', sentAt: '2026-04-04T15:27:00.000Z', text: 'I got k = 2 — want to compare steps?' },
+  ],
+  'mock-chat-student-p1': [
+    {
+      who: 'Ms. Lee',
+      type: 'in',
+      speakerRole: 'teacher',
+      sentAt: '2026-03-30T13:05:00.000Z',
+      text: 'If you’re stuck on the quiz review, message me the question number before 4 PM.',
+    },
+  ],
+  'mock-chat-teacher-g1': [
+    {
+      who: 'You',
+      type: 'out',
+      sentAt: '2026-04-06T07:30:00.000Z',
+      text: 'Unit test recap pushed to families — see Report in Messages.',
+    },
+    {
+      who: 'Carol’s parent',
+      type: 'in',
+      sentAt: '2026-04-06T07:46:00.000Z',
+      text: 'Thanks for the summary. Will review Example 3 with Carol.',
+    },
+  ],
+  'mock-chat-teacher-g2': [
+    {
+      who: 'Dept lead',
+      type: 'in',
+      sentAt: '2026-04-02T09:10:00.000Z',
+      text: 'Please confirm quadratics scope for next term by Friday EOD.',
+    },
+  ],
+  'mock-chat-teacher-p1': [
+    {
+      who: 'Alex Wang’s parent',
+      type: 'in',
+      sentAt: '2026-04-03T10:20:00.000Z',
+      text: 'Could we move Wednesday’s check-in to 6 PM?',
+    },
+  ],
 };
 
 /** Class report modal — simulated “Math 9 unit test (quadratics)” dataset. */
