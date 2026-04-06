@@ -1040,7 +1040,7 @@ body {
 
 /* Teacher — learning card engagement preview (mock data) */
 .modal__box--teacher-card-preview {
-  max-width: min(720px, 99vw);
+  max-width: min(880px, 99vw);
 }
 
 .teacher-card-preview__meta {
@@ -1055,6 +1055,139 @@ body {
   font-size: 0.8125rem;
   color: var(--text-muted);
   line-height: 1.45;
+}
+
+.teacher-card-preview__module {
+  margin-top: 1.25rem;
+  padding: 1rem 1rem 1.1rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-light);
+  background: color-mix(in srgb, var(--surface) 96%, var(--link-blue) 4%);
+}
+
+.teacher-card-preview__scroll > .teacher-card-preview__module:first-of-type {
+  margin-top: 0;
+}
+
+.teacher-card-preview__module-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.teacher-card-preview__module-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--link-blue);
+}
+
+.teacher-card-preview__module-head-text {
+  min-width: 0;
+}
+
+.teacher-card-preview__module-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.teacher-card-preview__module-lede {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.teacher-card-preview__progress-dashboard {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 480px) {
+  .teacher-card-preview__progress-dashboard {
+    justify-content: flex-start;
+  }
+}
+
+/* Learning progress module: keep doughnut left, legend on the right (no wrap under chart). */
+.teacher-card-preview__progress-dashboard .student-status-pie {
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.teacher-card-preview__progress-dashboard .student-status-pie__legend {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.teacher-card-preview__feedback-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .teacher-card-preview__feedback-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.teacher-card-preview__feedback-panel {
+  padding: 0.85rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--surface);
+  min-height: 0;
+}
+
+.teacher-card-preview__feedback-panel-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.teacher-card-preview__feedback-stat {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.teacher-card-preview__feedback-panel-lede {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.teacher-card-preview__feedback-empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+html.theme-dark .teacher-card-preview__module {
+  background: color-mix(in srgb, var(--surface) 92%, var(--link-blue) 8%);
 }
 
 .teacher-card-preview__stats {
@@ -1212,6 +1345,79 @@ body {
 }
 
 .student-status-pie__legend-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Finished students — self-report (matches Knowledge finish menu colors) */
+.student-finished-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+}
+
+.student-finished-pie__chart-wrap {
+  flex: 0 0 auto;
+  width: 8.5rem;
+  height: 8.5rem;
+  position: relative;
+}
+
+.student-finished-pie__chart {
+  width: 100%;
+  height: 100%;
+}
+
+.student-finished-pie__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.student-finished-pie__legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.45rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.student-finished-pie__swatch {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.student-finished-pie__legend-item--pretty-easy .student-finished-pie__swatch {
+  background: rgba(21, 128, 61, 0.22);
+  border: 1px solid rgba(21, 128, 61, 0.55);
+}
+
+.student-finished-pie__legend-item--think-get-it .student-finished-pie__swatch {
+  background: rgba(11, 87, 208, 0.18);
+  border: 1px solid rgba(11, 87, 208, 0.42);
+}
+
+.student-finished-pie__legend-item--challenge .student-finished-pie__swatch {
+  background: rgba(185, 28, 28, 0.2);
+  border: 1px solid rgba(185, 28, 28, 0.5);
+}
+
+.student-finished-pie__legend-label {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+}
+
+.student-finished-pie__legend-count {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   color: var(--text-muted);
@@ -1831,7 +2037,6 @@ html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--pa
 #form-learning-card-review .learning-card-ai-hint__icon-wrap {
   width: 1.45rem;
   height: 1.45rem;
-  margin-top: 0.04rem;
 }
 
 #form-learning-card-review .learning-card-ai-hint__text {
@@ -1950,7 +2155,7 @@ html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learni
 
 .learning-card-ai-hint {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 0.35rem;
   margin-bottom: 0.65rem;
@@ -1968,7 +2173,6 @@ html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learni
 
 .learning-card-ai-hint__icon-wrap {
   flex-shrink: 0;
-  margin-top: 0.08rem;
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
@@ -4154,7 +4358,7 @@ html.theme-dark .panel--knowledge #knowledge-msg-thread .msg--in {
   font-size: 0.92rem;
   line-height: 1.55;
   color: var(--text-muted);
-  white-space: pre-wrap;
+  /* Avoid pre-wrap here — it breaks ol/li layout (marker vs first line). Hard breaks come from Markdown `<br>`. */
   margin-bottom: 0.85rem;
 }
 
