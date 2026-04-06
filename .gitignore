@@ -6,6 +6,7 @@
 !backend/.env.example
 node_modules/
 __pycache__/
+.venv/
 *.py[cod]
 backend/data/
 
