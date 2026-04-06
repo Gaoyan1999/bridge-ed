@@ -3,6 +3,7 @@ import type { BroadcastBackend } from './entity/broadcast-backend';
 import type { LearningCardBackend } from './entity/learning-card-backend';
 import type { ReportBackend } from './entity/report-backend';
 import type { StudentMoodBackend } from './entity/student-mood-backend';
+import type { TeacherTodoListBackend } from './entity/teacher-todo-list-backend';
 import type { UserBackend } from './entity/user-backend';
 
 export interface LearningCardsRepository {
@@ -51,6 +52,12 @@ export interface BroadcastsRepository {
   delete(id: string): Promise<void>;
 }
 
+/** One `{ userId, list }` document per teacher (see `teacher-todo-list-backend.ts`). */
+export interface TeacherTodoListsRepository {
+  get(userId: string): Promise<TeacherTodoListBackend | undefined>;
+  put(doc: TeacherTodoListBackend): Promise<void>;
+}
+
 /** App data — swap implementation via `VITE_DATA_SOURCE`. */
 export interface DataLayer {
   readonly mode: DataSourceMode;
@@ -59,4 +66,5 @@ export interface DataLayer {
   readonly users: UsersRepository;
   readonly reports: ReportsRepository;
   readonly broadcasts: BroadcastsRepository;
+  readonly teacherTodoLists: TeacherTodoListsRepository;
 }
