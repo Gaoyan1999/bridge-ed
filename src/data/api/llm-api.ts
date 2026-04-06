@@ -57,6 +57,30 @@ const MOCK_CHILD_HERO_IMAGES: readonly { url: string; altBase: string }[] = [
 /** Hero/cover for student Knowledge — mirrors backend shape; combine with {@link generateChildKnowledge} text. */
 export type LearningCardChildKnowledgeHero = Pick<LearningCardChildKnowledge, 'heroImageUrl' | 'heroImageAlt'>;
 
+/** Demo copy for student Knowledge discovery (plain text; URLs on their own lines become links in UI). */
+function buildMockChildKnowledgeContent(topicRaw: string, subject: string, grade: string): string {
+  const topic = topicRaw.trim() || 'this topic';
+  const ctx = [subject, grade].filter(Boolean).join(' · ');
+  return [
+    `Below are a few short videos we picked for “${topic}” (${ctx}) — kid-friendly pacing and clear visuals. Watch with a parent and ask yourself: how does this connect to what you’re learning in class?`,
+    '',
+    '### 1. Getting started: build a big-picture feel',
+    `Video: Introduction for kids — ${topic}`,
+    'https://www.youtube.com/watch?v=87SftBC1vFo',
+    '**Why we picked it:** a simple “map” in plain language so you know what question we’re tackling today — great for a first look.',
+    '',
+    '### 2. Going deeper: make the key ideas click',
+    `Video: Key ideas explained — ${topic}`,
+    'https://www.youtube.com/watch?v=5vZlQe7yM8Y',
+    '**Why we picked it:** connect abstract words to concrete examples — good for understanding and a few keywords to remember.',
+    '',
+    '### 3. Hands-on or stretch: try it, talk it out',
+    `Video: Try it / mini activity — ${topic}`,
+    'https://www.youtube.com/watch?v=QFJ5QdG1J1k',
+    '**Why we picked it:** a short task or game-style demo — after watching, try a quick exercise or explain it to a parent.',
+  ].join('\n');
+}
+
 function pickMockChildHero(input: LearningCardChildKnowledgeGenerateInput): LearningCardChildKnowledgeHero {
   const key = `${input.topic}\0${input.subject}\0${input.grade}`;
   let h = 0;
@@ -156,26 +180,7 @@ export class LlmApi {
     input: LearningCardChildKnowledgeGenerateInput,
   ): Promise<Pick<LearningCardChildKnowledge, 'content'>> {
     await new Promise((r) => setTimeout(r, 280));
-    const ctx = [input.subject, input.grade].filter(Boolean).join(' · ');
-    const topic = input.topic.trim() || '这个主题';
-    const content = [
-      `下面是根据「${topic}」（${ctx}）为你挑的几支适合孩子看的小短片，节奏友好、画面清晰。可以和家长一起看，边看边想：这个主题和你课上学的有什么联系？`,
-      '',
-      `1. 入门：先建立整体印象`,
-      `视频：Introduction for kids — ${topic}`,
-      'https://www.youtube.com/watch?v=87SftBC1vFo',
-      '推荐：用简单语言搭一个“地图”，帮孩子知道今天要解决什么问题，适合第一次接触。',
-      '',
-      `2. 深入一点：把关键概念讲清楚`,
-      `视频：Key ideas explained — ${topic}`,
-      'https://www.youtube.com/watch?v=5vZlQe7yM8Y',
-      '推荐：把抽象词和具体例子对上号，适合巩固理解、记几个关键词。',
-      '',
-      `3. 动手或延伸：试一试、说一说`,
-      `视频：Try it / mini activity — ${topic}`,
-      'https://www.youtube.com/watch?v=QFJ5QdG1J1k',
-      '推荐：短任务或小游戏式演示，看完可以试一个小练习或讲给家长听。',
-    ].join('\n');
+    const content = buildMockChildKnowledgeContent(input.topic, input.subject, input.grade);
     return { content };
   }
 

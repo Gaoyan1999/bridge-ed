@@ -1,9 +1,10 @@
-import { Fragment } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { Components } from 'react-markdown';
 import type { LearningCardChildKnowledge } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
-
-const URL_IN_TEXT = /(https?:\/\/\S+)/g;
+import { Markdown } from '@/bridge/components/Markdown';
+import { discoveryPlainTextToMarkdown } from '@/bridge/discoveryPlainTextToMarkdown';
 
 /** Treat common video hosts as “video” taps for student progress (learning). */
 function isVideoUrl(url: string): boolean {
@@ -18,38 +19,6 @@ function isVideoUrl(url: string): boolean {
   }
 }
 
-function ContentWithLinks({
-  text,
-  onVideoLinkClick,
-}: {
-  text: string;
-  onVideoLinkClick?: () => void;
-}) {
-  const parts = text.split(URL_IN_TEXT);
-  return (
-    <>
-      {parts.map((part, i) =>
-        /^https?:\/\//.test(part) ? (
-          <a
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="knowledge-child-discovery__link"
-            onClick={() => {
-              if (onVideoLinkClick && isVideoUrl(part)) onVideoLinkClick();
-            }}
-          >
-            {part}
-          </a>
-        ) : (
-          <Fragment key={i}>{part}</Fragment>
-        ),
-      )}
-    </>
-  );
-}
-
 export function KnowledgeChildDiscovery({
   data,
   className,
@@ -61,6 +30,28 @@ export function KnowledgeChildDiscovery({
   onVideoLinkClick?: () => void;
 }) {
   const { t } = useTranslation();
+
+  const markdownComponents = useMemo<Components>(
+    () => ({
+      a: ({ href, children, className: linkClass, onClick, ...props }) => (
+        <a
+          {...props}
+          href={href}
+          className={cx('knowledge-child-discovery__link', linkClass)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            onClick?.(e);
+            if (href && onVideoLinkClick && isVideoUrl(href)) onVideoLinkClick();
+          }}
+        >
+          {children}
+        </a>
+      ),
+    }),
+    [onVideoLinkClick],
+  );
+
   return (
     <div className={cx('knowledge-child-discovery', className)}>
       <img
@@ -72,7 +63,9 @@ export function KnowledgeChildDiscovery({
       />
       <div className="knowledge-child-discovery__source">{t('common.bridgedAi')}</div>
       <div className="knowledge-child-discovery__content">
-        <ContentWithLinks text={data.content} onVideoLinkClick={onVideoLinkClick} />
+        <Markdown className="knowledge-child-discovery-md" components={markdownComponents}>
+          {discoveryPlainTextToMarkdown(data.content)}
+        </Markdown>
       </div>
     </div>
   );
