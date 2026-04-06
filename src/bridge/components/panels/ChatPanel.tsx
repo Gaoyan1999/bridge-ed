@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ImagePlus } from 'lucide-react';
+import { Bell, ImagePlus } from 'lucide-react';
 import type { InboxItem } from '@/bridge/types';
 import { isBroadcastFeedThreadId } from '@/bridge/broadcast-inbox-ids';
 import { buildChatInboxItems, buildFeedInboxItems, type ChatInboxRow } from '@/bridge/chat-inbox-mock';
+import { bookingSlotLabel } from '@/bridge/parent-booking-slot';
+import { bookingTargetsTeacher, resolveTeacherAuthorId } from '@/bridge/teacher-user';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
@@ -14,6 +16,8 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
+import type { ParentBookingBackend } from '@/data/entity/parent-booking-backend';
+import type { UserBackend } from '@/data/entity/user-backend';
 
 function formatClockLabel(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -52,23 +56,78 @@ function ChatInboxItemContent({ item }: { item: InboxItem }) {
 
 function ChatInboxChatRowContent({ row }: { row: ChatInboxRow }) {
   const { t } = useTranslation();
+  const kindLabel =
+    row.inboxKind === 'booking'
+      ? t('chat.inboxKindBooking')
+      : row.section === 'group'
+        ? t('chat.inboxKindGroup')
+        : t('chat.inboxKindPrivate');
+  const headline = row.title;
   return (
     <div className="inbox-item__block">
       <div className="inbox-item__meta-row">
         <span
           className={cx(
             'inbox-item__kind',
-            row.section === 'group' ? 'inbox-item__kind--group' : 'inbox-item__kind--private',
+            row.inboxKind === 'booking'
+              ? 'inbox-item__kind--booking'
+              : row.section === 'group'
+                ? 'inbox-item__kind--group'
+                : 'inbox-item__kind--private',
           )}
         >
-          {row.section === 'group' ? t('chat.inboxKindGroup') : t('chat.inboxKindPrivate')}
+          {kindLabel}
         </span>
         <time className="inbox-item__meta" dateTime={row.date}>
           {row.date}
         </time>
       </div>
-      <span className="inbox-item__headline">{row.title}</span>
+      <span className="inbox-item__headline">{headline}</span>
     </div>
+  );
+}
+
+function TeacherBookingRequestsList({
+  rows,
+  users,
+  onRespond,
+}: {
+  rows: ParentBookingBackend[];
+  users: UserBackend[];
+  onRespond: (id: string, action: 'accept' | 'reject') => void;
+}) {
+  const { t } = useTranslation();
+  if (!rows.length) {
+    return <p className="panel__hint">{t('chat.bookingNoPending')}</p>;
+  }
+  return (
+    <ul className="booking-request-list">
+      {rows.map((b) => {
+        const parent = users.find((u) => u.id === b.parentId);
+        const student = users.find((u) => u.id === b.studentId);
+        const parentName = parent?.name ?? b.parentId;
+        const studentName = student?.name ?? b.studentId;
+        return (
+          <li key={b.id} className="booking-request-card">
+            <div className="booking-request-card__row">
+              <span className="booking-request-card__student">{studentName}</span>
+              <span className="booking-request-card__date">{b.date}</span>
+            </div>
+            <div className="booking-request-card__slot">{bookingSlotLabel(b.bookSlot)}</div>
+            <p className="booking-request-card__topic">{b.topic.trim() || t('chat.bookingNoTopic')}</p>
+            <p className="booking-request-card__parent">{t('chat.bookingFromParent', { name: parentName })}</p>
+            <div className="booking-request-card__actions">
+              <Button variant="primary" pill className="btn--sm" type="button" onClick={() => onRespond(b.id, 'accept')}>
+                {t('chat.bookingAccept')}
+              </Button>
+              <Button variant="text" type="button" onClick={() => onRespond(b.id, 'reject')}>
+                {t('chat.bookingReject')}
+              </Button>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -86,10 +145,18 @@ export function ChatPanel({ active }: { active: boolean }) {
     setSelectedInboxId,
     appendChatMessage,
     openModal,
+    parentBookings,
+    users,
+    currentUserId,
+    respondToParentBooking,
+    findBookingByThreadId,
+    pendingBookingCount,
   } = useBridge();
   const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [teacherBookingPanelOpen, setTeacherBookingPanelOpen] = useState(false);
+
   const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
     onReject: (reason) => {
       if (reason === 'size') window.alert(t('common.imageTooLarge'));
@@ -116,6 +183,10 @@ export function ChatPanel({ active }: { active: boolean }) {
     setSelectedInboxId((cur) => (cur && orderedIds.includes(cur) ? cur : orderedIds[0]!));
   }, [role, inboxKey, orderedIds, setSelectedInboxId]);
 
+  useEffect(() => {
+    setTeacherBookingPanelOpen(false);
+  }, [selectedInboxId]);
+
   const threadId =
     selectedInboxId && orderedIds.includes(selectedInboxId) ? selectedInboxId : orderedIds[0];
   const currentFeed = feedItems.find((i) => i.id === threadId);
@@ -123,8 +194,21 @@ export function ChatPanel({ active }: { active: boolean }) {
   const isGroupThread = currentChat?.section === 'group';
   const msgs = threadId ? threads[threadId] ?? [] : [];
 
+  const pendingTeacherRows = useMemo(() => {
+    if (role !== 'teacher' || !currentUserId) return [];
+    const tid = resolveTeacherAuthorId(users, currentUserId);
+    return parentBookings
+      .filter((b) => bookingTargetsTeacher(b, tid) && b.status === 'pending')
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }, [role, parentBookings, users, currentUserId]);
+
+  const threadBooking = threadId ? findBookingByThreadId(threadId) : undefined;
+
+  const showTeacherBookingPanel = role === 'teacher' && teacherBookingPanelOpen;
+
   const showComposer =
     !!threadId &&
+    !showTeacherBookingPanel &&
     (currentChat != null ||
       (!!currentFeed && currentFeed.kind !== 'report' && currentFeed.kind !== 'broadcast'));
 
@@ -171,16 +255,33 @@ export function ChatPanel({ active }: { active: boolean }) {
         hintId="chat-role-hint"
         split
         end={
-          <Button
-            variant="primary"
-            pill
-            className="btn--sm"
-            id="btn-broadcast"
-            hidden={role !== 'teacher'}
-            onClick={() => openModal({ type: 'broadcast' })}
-          >
-            {t('chat.broadcast')}
-          </Button>
+          role === 'teacher' ? (
+            <div className="chat-panel-header-actions">
+              <Button
+                variant="primary"
+                pill
+                className="btn--sm"
+                id="btn-broadcast"
+                onClick={() => openModal({ type: 'broadcast' })}
+              >
+                {t('chat.broadcast')}
+              </Button>
+              <button
+                type="button"
+                className={cx('chat-booking-bell', teacherBookingPanelOpen && 'is-active')}
+                id="btn-booking-requests"
+                aria-pressed={teacherBookingPanelOpen}
+                aria-label={t('chat.bookingRequestsTitle')}
+                title={t('chat.bookingRequestsTitle')}
+                onClick={() => setTeacherBookingPanelOpen((v) => !v)}
+              >
+                <Bell className="chat-booking-bell__icon" strokeWidth={2} size={20} aria-hidden />
+                {pendingBookingCount > 0 ? (
+                  <span className="chat-booking-bell__dot" aria-hidden />
+                ) : null}
+              </button>
+            </div>
+          ) : null
         }
       />
 
@@ -200,13 +301,16 @@ export function ChatPanel({ active }: { active: boolean }) {
                       type="button"
                       className={cx(
                         'inbox-item',
-                        item.id === threadId && 'is-active',
+                        item.id === threadId && !showTeacherBookingPanel && 'is-active',
                         item.kind === 'broadcast' &&
                           isBroadcastFeedThreadId(item.id) &&
                           'inbox-item--broadcast-feed',
                       )}
                       data-id={item.id}
-                      onClick={() => setSelectedInboxId(item.id)}
+                      onClick={() => {
+                        setTeacherBookingPanelOpen(false);
+                        setSelectedInboxId(item.id);
+                      }}
                     >
                       <ChatInboxItemContent item={item} />
                     </button>
@@ -222,9 +326,16 @@ export function ChatPanel({ active }: { active: boolean }) {
                       <button
                         key={row.id}
                         type="button"
-                        className={cx('inbox-item', 'inbox-item--chat', row.id === threadId && 'is-active')}
+                        className={cx(
+                          'inbox-item',
+                          'inbox-item--chat',
+                          row.id === threadId && !showTeacherBookingPanel && 'is-active',
+                        )}
                         data-id={row.id}
-                        onClick={() => setSelectedInboxId(row.id)}
+                        onClick={() => {
+                          setTeacherBookingPanelOpen(false);
+                          setSelectedInboxId(row.id);
+                        }}
                       >
                         <ChatInboxChatRowContent row={row} />
                       </button>
@@ -246,7 +357,16 @@ export function ChatPanel({ active }: { active: boolean }) {
               )}
               id="thread-title"
             >
-              {currentFeed ? (
+              {showTeacherBookingPanel ? (
+                <>
+                  <div className="thread-title__meta-row">
+                    <span className={cx('inbox-item__kind', 'inbox-item__kind--booking')}>
+                      {t('chat.inboxKindBooking')}
+                    </span>
+                  </div>
+                  <span className="thread-title__text">{t('chat.bookingRequestsTitle')}</span>
+                </>
+              ) : currentFeed ? (
                 <>
                   {(currentFeed.kind === 'report' || currentFeed.kind === 'broadcast') && (
                     <div className="thread-title__meta-row">
@@ -276,17 +396,28 @@ export function ChatPanel({ active }: { active: boolean }) {
                     <span
                       className={cx(
                         'inbox-item__kind',
-                        currentChat.section === 'group'
-                          ? 'inbox-item__kind--group'
-                          : 'inbox-item__kind--private',
+                        currentChat.inboxKind === 'booking'
+                          ? 'inbox-item__kind--booking'
+                          : currentChat.section === 'group'
+                            ? 'inbox-item__kind--group'
+                            : 'inbox-item__kind--private',
                       )}
                     >
-                      {currentChat.section === 'group'
-                        ? t('chat.inboxKindGroup')
-                        : t('chat.inboxKindPrivate')}
+                      {currentChat.inboxKind === 'booking'
+                        ? t('chat.inboxKindBooking')
+                        : currentChat.section === 'group'
+                          ? t('chat.inboxKindGroup')
+                          : t('chat.inboxKindPrivate')}
                     </span>
                   </div>
-                  <span className="thread-title__text">{currentChat.title}</span>
+                  <span className="thread-title__text">
+                    {threadBooking
+                      ? t('chat.bookingThreadTitle', {
+                          name:
+                            users.find((u) => u.id === threadBooking.studentId)?.name ?? threadBooking.studentId,
+                        })
+                      : currentChat.title}
+                  </span>
                 </>
               ) : (
                 t('chat.selectThread')
@@ -304,7 +435,9 @@ export function ChatPanel({ active }: { active: boolean }) {
             </Button>
           </div>
           <div className="msg-thread" id="msg-thread">
-            {!msgs.length ? (
+            {showTeacherBookingPanel ? (
+              <TeacherBookingRequestsList rows={pendingTeacherRows} users={users} onRespond={respondToParentBooking} />
+            ) : !msgs.length ? (
               <p className="panel__hint">{t('chat.noMessagesInThread')}</p>
             ) : (
               msgs.map((m, idx) => {
@@ -318,13 +451,14 @@ export function ChatPanel({ active }: { active: boolean }) {
                       : /^(Ms\.?|Mr\.?|Mrs\.?|Teacher\b)/i.test(m.who.trim())));
                 return (
                   <div
-                    key={`${idx}-${m.who}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
+                    key={`${idx}-${m.who}-${m.bookingDetail?.bookingId ?? ''}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
                     className={cx(
                       'msg',
                       m.type === 'out' ? 'msg--out' : 'msg--in',
                       m.learningCard && 'msg--learning-card',
                       m.teacherReport && 'msg--teacher-report',
                       m.broadcastPost && 'msg--broadcast',
+                      m.bookingDetail && 'msg--booking',
                     )}
                   >
                     {m.broadcastPost ? (
@@ -365,6 +499,22 @@ export function ChatPanel({ active }: { active: boolean }) {
                       <div className="msg__broadcast-card">
                         <div className="msg__broadcast-title">{m.broadcastPost.title}</div>
                         <div className="msg__broadcast-body">{m.broadcastPost.body}</div>
+                      </div>
+                    ) : m.bookingDetail ? (
+                      <div className="booking-detail-card">
+                        <div className="booking-detail-card__title">{t('chat.bookingCardTitle')}</div>
+                        <dl className="booking-detail-card__dl">
+                          <dt>{t('chat.bookingLabelTopic')}</dt>
+                          <dd>{m.bookingDetail.topic}</dd>
+                          <dt>{t('chat.bookingLabelWith')}</dt>
+                          <dd>
+                            {m.bookingDetail.parentDisplay} · {m.bookingDetail.studentDisplay}
+                          </dd>
+                          <dt>{t('chat.bookingLabelWhen')}</dt>
+                          <dd>
+                            {m.bookingDetail.date} · {m.bookingDetail.slotLabel}
+                          </dd>
+                        </dl>
                       </div>
                     ) : m.text?.trim() ? (
                       <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>

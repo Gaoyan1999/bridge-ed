@@ -30,7 +30,8 @@
     "dashboard": "仪表盘",
     "knowledge": "知识",
     "chat": "消息",
-    "mood": "心情"
+    "mood": "心情",
+    "chatBadgePending": "{{count}} 条待处理预约"
   },
   "sidebar": {
     "viewAs": "视角",
@@ -173,7 +174,19 @@
       "topicPlaceholder": "例如：因式分解作业",
       "sendRequest": "发送请求",
       "success": "请求已发送（演示）。老师会确认该时间段。"
-    }
+    },
+    "inboxKindBooking": "预约",
+    "bookingRequestsTitle": "预约请求",
+    "bookingThreadTitle": "预约：{{name}} 的家长",
+    "bookingNoPending": "暂无待处理预约。",
+    "bookingNoTopic": "（无主题）",
+    "bookingFromParent": "来自 {{name}}",
+    "bookingAccept": "接受",
+    "bookingReject": "拒绝",
+    "bookingCardTitle": "已确认 1:1",
+    "bookingLabelTopic": "主题",
+    "bookingLabelWith": "对象",
+    "bookingLabelWhen": "时间"
   },
   "mood": {
     "emotion": "情绪",

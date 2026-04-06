@@ -4,6 +4,7 @@ export * from './learning-card-mappers';
 export * from './report-mappers';
 export * from './student-mood-mappers';
 export * from './teacher-todo-list-mappers';
+export * from './parent-booking-mappers';
 export * from './config';
 export * from './learning-card-summary';
 export * from './repositories';

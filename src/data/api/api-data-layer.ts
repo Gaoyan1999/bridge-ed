@@ -11,11 +11,14 @@ import type {
   BroadcastsRepository,
   DataLayer,
   LearningCardsRepository,
+  ParentBookingsRepository,
   ReportsRepository,
   StudentMoodsRepository,
   TeacherTodoListsRepository,
   UsersRepository,
 } from '../repositories';
+import type { ParentBookingBackend } from '../entity/parent-booking-backend';
+import { normalizeParentBookingBackend } from '../parent-booking-mappers';
 import type { BroadcastBackend } from '../entity/broadcast-backend';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { ReportBackend } from '../entity/report-backend';
@@ -180,6 +183,30 @@ class ApiTeacherTodoListsRepo implements TeacherTodoListsRepository {
   }
 }
 
+/** In-memory until `/parent-bookings` exists. */
+class ApiParentBookingsRepo implements ParentBookingsRepository {
+  private rows: ParentBookingBackend[] = [];
+
+  async listAll(): Promise<ParentBookingBackend[]> {
+    return this.rows.map((r) => normalizeParentBookingBackend(r));
+  }
+
+  async get(id: string): Promise<ParentBookingBackend | undefined> {
+    const raw = this.rows.find((r) => r.id === id);
+    return raw ? normalizeParentBookingBackend(raw) : undefined;
+  }
+
+  async put(booking: ParentBookingBackend): Promise<void> {
+    const n = normalizeParentBookingBackend(booking);
+    this.rows = this.rows.filter((r) => r.id !== n.id);
+    this.rows.push(n);
+  }
+
+  async delete(id: string): Promise<void> {
+    this.rows = this.rows.filter((r) => r.id !== id);
+  }
+}
+
 export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
@@ -188,4 +215,5 @@ export class ApiDataLayer implements DataLayer {
   readonly reports = new ApiReportsRepo();
   readonly broadcasts = new ApiBroadcastsRepo();
   readonly teacherTodoLists = new ApiTeacherTodoListsRepo();
+  readonly parentBookings = new ApiParentBookingsRepo();
 }

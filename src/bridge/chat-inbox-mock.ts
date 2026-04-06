@@ -8,6 +8,8 @@ export type ChatInboxRow = {
   date: string;
   /** `group` = 群聊, `private` = 私聊 */
   section: 'group' | 'private';
+  /** Inbox kind label override (e.g. booking requests). */
+  inboxKind?: 'booking' | 'dm';
 };
 
 const MOCK_GROUPS: Record<Role, ChatInboxRow[]> = {
@@ -84,6 +86,7 @@ function inboxItemToChatRow(item: InboxItem): ChatInboxRow | null {
     title: item.title,
     date: item.date,
     section: 'private',
+    inboxKind: item.kind === 'booking' ? 'booking' : item.kind === 'dm' ? 'dm' : undefined,
   };
 }
 

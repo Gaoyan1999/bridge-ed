@@ -4,3 +4,4 @@ export * from './report-backend';
 export * from './student-mood-backend';
 export * from './teacher-todo-list-backend';
 export * from './user-backend';
+export * from './parent-booking-backend';

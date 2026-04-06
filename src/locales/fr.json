@@ -30,7 +30,8 @@
     "dashboard": "Tableau de bord",
     "knowledge": "Savoirs",
     "chat": "Messages",
-    "mood": "Humeur"
+    "mood": "Humeur",
+    "chatBadgePending": "{{count}} demande(s) de rendez-vous"
   },
   "sidebar": {
     "viewAs": "Voir en tant que",
@@ -173,7 +174,19 @@
       "topicPlaceholder": "ex. devoirs de factorisation",
       "sendRequest": "Envoyer la demande",
       "success": "Demande envoyée (démo). L'enseignant confirmera le créneau."
-    }
+    },
+    "inboxKindBooking": "Rendez-vous",
+    "bookingRequestsTitle": "Demandes de rendez-vous",
+    "bookingThreadTitle": "Rendez-vous : parents de {{name}}",
+    "bookingNoPending": "Aucune demande en attente.",
+    "bookingNoTopic": "(Sans sujet)",
+    "bookingFromParent": "De {{name}}",
+    "bookingAccept": "Accepter",
+    "bookingReject": "Refuser",
+    "bookingCardTitle": "Rendez-vous 1:1 confirmé",
+    "bookingLabelTopic": "Sujet",
+    "bookingLabelWith": "Avec",
+    "bookingLabelWhen": "Quand"
   },
   "mood": {
     "emotion": "Émotion",

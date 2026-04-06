@@ -30,7 +30,8 @@
     "dashboard": "Dashboard",
     "knowledge": "Knowledge",
     "chat": "Messages",
-    "mood": "Mood"
+    "mood": "Mood",
+    "chatBadgePending": "{{count}} pending booking request(s)"
   },
   "sidebar": {
     "viewAs": "View as",
@@ -174,7 +175,19 @@
       "topicPlaceholder": "e.g. factoring homework",
       "sendRequest": "Send request",
       "success": "Your teacher will confirm the slot."
-    }
+    },
+    "inboxKindBooking": "Booking",
+    "bookingRequestsTitle": "Booking requests",
+    "bookingThreadTitle": "Booking: {{name}}'s parents",
+    "bookingNoPending": "No pending booking requests.",
+    "bookingNoTopic": "(No topic)",
+    "bookingFromParent": "From {{name}}",
+    "bookingAccept": "Accept",
+    "bookingReject": "Decline",
+    "bookingCardTitle": "Scheduled 1:1",
+    "bookingLabelTopic": "Topic",
+    "bookingLabelWith": "With",
+    "bookingLabelWhen": "When"
   },
   "mood": {
     "emotion": "Emotion",

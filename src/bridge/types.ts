@@ -52,6 +52,17 @@ export interface ThreadMessage {
   broadcastPost?: { title: string; body: string; sentAt?: string };
   /** Broadcast / class report author (`UserBackend.id`); used to resolve display name from `users`. */
   authorUserId?: string;
+  /** Confirmed 1:1 booking — shown as a card in the DM thread. */
+  bookingDetail?: {
+    bookingId: string;
+    parentDisplay: string;
+    studentDisplay: string;
+    topic: string;
+    /** Preferred date YYYY-MM-DD. */
+    date: string;
+    slotLabel: string;
+    slotValue: string;
+  };
 }
 
 /** Parent dashboard children linked to mood check-ins (demo roster). */
