@@ -111,11 +111,8 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 ];
 
 export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
-  parent: [
-    { id: 'broadcast-feed-parent', title: '', date: '2026-04-01', kind: 'broadcast' },
-    { id: 'n2', title: 'Ms. Lee: note on next week’s quiz', date: '2026-03-30', kind: 'dm' },
-  ],
-  student: [{ id: 'broadcast-feed-student', title: '', date: '2026-04-02', kind: 'broadcast' }],
+  parent: [{ id: 'n2', title: 'Ms. Lee: note on next week’s quiz', date: '2026-03-30', kind: 'dm' }],
+  student: [],
   teacher: [
     { id: 't1', title: 'Booking: Alex Wang’s parent', date: '2026-04-02', kind: 'booking' },
     { id: 't2', title: 'Draft: broadcast', date: '2026-04-01', kind: 'draft' },
@@ -123,19 +120,6 @@ export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
 };
 
 export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
-  'broadcast-feed-parent': [
-    {
-      who: 'School',
-      type: 'in',
-      text: 'This week’s factoring practice (PDF is in Materials). About 15 minutes a day is enough—you don’t need to finish it in one go.',
-      broadcastPost: {
-        title: 'Practice set: quadratics',
-        body:
-          'This week’s factoring practice (PDF is in Materials). About 15 minutes a day is enough—you don’t need to finish it in one go.',
-        sentAt: '2026-04-01T14:30:00.000Z',
-      },
-    },
-  ],
   n2: [
     {
       who: 'Ms. Lee',
@@ -143,18 +127,6 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
       text: 'Next week’s quiz focuses on variations of the in-class examples. If your child gets stuck on a step, send the question number.',
     },
     { who: 'You', type: 'out', text: 'Thanks—we’ll focus on example 3 this weekend.' },
-  ],
-  'broadcast-feed-student': [
-    {
-      who: 'Homeroom',
-      type: 'in',
-      text: 'Submit math homework by Friday; format is in the class announcement.',
-      broadcastPost: {
-        title: 'Class: submit homework by Friday',
-        body: 'Submit math homework by Friday; format is in the class announcement.',
-        sentAt: '2026-04-02T09:15:00.000Z',
-      },
-    },
   ],
   t1: [
     {

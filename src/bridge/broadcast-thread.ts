@@ -31,3 +31,11 @@ export function threadMessageFromBroadcastBackend(b: BroadcastBackend): ThreadMe
     b.sentAt,
   );
 }
+
+/**
+ * Teacher’s merged broadcast feed: same card body as parent/student, shown as self-sent (outgoing).
+ */
+export function threadMessageFromBroadcastBackendTeacherView(b: BroadcastBackend): ThreadMessage {
+  const m = threadMessageFromBroadcastBackend(b);
+  return { ...m, who: 'You', type: 'out' };
+}
