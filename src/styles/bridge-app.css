@@ -1134,6 +1134,10 @@ body {
   min-width: 0;
 }
 
+.teacher-card-preview__tonight-actions {
+  margin-top: 1rem;
+}
+
 .teacher-card-preview__feedback-grid {
   display: grid;
   gap: 1rem;

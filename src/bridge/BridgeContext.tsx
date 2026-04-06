@@ -84,6 +84,8 @@ interface BridgeContextValue {
   appendKnowledgeMessage: (threadId: string, msg: ThreadMessage) => void;
   /** First visit to a card’s AI thread: seed the intro message if empty. */
   seedKnowledgeThreadIfEmpty: (card: LearningCardItem) => void;
+  /** After a learning card document is removed from storage, drop its Knowledge thread cache so parents/students don’t see stale chat. */
+  removeKnowledgeThreadForDeletedCard: (threadId: string) => void;
   modal: ModalState;
   openModal: (m: ModalState) => void;
   closeModal: () => void;
@@ -294,6 +296,18 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     [role],
   );
 
+  const removeKnowledgeThreadForDeletedCard = useCallback((threadId: string) => {
+    const id = threadId.trim();
+    if (!id) return;
+    setKnowledgeThreads((prev) => {
+      if (!(id in prev)) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setSelectedKnowledgeThreadId((cur) => (cur === id ? null : cur));
+  }, []);
+
   const openKnowledgeFromCard = (card: LearningCardItem) => {
     const id = card.threadId;
     seedKnowledgeThreadIfEmpty(card);
@@ -360,6 +374,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     appendChatMessage,
     appendKnowledgeMessage,
     seedKnowledgeThreadIfEmpty,
+    removeKnowledgeThreadForDeletedCard,
     modal,
     openModal,
     closeModal,

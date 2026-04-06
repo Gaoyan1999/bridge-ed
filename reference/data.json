@@ -1,156 +1,7 @@
 {
   "snapshotVersion": 1,
-  "exportedAt": "2026-04-05T16:40:10.723Z",
+  "exportedAt": "2026-04-06T07:04:04.524Z",
   "learningCards": [
-    {
-      "id": "card-0af9c11c-57fe-444b-8b32-8d5faff69615",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-05T04:39:26.819Z",
-      "updatedAt": "2026-04-05T04:39:26.819Z",
-      "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Week 14 — Factoring review",
-      "grade": "G7",
-      "subject": "Science",
-      "topic": "两位数减法",
-      "teacherNotes": "",
-      "parentSummary": "This week in Grade 7 Science, we reviewed two-digit subtraction. Students practiced to strengthen their understanding of subtraction, which helps them solve science problems. Please encourage your child to keep practicing subtraction at home to reinforce their learning.",
-      "translatedSummaries": {
-        "zh": "本周我们在七年级科学课上复习了两位数减法。学生们通过练习加强了对减法的理解，这对他们解决科学问题很有帮助。请鼓励孩子在家继续练习减法，帮助他们巩固所学知识。",
-        "en": "This week in Grade 7 Science, we reviewed two-digit subtraction. Students practiced to strengthen their understanding of subtraction, which helps them solve science problems. Please encourage your child to keep practicing subtraction at home to reinforce their learning.",
-        "fr": "Cette semaine, en sciences de 7e année, nous avons révisé la soustraction à deux chiffres. Les élèves ont pratiqué pour renforcer leur compréhension de la soustraction, ce qui les aide à résoudre des problèmes scientifiques. Veuillez encourager votre enfant à continuer à pratiquer la soustraction à la maison pour consolider ses apprentissages."
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": ""
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-05T04:39:26.819Z",
-      "threadId": "card-thread-0af9c11c-57fe-444b-8b32-8d5faff69615"
-    },
-    {
-      "id": "card-277b0c35-df52-4f5c-8f0a-cf27fbcee782",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-05T05:11:44.307Z",
-      "updatedAt": "2026-04-05T16:32:48.829Z",
-      "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Week 14 — Factoring review",
-      "grade": "G7",
-      "subject": "Math",
-      "topic": "DDD",
-      "teacherNotes": "",
-      "parentSummary": "[Demo] Parent summary for “DDD” (Math · G7). Edit before sending.",
-      "translatedSummaries": {
-        "en": "[Demo] Parent summary for “DDD” (Math · G7). Edit before sending.",
-        "zh": "[演示] 家长版摘要：「DDD」（Math · G7）。发送前请修改。",
-        "fr": "[Démo] Résumé parents : « DDD » (Math · G7). À relire avant envoi."
-      },
-      "childKnowledge": {
-        "heroImageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
-        "heroImageAlt": "Science and discovery — DDD (Math · G7)",
-        "content": "Below are a few short videos we picked for “DDD” (Math · G7) — kid-friendly pacing and clear visuals. Watch with a parent and ask yourself: how does this connect to what you’re learning in class?\n\n### 1. Getting started: build a big-picture feel\nVideo: Introduction for kids — DDD\nhttps://www.youtube.com/watch?v=87SftBC1vFo\n**Why we picked it:** a simple “map” in plain language so you know what question we’re tackling today — great for a first look.\n\n### 2. Going deeper: make the key ideas click\nVideo: Key ideas explained — DDD\nhttps://www.youtube.com/watch?v=5vZlQe7yM8Y\n**Why we picked it:** connect abstract words to concrete examples — good for understanding and a few keywords to remember.\n\n### 3. Hands-on or stretch: try it, talk it out\nVideo: Try it / mini activity — DDD\nhttps://www.youtube.com/watch?v=QFJ5QdG1J1k\n**Why we picked it:** a short task or game-style demo — after watching, try a quick exercise or explain it to a parent."
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": ""
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-05T05:11:44.307Z",
-      "threadId": "card-thread-277b0c35-df52-4f5c-8f0a-cf27fbcee782",
-      "studentFeedbacks": [
-        {
-          "studentId": "student-2",
-          "watchedVideo": false,
-          "chatedWithAI": false,
-          "status": "finished",
-          "finishedType": "pretty_easy"
-        },
-        {
-          "studentId": "student-1",
-          "watchedVideo": false,
-          "chatedWithAI": true,
-          "status": "learning"
-        }
-      ]
-    },
-    {
-      "id": "card-36c8c7c9-20e2-4609-af3f-c0d5c018b754",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-02T17:21:22.032Z",
-      "updatedAt": "2026-04-02T17:21:22.032Z",
-      "authorUserId": "1",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "G9",
-      "subject": "Math",
-      "topic": "Plus and Minus in two-digital number",
-      "teacherNotes": "",
-      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
-      "translatedSummaries": {
-        "zh": "课堂上我们复习了因式分解：先提公因式，再尝试分组或简单情形。回家只需两道课本例题，并把中间步骤写清楚即可——不必一次做完整组作业。",
-        "en": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
-        "fr": "En classe nous avons revu la factorisation : d’abord extraire le PGCD, puis essayer le regroupement ou les cas simples. À la maison, deux exemples du manuel avec les étapes intermédiaires suffisent — pas besoin de finir toute la série en une fois."
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-02T17:21:22.031Z",
-      "threadId": "card-thread-36c8c7c9-20e2-4609-af3f-c0d5c018b754"
-    },
     {
       "id": "card-55615594-c62e-41b5-86e1-93af028a1f8e",
       "schemaVersion": 4,
@@ -200,362 +51,232 @@
       "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
     },
     {
-      "id": "card-6f78e588-38a2-4af8-8951-5071aac89ece",
+      "id": "card-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
       "schemaVersion": 4,
-      "createdAt": "2026-04-04T11:49:58.169Z",
-      "updatedAt": "2026-04-05T16:32:20.797Z",
+      "createdAt": "2026-04-02T09:00:00.000Z",
+      "updatedAt": "2026-04-02T15:30:00.000Z",
       "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "G7",
+      "classId": "class-au-g8-01",
+      "classLessonTitle": "Week 1 — Numeracy Essentials: 3-Digit Operations Refresher",
+      "grade": "G8",
       "subject": "Math",
-      "topic": "1 + 1？",
-      "teacherNotes": "",
-      "parentSummary": "This week in Grade 7 Math, students will have light homework focusing on reviewing basic addition concepts like 1 + 1. It's a chance for them to strengthen their understanding with simple practice.",
+      "topic": "3-Digit Addition and Subtraction",
+      "teacherNotes": "Focusing on mental strategies and regrouping techniques as a foundation for upcoming algebraic expressions.",
+      "parentSummary": "This week, students revisited 3-digit addition and subtraction to strengthen their mental math and understanding of place value before moving into more complex topics.",
       "translatedSummaries": {
-        "zh": "本周七年级数学家庭作业较轻，重点是复习基础加法（如 1+1）。这是巩固理解、做简单练习的好机会。",
-        "en": "This week in Grade 7 Math, students will have light homework focusing on reviewing basic addition concepts like 1 + 1. It's a chance for them to strengthen their understanding with simple practice.",
-        "fr": "Cette semaine en maths (6e/5e), les devoirs sont légers et portent sur la révision de l’addition de base (comme 1 + 1). C’est l’occasion de renforcer la compréhension avec de la pratique simple."
+        "en": "This week, students revisited 3-digit addition and subtraction to strengthen their mental math and understanding of place value before moving into more complex topics.",
+        "zh": "本周，学生们复习了三位数的加减法，旨在进入更复杂的课程内容前，强化他们的心算能力和对位值的理解。",
+        "fr": "Cette semaine, les élèves ont revu l'addition et la soustraction à trois chiffres afin de renforcer leur calcul mental et leur compréhension de la valeur de position avant d'aborder des sujets plus complexes."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://charatoon.com/photo/3641.png?20200826",
+        "heroImageAlt": "Colorful math numbers and symbols for kids — 3-Digit Operations (Math · G8)",
+        "content": "Here are some hand-picked videos to help you master 3-digit addition and subtraction. Watch them to sharpen your mental math skills for this week's lesson!\n\n1. Foundational Concept: Addition with Regrouping\nVideo: 3-Digit Addition with Regrouping\nhttps://www.youtube.com/watch?v=mAvuom42NyY\nDescription: A clear walkthrough by Khan Academy on how to handle carrying over numbers when adding three-digit figures.\n\n2. Mastering the Challenge: Subtraction with Borrowing\nVideo: 3-Digit Subtraction with Regrouping (Borrowing)\nhttps://www.youtube.com/watch?v=uK7v8LpX06Q\nDescription: Learn the step-by-step process of regrouping when the top digit is smaller than the bottom digit in subtraction.\n\n3. Speed & Strategy: Mental Math Techniques\nVideo: Mental Math Addition and Subtraction Strategies\nhttps://www.youtube.com/watch?v=q6_f7F-Q_Q8\nDescription: Discover clever shortcuts to solve 3-digit problems in your head without using a pen and paper."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": ""
+          "text": "Complete the 5-minute mental math challenge on your student portal."
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": ""
+          "text": "Ask your child to solve two 3-digit subtraction problems using the 'regrouping' method."
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": ""
+          "text": "Explain to your parents the difference between 'carrying' in addition and 'borrowing' in subtraction."
         }
       ],
       "audience": {
         "mode": "whole_class",
-        "recipientCount": 28,
+        "recipientCount": 25,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-04-04T11:49:58.169Z",
-      "threadId": "card-thread-6f78e588-38a2-4af8-8951-5071aac89ece",
+      "sentAt": "2026-04-06T09:15:00.000Z",
+      "threadId": "card-thread-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
       "studentFeedbacks": [
         {
-          "studentId": "student-1",
-          "watchedVideo": false,
-          "chatedWithAI": true,
-          "status": "learning"
+          "studentId": "student-au-01",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "pretty_easy"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "parent-au-01",
+          "doNotUnderstand": false
         }
       ]
     },
     {
-      "id": "card-99191523-fe82-4063-b68a-93f21611b315",
+      "id": "card-art-g5-au-2026-04-06",
       "schemaVersion": 4,
-      "createdAt": "2026-04-05T04:50:47.477Z",
-      "updatedAt": "2026-04-05T04:50:47.477Z",
-      "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Week 14 — Factoring review",
-      "grade": "G7",
-      "subject": "Math",
-      "topic": "乘法",
-      "teacherNotes": "",
-      "parentSummary": "This week in Grade 7 math, we reviewed factoring. Students learned how to break down multiplication expressions into simpler parts, which helps them understand math operations better. Please encourage your child to review multiplication tables at home and try some factoring practice problems.",
-      "translatedSummaries": {
-        "zh": "本周我们在七年级数学课上复习了因式分解的内容。学生们学习了如何将乘法表达式拆解成更简单的部分，这有助于他们更好地理解数学运算。请鼓励孩子在家复习乘法表，并尝试做一些因式分解的练习题。",
-        "en": "This week in Grade 7 math, we reviewed factoring. Students learned how to break down multiplication expressions into simpler parts, which helps them understand math operations better. Please encourage your child to review multiplication tables at home and try some factoring practice problems.",
-        "fr": "Cette semaine, en mathématiques de 7e année, nous avons révisé la factorisation. Les élèves ont appris à décomposer des expressions de multiplication en parties plus simples, ce qui les aide à mieux comprendre les opérations mathématiques. Veuillez encourager votre enfant à revoir les tables de multiplication à la maison et à essayer quelques exercices de factorisation."
-      },
-      "childKnowledge": {
-        "heroImageUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80",
-        "heroImageAlt": "Learning illustration",
-        "content": "Below are a few short videos we picked for “Multiplication” (Math · G7) — kid-friendly pacing and clear visuals. Watch with a parent and ask yourself: how does this connect to what you’re learning in class?\n\n### 1. Getting started: build a big-picture feel\nVideo: Introduction for kids — Multiplication\nhttps://www.youtube.com/watch?v=87SftBC1vFo\n**Why we picked it:** a simple “map” in plain language so you know what question we’re tackling today — great for a first look.\n\n### 2. Going deeper: make the key ideas click\nVideo: Key ideas explained — Multiplication\nhttps://www.youtube.com/watch?v=5vZlQe7yM8Y\n**Why we picked it:** connect abstract words to concrete examples — good for understanding and a few keywords to remember.\n\n### 3. Hands-on or stretch: try it, talk it out\nVideo: Try it / mini activity — Multiplication\nhttps://www.youtube.com/watch?v=QFJ5QdG1J1k\n**Why we picked it:** a short task or game-style demo — after watching, try a quick exercise or explain it to a parent."
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": ""
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-05T04:50:47.477Z",
-      "threadId": "card-thread-99191523-fe82-4063-b68a-93f21611b315"
-    },
-    {
-      "id": "card-atmospheric-pressure",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-01T22:20:00.000Z",
-      "updatedAt": "2026-04-01T22:20:00.000Z",
+      "createdAt": "2026-04-06T09:00:00.000Z",
+      "updatedAt": "2026-04-06T14:30:15.000Z",
       "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "",
-      "subject": "Science",
-      "topic": "What is atmospheric pressure?",
-      "teacherNotes": "",
-      "parentSummary": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
-      "translatedSummaries": {
-        "zh": "空气会挤压我们周围的一切；我们如何感受到它，以及一个简单的“空气柱”画面。",
-        "en": "Air pushes on everything around us; how we feel it and a simple “column of air” picture.",
-        "fr": "L’air exerce une pression sur tout ce qui nous entoure ; comment on le ressent et une image simple de « colonne d’air »."
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": "Tonight: revisit “What is atmospheric pressure?” with one class or homework example."
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-01T22:20:00.000Z",
-      "threadId": "card-thread-atmospheric-pressure"
-    },
-    {
-      "id": "card-cells",
-      "schemaVersion": 4,
-      "createdAt": "2026-03-30T23:50:00.000Z",
-      "updatedAt": "2026-03-30T23:50:00.000Z",
-      "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Week 12 — Pythagorean theorem & applications",
-      "grade": "Science",
-      "subject": "Biology",
-      "topic": "Plant vs animal cells",
-      "teacherNotes": "",
-      "parentSummary": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
-      "translatedSummaries": {
-        "zh": "细胞壁、叶绿体、细胞核——示意图标注单上要记住的重点。",
-        "en": "Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.",
-        "fr": "Paroi cellulaire, chloroplastes, noyau — ce qu’il faut retenir pour la feuille d’étiquetage du schéma."
-      },
-      "childKnowledge": {
-        "heroImageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
-        "heroImageAlt": "医学与健康主题插图（演示）",
-        "content": "下面这些视频画风可爱、互动也多，给你这个年级看刚刚好。随便点开一个，看看哪个最有意思：\n\n1. 全方位器官概览：适合作为 Unit Intro\n视频：Human Body Organs | Science For Kids | STEM Home Learning\nhttps://www.youtube.com/watch?v=B3Fv2X8EKfE\n推荐：动画色彩鲜艳，介绍了心脏、肺、大脑等核心器官。视频中提到「成人有 206 块骨头而婴儿有 300 块」这类有趣的 facts，很容易吸引 G6 孩子的注意力。\n\n2. 沉浸式体验：人体内部之旅\n视频：A Journey Inside Your Body (Bright Side)\nhttps://www.youtube.com/watch?v=3pjkQcQBTtc\n推荐：这是一个模拟「缩小版旅行」的视角，第一人称视角带学生进入消化道和血管。虽然风格稍显活泼，但它能很好地建立空间感，让学生理解器官之间的物理关系。\n\n3. 专项系统：消化系统（G6 重点）\n视频：Biology | \"What's In Our Digestive System?\" Explained\nhttps://www.youtube.com/watch?v=W55-QiHCYGA\n推荐：Big Bang Academy 的风格非常符合「可爱」的要求，动画极其精良，逻辑清晰，适合讲解复杂的消化过程，帮助学生理解「能量转化」这一科学概念。"
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": "Tonight: revisit “Plant vs animal cells” with one class or homework example."
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-03-30T23:50:00.000Z",
-      "threadId": "card-thread-cells"
-    },
-    {
-      "id": "card-ec3591c8-b5c4-4da8-80a7-29e363682a04",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-04T14:46:04.951Z",
-      "updatedAt": "2026-04-04T14:46:04.951Z",
-      "authorUserId": "teacher-2",
-      "classId": null,
-      "classLessonTitle": "Week 14 — Factoring review",
-      "grade": "G7",
-      "subject": "Science",
-      "topic": "barometric pressure",
-      "teacherNotes": "",
-      "parentSummary": "This week in science, your child is reviewing the concept of barometric pressure, which is about understanding how air pressure works in the atmosphere. This helps them learn about weather and how it changes.",
-      "translatedSummaries": {
-        "zh": "本周科学课复习气压概念，帮助孩子理解大气中的压力如何运作，从而更好地认识天气与天气变化。",
-        "en": "This week in science, your child is reviewing the concept of barometric pressure, which is about understanding how air pressure works in the atmosphere. This helps them learn about weather and how it changes.",
-        "fr": "Cette semaine en sciences, votre enfant révise la pression barométrique : comprendre comment la pression de l’air fonctionne dans l’atmosphère, pour mieux saisir la météo et ses changements."
-      },
-      "childKnowledge": {
-        "heroImageUrl": "/knowledge/mock-hero.png",
-        "heroImageAlt": "知识面板示意（演示配图）",
-        "content": "下面几支小视频用动画讲气压、天气和大气，很好懂。你可以边看边想：空气是怎么压住地面的？风和云又是怎么来的？\n\n1. 从「飞机为什么能飞」理解气压与升力\n视频：How Airplanes Fly! | Airplane Science | SciShow Kids\nhttps://www.youtube.com/watch?v=VLpSxHwfU04\n推荐：用机翼、风速与空气密度把「气压差」讲得很直观；适合当「大气压」的引子，把抽象概念和看得见的现象联系起来。\n\n2. 大气层：我们头顶的「空气海洋」\n视频：Bill Nye The Science Guy - Atmosphere\nhttps://www.youtube.com/watch?v=r4yL18XOmZ0\n推荐：经典科学秀风格，把大气层、压强与生命所需气体讲得很上头；语速偏快，建议开字幕或和家长一起看。\n\n3. 天气与水的循环（和云、雨怎么来有关）\n视频：The Water Cycle | The Dr. Binocs Show | Peekaboo Kidz\nhttps://www.youtube.com/watch?v=fcTDSPM5S4U\n推荐：把蒸发、凝结、降水串成一条线，帮助理解「为什么气压图和天气预报总连在一起」；动画节奏友好，适合做笔记关键词。"
-      },
-      "tonightActions": [
-        {
-          "preset": "quiz",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "parent_led_practice",
-          "include": true,
-          "text": ""
-        },
-        {
-          "preset": "explain_to_parent",
-          "include": true,
-          "text": ""
-        }
-      ],
-      "audience": {
-        "mode": "whole_class",
-        "recipientCount": 28,
-        "selectedStudentIds": []
-      },
-      "sentAt": "2026-04-04T14:46:04.951Z",
-      "threadId": "card-thread-ec3591c8-b5c4-4da8-80a7-29e363682a04"
-    },
-    {
-      "id": "card-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7",
-      "schemaVersion": 4,
-      "createdAt": "2026-04-04T03:48:48.238Z",
-      "updatedAt": "2026-04-04T03:48:48.238Z",
-      "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "G9",
+      "classId": "AU-QLD-G5-ART",
+      "classLessonTitle": "Week 1 — The Magic of Color: The Color Wheel",
+      "grade": "G5",
       "subject": "Art",
-      "topic": "Draw a sunflower",
-      "teacherNotes": "",
-      "parentSummary": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
+      "topic": "Color Theory",
+      "teacherNotes": "Introductory lesson on the color wheel. Students are learning to identify primary, secondary, and complementary colors to create contrast in their own artworks.",
+      "parentSummary": "This week, students explored the basics of color theory. We learned how to organize colors on a wheel and discovered how 'opposite' colors can make an artwork pop!",
       "translatedSummaries": {
-        "zh": "课堂上我们复习了因式分解：先提公因式，再尝试分组或简单情形。回家只需两道课本例题，并把中间步骤写清楚即可——不必一次做完整组作业。",
-        "en": "In class we reviewed factoring patterns: pull out a GCF first, then try grouping or simple cases. At home, two textbook examples with clear intermediate steps are enough—no need to finish the whole set in one sitting.",
-        "fr": "En classe nous avons revu la factorisation : d’abord extraire le PGCD, puis essayer le regroupement ou les cas simples. À la maison, deux exemples du manuel avec les étapes intermédiaires suffisent — pas besoin de finir toute la série en une fois."
+        "en": "This week, students explored the basics of color theory. We learned how to organize colors on a wheel and discovered how 'opposite' colors can make an artwork pop!",
+        "zh": "本周，学生们探索了色彩理论的基础知识。我们学习了如何在色轮上组织颜色，并发现了“对比色”如何让艺术作品脱颖而出！",
+        "fr": "Cette semaine, les élèves ont exploré les bases de la théorie des couleurs. Nous avons appris à organiser les couleurs sur un cercle chromatique et découvert comment les couleurs « opposées » peuvent faire ressortir une œuvre d'art !"
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://img.freepik.com/free-vector/colour-palette-white-background_1308-127908.jpg?semt=ais_incoming&w=740&q=80",
+        "heroImageAlt": "Bright and colorful illustration of art supplies and a color wheel — Color Theory (Art · G5)",
+        "content": "Ready to become a color expert? Watch these 3 videos to see how artists use the color wheel to make magic happen on the canvas!\n\n1. Intro: The Color Wheel Song\nVideo: The Color Wheel by Scratch Garden\nhttps://www.youtube.com/watch?v=wWW_UbrkBEw\nDescription: A super fun and catchy cartoon video that introduces the primary and secondary colors and how they sit on the wheel.\n\n2. Deep Dive: How to Mix Colors\nVideo: Primary, Secondary and Tertiary Colors Explained\nhttps://www.youtube.com/watch?v=L1AUJ69PqM8\nDescription: See exactly how to mix your primary colors to create every other color in the rainbow. Perfect for your next painting session!\n\n3. Try it: The Power of Complementary Colors\nVideo: Complementary Colors for Kids\nhttps://www.youtube.com/watch?v=pD9_r8X7rL4\nDescription: Learn about 'Color Opposites' and why putting blue next to orange makes both colors look much brighter and more exciting."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": "Tonight: pick two homework items labeled “factoring” and rewrite each solution with one extra line of work shown."
+          "text": "What is the complementary (opposite) color of Red on the color wheel?"
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": "Together, say aloud the first step you try before using a formula (GCF vs. pattern)."
+          "text": "Find two objects in the house that have complementary colors (like a yellow lemon and a purple toy) and put them next to each other."
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": "If it’s still stuck after 10 minutes, message the teacher with the problem number."
+          "text": "Explain to your parents how you can make the color Green using only two primary colors."
         }
       ],
       "audience": {
         "mode": "whole_class",
-        "recipientCount": 28,
+        "recipientCount": 24,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-04-04T03:48:48.238Z",
-      "threadId": "card-thread-f18a01a4-bf7b-4ce9-9fe9-bb220d2ffdc7"
+      "sentAt": "2026-04-06T09:10:00.000Z",
+      "threadId": "card-thread-art-g5-color-theory",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-g5-01",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "pretty_easy"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "parent-g5-01",
+          "doNotUnderstand": false
+        }
+      ]
     },
     {
-      "id": "card-metaphor",
+      "id": "card-au-g6-lit-2026-04-02",
       "schemaVersion": 4,
-      "createdAt": "2026-03-31T00:20:00.000Z",
-      "updatedAt": "2026-03-31T00:20:00.000Z",
-      "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Shakespeare — Reading workshop",
-      "grade": "English",
-      "subject": "Writing",
-      "topic": "What is a metaphor?",
-      "teacherNotes": "",
-      "parentSummary": "Not literal comparison—how metaphors work in poems and everyday speech.",
+      "createdAt": "2026-04-02T09:15:22.410Z",
+      "updatedAt": "2026-04-02T17:30:10.105Z",
+      "authorUserId": "teacher-2",
+      "classId": "AU-NSW-G6-ENG-B",
+      "classLessonTitle": "Introduction to Figurative Language: Similes & Metaphors",
+      "grade": "G6",
+      "subject": "English",
+      "topic": "Figurative Language",
+      "teacherNotes": "This lesson aligns with the Australian Curriculum (AC9E6LA08), focusing on identifying and using vivid, emotive vocabulary to enhance narrative writing.",
+      "parentSummary": "This week, students began exploring how authors use figurative language—specifically similes and metaphors—to make their writing more descriptive and engaging. We focused on 'showing, not telling' through creative comparisons.",
       "translatedSummaries": {
-        "zh": "不是字面比较——隐喻在诗歌和日常表达里如何运作。",
-        "en": "Not literal comparison—how metaphors work in poems and everyday speech.",
-        "fr": "Pas une comparaison littérale — comment fonctionnent les métaphores dans les poèmes et le langage courant."
+        "en": "This week, students began exploring how authors use figurative language—specifically similes and metaphors—to make their writing more descriptive and engaging. We focused on 'showing, not telling' through creative comparisons.",
+        "zh": "本周，学生们开始探索作者如何利用比喻修辞（特别是明喻和暗喻）来增强写作的描述性和趣味性。我们重点练习了如何通过创意比拟来实现“展示而非陈述”的表达方式。",
+        "fr": "Cette semaine, les élèves ont commencé à explorer comment les auteurs utilisent le langage figuré — en particulier les comparaisons et les métaphores — pour rendre leur écriture plus descriptive et attrayante. Nous nous sommes concentrés sur le concept « montrer au lieu de dire » grâce à des comparaisons créatives."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://static.vecteezy.com/system/resources/previews/023/078/948/non_2x/cartoon-kids-character-reading-a-book-in-sitting-pose-vector.jpg",
+        "heroImageAlt": "Stack of colorful children's storybooks with a focus on imagination — Figurative Language (English · G6)",
+        "content": "Below are 3 fun videos to help you understand the magic of Similes and Metaphors! Watch them and see if you can find any examples in your favorite book.\n\n1. The Basics: What is a Simile?\nVideo: Similes and Metaphors for Kids | Homeschool Pop\nhttps://www.youtube.com/watch?v=5V3ZdTFxoX4\nDescription: A great starting point to learn how to spot comparisons using 'like' or 'as' and how they make stories more colorful.\n\n2. Deep Dive: Simile vs. Metaphor\nVideo: Metaphor and Similes | EasyTeaching\nhttps://www.youtube.com/watch?v=xH5EgQS8ZIE\nDescription: Learn the key differences between these two tools and why authors choose one over the other to create mood.\n\n3. Advanced Fun: Idioms and Figures of Speech\nVideo: Similes, Metaphors & Idioms | Homeschool Pop\nhttps://www.youtube.com/watch?v=35PzoZWJpIM\nDescription: Take it a step further! Explore common idioms and see how figurative language is used in everyday English conversations."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": "Tonight: revisit “What is a metaphor?” with one class or homework example."
+          "text": "Identify if the sentence 'Her smile was as bright as the sun' is a simile or a metaphor."
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
+          "text": "Take a look around the room and try to describe an object using a simile (e.g., 'This chair is as soft as a cloud')."
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
+          "text": "Tell your parents why an author might say 'Life is a rollercoaster' instead of just saying 'Life has many ups and downs'."
         }
       ],
       "audience": {
         "mode": "whole_class",
-        "recipientCount": 28,
+        "recipientCount": 26,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-03-31T00:20:00.000Z",
-      "threadId": "card-thread-metaphor"
+      "sentAt": "2026-04-02T09:20:00.000Z",
+      "threadId": "card-thread-au-g6-literature-intro",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-au-601",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "think_get_it"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "parent-au-601",
+          "doNotUnderstand": false
+        }
+      ]
     },
     {
-      "id": "card-renaissance",
+      "id": "card-hist-g9-au-industrial-rev-v2",
       "schemaVersion": 4,
-      "createdAt": "2026-03-29T00:05:00.000Z",
-      "updatedAt": "2026-03-29T00:05:00.000Z",
-      "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
-      "grade": "History",
-      "subject": "World",
-      "topic": "What was the Renaissance?",
-      "teacherNotes": "",
-      "parentSummary": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
+      "createdAt": "2026-04-03T11:20:00.000Z",
+      "updatedAt": "2026-04-06T15:45:10.000Z",
+      "authorUserId": "teacher-2",
+      "classId": "G9-HIST-NSW-01",
+      "classLessonTitle": "Chapter 01 — The Industrial Revolution: Global Impact",
+      "grade": "G9",
+      "subject": "History",
+      "topic": "The Industrial Revolution",
+      "teacherNotes": "Replacement materials for Chapter 01. Focus on the technological shift and the environmental consequences of the era.",
+      "parentSummary": "This week, we revisited the dawn of the modern age. Students explored how the Industrial Revolution began in Britain and fundamentally changed human society through mass production and urbanization.",
       "translatedSummaries": {
-        "zh": "艺术、思想与“复兴”——晚餐时怎么聊，而不像背课本。",
-        "en": "Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.",
-        "fr": "Art, idées et « renaissance » — comment en parler au dîner sans ton de manuel."
+        "en": "This week, we revisited the dawn of the modern age. Students explored how the Industrial Revolution began in Britain and fundamentally changed human society through mass production and urbanization.",
+        "zh": "本周，我们重新审视了现代社会的黎明。学生们探索了工业革命如何起源于英国，并如何通过大规模生产和城市化从根本上改变了人类社会。",
+        "fr": "Cette semaine, nous avons revisité l'aube de l'ère moderne. Les élèves ont exploré comment la révolution industrielle a commencé en Grande-Bretagne et a fondamentalement changé la société humaine grâce à la production de masse et à l'urbanisation."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_YdhNxzVDN5faJI7frMuUPZ1M178oY3LKzQ&s",
+        "heroImageAlt": "Vibrant illustration of gears and digital connections — Industrial Revolution (History · G9)",
+        "content": "Let's try this again! Here are 3 high-quality videos to help you visualize the steam, the gears, and the cities of the Industrial Revolution. Watch closely for the 'How' and 'Why'!\n\n1. The Grand Overview\nVideo: The Industrial Revolution | National Geographic\nhttps://www.youtube.com/watch?v=xLhNP0qp38Q\nDescription: A breathtaking look at how a series of innovations transformed the world from muscle power to machine power.\n\n2. The Core Technology: Coal & Steam\nVideo: Coal, Steam, and The Industrial Revolution: Crash Course World History #32\nhttps://www.youtube.com/watch?v=zhL5DCizj5c\nDescription: Join John Green to find out why the revolution happened in Britain first and how coal changed the course of history.\n\n3. Daily Life: Working in the Factories\nVideo: Working Conditions in the Industrial Revolution\nhttps://www.youtube.com/watch?v=vV_vK6Bw2_8\nDescription: A simple, cartoon-style overview of what it was really like to work in a 19th-century factory, including the challenges faced by children."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": "Tonight: revisit “What was the Renaissance?” with one class or homework example."
+          "text": "Identify one way the invention of the steam engine changed transportation."
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
+          "text": "Find an item at home made in a factory. Imagine how someone would have made it by hand 300 years ago."
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
+          "text": "Tell your parents why 'access to coal' was a game-changer for Great Britain in the 1700s."
         }
       ],
       "audience": {
@@ -563,51 +284,149 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-03-29T00:05:00.000Z",
-      "threadId": "card-thread-renaissance"
+      "sentAt": "2026-04-03T12:00:00.000Z",
+      "threadId": "card-thread-hist-g9-industrial-v2",
+      "studentFeedbacks": [
+        {
+          "studentId": "std-9-A",
+          "watchedVideo": true,
+          "chatedWithAI": true,
+          "status": "finished",
+          "finishedType": "think_get_it"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "prn-9-A",
+          "doNotUnderstand": false
+        }
+      ]
     },
     {
-      "id": "card-shakespeare",
+      "id": "card-hsc-eng-v3-2026",
       "schemaVersion": 4,
-      "createdAt": "2026-04-02T23:15:00.000Z",
-      "updatedAt": "2026-04-02T23:15:00.000Z",
+      "createdAt": "2026-04-01T09:30:00.000Z",
+      "updatedAt": "2026-04-01T16:20:45.000Z",
       "authorUserId": "teacher-1",
-      "classId": null,
-      "classLessonTitle": "Shakespeare — Reading workshop",
-      "grade": "",
-      "subject": "Literature",
-      "topic": "Who is Shakespeare?",
-      "teacherNotes": "",
-      "parentSummary": "Why we still read Shakespeare and how to help with reading at home.",
+      "classId": "G12-ENG-001",
+      "classLessonTitle": "Chapter 01 — Advanced Reading & Visual Literacy",
+      "grade": "G12",
+      "subject": "English",
+      "topic": "Reading and Viewing Strategies",
+      "teacherNotes": "Crucial chapter for the final year. Focus is on moving from 'what' happens to 'how' it is constructed to create meaning.",
+      "parentSummary": "This week we tackled Chapter 01, focusing on 'Close Reading' and 'Visual Literacy'. The goal is for students to stop summarizing and start analyzing the author's techniques.",
       "translatedSummaries": {
-        "zh": "我们为什么仍读莎士比亚，以及如何在家协助阅读。",
-        "en": "Why we still read Shakespeare and how to help with reading at home.",
-        "fr": "Pourquoi on lit encore Shakespeare et comment aider à la lecture à la maison."
+        "en": "This week we tackled Chapter 01, focusing on 'Close Reading' and 'Visual Literacy'. The goal is for students to stop summarizing and start analyzing the author's techniques.",
+        "zh": "本周我们学习了第一章，重点是“细读”和“视觉素养”。目标是让学生停止简单的内容总结，开始分析作者的创作手法。",
+        "fr": "Cette semaine, nous avons abordé le chapitre 01, en nous concentrant sur la « lecture attentive » et la « littératie visuelle ». L'objectif est que les élèves cessent de résumer et commencent à analyser les techniques de l'auteur."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://static.vecteezy.com/system/resources/previews/023/078/948/non_2x/cartoon-kids-character-reading-a-book-in-sitting-pose-vector.jpg",
+        "heroImageAlt": "Bright study desk with books and creative supplies — Reading Strategies (Math · G12)",
+        "content": "Mastering Year 12 English means reading between the lines. Here are 3 essential videos to help you move from 'Describing' to 'Analyzing' as required in Chapter 01.\n\n1. The Foundation: How and Why We Read\nVideo: How and Why We Read: Crash Course Literature\nhttps://www.youtube.com/watch?v=MSYw502dJNY\nDescription: A high-speed guide to active reading. It explains how to engage with a text to find deeper, non-obvious meanings.\n\n2. Viewing Strategies: Decoding Visual Texts\nVideo: What is Visual Literacy?\nhttps://www.youtube.com/watch?v=6m8G-C2Wk0I\nDescription: Essential for the 'Viewing' part of this chapter. Learn how to 'read' an image or video by analyzing composition, color, and focus.\n\n3. Writing for Marks: Analysis vs. Description\nVideo: Descriptive vs. Analytical Writing\nhttps://www.youtube.com/watch?v=VlSj5-0q72M\nDescription: This is the 'secret sauce' for G12. It shows you exactly how to stop just retelling the story and start arguing how the text works."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": "Tonight: revisit “Who is Shakespeare?” with one class or homework example."
+          "text": "Identify 3 literary techniques in your current text and explain their effect."
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": "Ask your child to explain the main idea in their own words."
+          "text": "Look at a movie poster together. Ask your child: 'How does the lighting affect the mood?'"
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": "If it’s stuck after ~15 minutes, note the question and message the teacher."
+          "text": "Explain why an 'inference' is more than just a guess based on the text."
         }
       ],
       "audience": {
         "mode": "whole_class",
-        "recipientCount": 28,
+        "recipientCount": 26,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-04-02T23:15:00.000Z",
-      "threadId": "card-thread-shakespeare"
+      "sentAt": "2026-04-01T10:00:00.000Z",
+      "threadId": "card-thread-hsc-ch1-v3",
+      "studentFeedbacks": [
+        {
+          "studentId": "std-001",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "think_get_it"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "prn-001",
+          "doNotUnderstand": false
+        }
+      ]
+    },
+    {
+      "id": "card-sci-g7-au-2026-04-06",
+      "schemaVersion": 4,
+      "createdAt": "2026-04-01T08:30:00.000Z",
+      "updatedAt": "2026-04-01T15:20:45.000Z",
+      "authorUserId": "teacher-1",
+      "classId": "AU-G7-SCI-02",
+      "classLessonTitle": "Week 1 — The Living World: Biological Classification",
+      "grade": "G7",
+      "subject": "Science",
+      "topic": "Classification of Living Things",
+      "teacherNotes": "Introductory lesson on taxonomy. Students should learn the Linnaean hierarchy and the concept of the Five Kingdoms.",
+      "parentSummary": "This week, students started their journey into biology by learning how scientists organize life on Earth. We explored why classification is necessary and the characteristics used to group organisms.",
+      "translatedSummaries": {
+        "en": "This week, students started their journey into biology by learning how scientists organize life on Earth. We explored why classification is necessary and the characteristics used to group organisms.",
+        "zh": "本周，学生们开始了生物学之旅，学习科学家如何组织地球上的生命。我们探讨了分类的必要性以及用于对生物进行分组的特征。",
+        "fr": "Cette semaine, les élèves ont commencé leur voyage en biologie en apprenant comment les scientifiques organisent la vie sur Terre. Nous avons exploré pourquoi la classification est nécessaire et les caractéristiques utilisées pour grouper les organismes."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://img.freepik.com/free-vector/science-lab-objects_23-2148488312.jpg?semt=ais_incoming&w=740&q=80",
+        "heroImageAlt": "Bright cartoon-style illustration of various plants and animals — Classification (Science · G7)",
+        "content": "Welcome to the world of Taxonomy! Here are 3 videos to help you understand how we sort everything from tiny bacteria to giant blue whales.\n\n1. The Big Picture: Why Classify?\nVideo: Classification of Living Things | Dr. Binocs Show\nhttps://www.youtube.com/watch?v=vqxomJIBGcY\nDescription: Join Dr. Binocs to discover why scientists need a 'filing system' for all living creatures on our planet.\n\n2. Exploring the Groups: The Five Kingdoms\nVideo: The 5 Kingdoms of Classification\nhttps://www.youtube.com/watch?v=u90WvBZuV8Q\nDescription: A clear breakdown of the five major kingdoms of life: Animals, Plants, Fungi, Protists, and Monerans.\n\n3. Memory Trick: The Levels of Life\nVideo: Taxonomy: Life's Filing System | Crash Course Kids\nhttps://www.youtube.com/watch?v=DVouAdj44mo\nDescription: Learn a fun mnemonic to remember the hierarchy of life, from Kingdom all the way down to Species!"
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": "Can you name the 5 Kingdoms of life we discussed in class?"
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": "Pick five items in your kitchen and try to 'classify' them into two groups based on one shared characteristic."
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": "Explain to your parents what 'King Philip Came Over For Great Soup' stands for in biology!"
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 25,
+        "selectedStudentIds": []
+      },
+      "sentAt": "2026-04-01T09:00:00.000Z",
+      "threadId": "card-thread-sci-g7-taxonomy",
+      "studentFeedbacks": [
+        {
+          "studentId": "std-7-01",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "finished",
+          "finishedType": "pretty_easy"
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "prn-7-01",
+          "doNotUnderstand": false
+        }
+      ]
     }
   ],
   "studentMoods": [

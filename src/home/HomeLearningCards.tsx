@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
-import { LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
+import { isParentFacingTonightPreset, LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
 import { getDataLayer } from '@/data';
 import type { LearningCardBackend } from '@/data';
 import { sampleLearningCardBackend } from '@/data/learning-card-mappers';
@@ -114,7 +114,7 @@ export function HomeLearningCards() {
             <p className="learning-card__label">家长可执行动作</p>
             <ol className="learning-card__actions">
               {card.tonightActions
-                .filter((a) => a.include)
+                .filter((a) => a.include && isParentFacingTonightPreset(a.preset))
                 .map((action) => (
                   <li key={action.preset}>{LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset].title}</li>
                 ))}

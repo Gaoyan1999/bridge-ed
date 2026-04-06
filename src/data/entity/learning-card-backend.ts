@@ -99,6 +99,12 @@ export type LearningCardStudentFeedback = {
   /** Set when `status === 'finished'` (how it felt / self-report). */
   finishedType?: LearningCardStudentFinishedType;
   feeling?: string;
+  /** Student used the teacher-suggested Quiz action in Knowledge. */
+  actionQuiz?: boolean;
+  /** Student used the teacher-suggested Practice action in Knowledge. */
+  actionPractice?: boolean;
+  /** Student used the teacher-suggested Teach-back action in Knowledge. */
+  actionTeachBack?: boolean;
 };
 
 export function getDefaultLearningCardStudentFeedback(studentId: string): LearningCardStudentFeedback {

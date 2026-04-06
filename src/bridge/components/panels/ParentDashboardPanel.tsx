@@ -17,8 +17,14 @@ import { ScheduleWeek } from '@/bridge/components/ScheduleWeek';
 
 export function ParentDashboardPanel({ active, dashHint }: { active: boolean; dashHint: string }) {
   const { t } = useTranslation();
-  const { openKnowledgeFromCard, learningCardsEpoch, bumpLearningCards, studentMoodsEpoch, currentUser } =
-    useBridge();
+  const {
+    openKnowledgeFromCard,
+    learningCardsEpoch,
+    bumpLearningCards,
+    removeKnowledgeThreadForDeletedCard,
+    studentMoodsEpoch,
+    currentUser,
+  } = useBridge();
   const parentUserId = currentUser?.role === 'parent' ? currentUser.id : DEMO_PARENT_USER_ID;
   const [cards, setCards] = useState<LearningCardItem[]>([]);
   const [moodEntries, setMoodEntries] = useState<StudentMoodBackend[]>([]);
@@ -30,12 +36,13 @@ export function ParentDashboardPanel({ active, dashHint }: { active: boolean; da
       if (!window.confirm(t('learningCard.deleteConfirm', { title: card.title }))) return;
       try {
         await getDataLayer().learningCards.delete(card.id);
+        removeKnowledgeThreadForDeletedCard(card.threadId);
         bumpLearningCards();
       } catch (e) {
         console.error('[LearningCard] delete failed', e);
       }
     },
-    [bumpLearningCards, t],
+    [bumpLearningCards, removeKnowledgeThreadForDeletedCard, t],
   );
 
   useEffect(() => {
