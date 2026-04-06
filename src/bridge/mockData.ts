@@ -218,8 +218,7 @@ export const REPORT_DRAFT_BODY =
   '• Double-check signs when you add/subtract both sides (small error → wrong roots).\n' +
   '• “Completing the square” — review Example 3 in the learning card pack.\n\n' +
   'Next step\n' +
-  '• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.\n\n' +
-  '— Ms. Lee';
+  '• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.';
 
 /** Demo analytics shown in the class report modal (layout preview until gradebook is wired). */
 export const REPORT_DEMO_GRADE_COUNTS = { hd: 5, d: 11, c: 9, p: 3 } as const;

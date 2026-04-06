@@ -1,29 +1,31 @@
 {
-  "snapshotVersion": 1,
-  "exportedAt": "2026-04-06T07:04:04.524Z",
+  "snapshotVersion": 3,
+  "exportedAt": "2026-04-06T14:45:10.362Z",
   "learningCards": [
     {
-      "id": "card-55615594-c62e-41b5-86e1-93af028a1f8e",
+      "id": "card-2f4aca11-04bc-46ea-8621-3c82be9a9bf0",
       "schemaVersion": 4,
-      "createdAt": "2026-04-04T06:55:19.608Z",
-      "updatedAt": "2026-04-04T06:55:19.608Z",
+      "createdAt": "2026-04-06T12:16:10.825Z",
+      "updatedAt": "2026-04-06T12:47:33.920Z",
       "authorUserId": "teacher-2",
       "classId": null,
-      "classLessonTitle": "Dept week — light homework & review",
+      "classLessonTitle": "Week 14 — Factoring review",
       "grade": "G7",
-      "subject": "Art",
-      "topic": "Van Gogh's Style",
-      "teacherNotes": "Today the children learned what Van Gogh's style is. They looked at The Starry Night and Sunflowers",
-      "parentSummary": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
+      "subject": "Science",
+      "topic": "Dinosaur Extinction",
+      "teacherNotes": "",
+      "parentSummary": "This week, your child is learning about why dinosaurs went extinct in science class. Understanding this helps them learn about Earth's history and how life changes over time. Tonight, you can talk with your child about what they know about dinosaurs and ask why they think dinosaurs disappeared. This helps your child review and share their ideas.",
       "translatedSummaries": {
-        "zh": "这代表什么？\n今天孩子们学习了著名画家文森特·梵高的创作方式：不只是看画，还了解他让作品显得特别的“手法”。\n\n什么是梵高的“风格”？用孩子能懂的话说，主要有三点：\n\n- 厚涂与笔触：画面不追求光滑，颜料涂得厚，能看见笔刷的痕迹，像许多小色条。\n\n- 鲜艳色彩：喜欢用很亮的黄、很深的蓝等，即使和实物不完全一样。\n\n- 旋涡与动感：画里的一切都像在动：星星像在旋转，草叶像在风中摇摆。\n\n总之：孩子们学着用鲜艳、厚重、卷曲的线条，让画面充满力量与情感。",
-        "en": "What does it mean?\nIt means that today, the kids learned how a famous painter named Vincent van Gogh made his art. They didn't just look at his pictures; they learned the \"tricks\" he used to make his art look special.\n\nWhat is Van Gogh's \"style\"?\nTo explain it simply to a child or in plain talk, his style has three main parts:\n\n- Thick Paint and Lines: He didn't make his paintings smooth. He used thick paint. You can see the marks from his brush. It looks like many little \"dashes\" or \"sticks\" of color.\n\n- Bright Colors: He loved using very bright colors, like bold yellows and deep blues, even if the real object didn't look exactly like that.\n\n- Swirls and Movement: Everything in his paintings looks like it is moving. The stars look like they are spinning (swirls), and the grass looks like it is blowing in the wind.\n\nIn short:\nThe children learned to paint with bright colors and swirly, thick lines to make their pictures look full of energy and feeling.",
-        "fr": "Qu’est-ce que cela veut dire ?\nAujourd’hui, les enfants ont découvert comment le peintre Vincent van Gogh créait : pas seulement regarder des tableaux, mais les « astuces » qui rendent son art particulier.\n\nQu’est-ce que son « style » ? En termes simples, trois grands traits :\n\n- Peinture épaisse et coups de pinceau visibles, comme de petits traits de couleur.\n\n- Couleurs vives (jaunes audacieux, bleus profonds), même si ce n’est pas le réel au détail près.\n\n- Tourbillons et mouvement : les étoiles semblent tourner, l’herbe ondule au vent.\n\nEn bref : peindre avec des couleurs vives et des lignes épaisses et ondulées pour donner de l’énergie et de l’émotion."
+        "zh": "这周您的孩子在科学课上学习恐龙灭绝的原因。了解这些原因可以帮助孩子更好地理解地球的历史和生命变化。今晚，您可以和孩子一起谈谈他们知道的恐龙，问问他们为什么恐龙会消失。这样可以帮助孩子复习并表达自己的想法。",
+        "en": "This week, your child is learning about why dinosaurs went extinct in science class. Understanding this helps them learn about Earth's history and how life changes over time. Tonight, you can talk with your child about what they know about dinosaurs and ask why they think dinosaurs disappeared. This helps your child review and share their ideas.",
+        "fr": "Cette semaine, votre enfant apprend en sciences pourquoi les dinosaures ont disparu. Comprendre cela l’aide à mieux connaître l’histoire de la Terre et les changements de la vie. Ce soir, vous pouvez discuter avec votre enfant de ce qu’il sait sur les dinosaures et lui demander pourquoi il pense qu’ils ont disparu. Cela l’aide à revoir ses connaissances et à exprimer ses idées."
       },
       "childKnowledge": {
-        "heroImageUrl": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80",
-        "heroImageAlt": "美术馆中的画作（演示配图）",
-        "content": "给你挑了几支讲梵高、笔触和《星夜》的小短片，画风很活泼。你可以边画边看，想一想：他的画为什么看起来像在动？\n\n1. 入门：梵高是谁？他为什么这么有名\n视频：Vincent van Gogh for Kids | Famous Artists for Children\nhttps://www.youtube.com/watch?v=87SftBC1vFo\n推荐：用孩子能懂的话介绍生平与代表作，适合第一次接触梵高时建立整体印象。\n\n2. 细看《星夜》：旋涡、厚涂和颜色\n视频：Starry Night by Vincent van Gogh | Art for Kids!\nhttps://www.youtube.com/watch?v=5vZlQe7yM8Y\n推荐：画面贴近你课上看到的「旋涡与动感」，帮助孩子把「风格」三个字和具体笔触对上号。\n\n3. 动手向：向日葵与厚涂笔触\n视频：Van Gogh Sunflowers Art Lesson for Kids\nhttps://www.youtube.com/watch?v=QFJ5QdG1J1k\n推荐：跟着示范用厚涂和亮色叠色，和「向日葵」主题直接呼应；看完可以试画一小张并拍照给老师。"
+        "heroImageUrl": "https://i.ytimg.com/vi/14QsFTEhU0M/mqdefault.jpg",
+        "heroImageAlt": "Video cover for Dinosaur Extinction (Science - G7)",
+        "source": "curricullm",
+        "warning": null,
+        "content": "Discover how dinosaurs disappeared from Earth millions of years ago with these fun and easy-to-understand videos. Perfect for Grade 7 students and parents to explore science together!\n\n### 1. Getting started\nResource: Intro videos for Dinosaur Extinction\nhttps://www.youtube.com/watch?v=14QsFTEhU0M\nWhy: opens a beginner-friendly video list so you can choose a clear first explanation.\n\n### 2. Build understanding\nResource: Animated worked examples for Dinosaur Extinction\nhttps://www.youtube.com/watch?v=dktnOPfE7Dc\nWhy: example-based explanations help connect ideas to step-by-step solving.\n\n### 3. Practice and teach-back\nResource: Practice videos/questions for Dinosaur Extinction\nhttps://www.youtube.com/watch?v=ffHgLHTeeq0\nWhy: use one practice item, then explain your answer back to a parent."
       },
       "tonightActions": [
         {
@@ -33,12 +35,12 @@
         },
         {
           "preset": "parent_led_practice",
-          "include": true,
+          "include": false,
           "text": ""
         },
         {
           "preset": "explain_to_parent",
-          "include": false,
+          "include": true,
           "text": ""
         }
       ],
@@ -47,8 +49,33 @@
         "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-04-04T06:55:19.608Z",
-      "threadId": "card-thread-55615594-c62e-41b5-86e1-93af028a1f8e"
+      "sentAt": "2026-04-06T12:16:10.825Z",
+      "threadId": "card-thread-2f4aca11-04bc-46ea-8621-3c82be9a9bf0",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-2",
+          "watchedVideo": true,
+          "chatedWithAI": false,
+          "status": "learning",
+          "actionTeachBack": true
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": false,
+          "status": "not_started",
+          "actionTeachBack": true
+        }
+      ],
+      "parentFeedbacks": [
+        {
+          "parentId": "parent-1",
+          "doNotUnderstand": false,
+          "tonightActionsDone": [
+            "explain_to_parent"
+          ]
+        }
+      ]
     },
     {
       "id": "card-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
@@ -114,10 +141,74 @@
       ]
     },
     {
+      "id": "card-9c5dd6e4-62d6-4b5f-8d82-e6cdce10f5ce",
+      "schemaVersion": 4,
+      "createdAt": "2026-04-06T08:54:44.480Z",
+      "updatedAt": "2026-04-06T10:53:04.234Z",
+      "authorUserId": "teacher-2",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Science",
+      "topic": "Acid vs Base",
+      "teacherNotes": "",
+      "parentSummary": "This week, your child is learning about acids and bases in science. This means they are discovering how different substances can be sour or slippery and how this affects everyday things like food and cleaning. You can help by asking your child to name some sour or slippery things at home and talk about where they see acids or bases in daily life. Keep it simple and fun, and praise their ideas to build confidence.",
+      "translatedSummaries": {
+        "zh": "这周，您的孩子正在科学课上学习酸和碱。也就是说，他们在了解不同物质为什么有酸味或滑滑的感觉，这些知识和日常生活中的食物和清洁用品有关。您可以和孩子一起说说家里有哪些酸味或滑滑的东西，聊聊他们在哪里见过酸或碱。保持简单有趣，多鼓励孩子，让他们更有信心。",
+        "en": "This week, your child is learning about acids and bases in science. This means they are discovering how different substances can be sour or slippery and how this affects everyday things like food and cleaning. You can help by asking your child to name some sour or slippery things at home and talk about where they see acids or bases in daily life. Keep it simple and fun, and praise their ideas to build confidence.",
+        "fr": "Cette semaine, votre enfant apprend les acides et les bases en science. Cela signifie qu'il découvre pourquoi certaines choses sont acides ou glissantes et comment cela touche la nourriture et le nettoyage au quotidien. Vous pouvez aider en demandant à votre enfant de nommer des choses acides ou glissantes à la maison et en parlant de où ils voient des acides ou des bases dans la vie de tous les jours. Faites simple et encouragez-le pour qu'il ait confiance."
+      },
+      "childKnowledge": {
+        "heroImageUrl": "https://i.ytimg.com/vi/1rj1oNl7hgU/mqdefault.jpg",
+        "heroImageAlt": "Video cover for Acid vs Base (Science - G7)",
+        "source": "curricullm",
+        "warning": null,
+        "content": "Understanding acids and bases helps us see how everyday substances work, from the food we eat to cleaning products. This week, we'll dive into the world of acids and bases, learning how they behave, how to test them safely, and why they matter in science and our daily lives.\n\n### 1. Getting started\nResource: Intro videos for Acid vs Base\nhttps://www.youtube.com/watch?v=1rj1oNl7hgU\nWhy: opens a beginner-friendly video list so you can choose a clear first explanation.\n\n### 2. Build understanding\nResource: Animated worked examples for Acid vs Base\nhttps://www.youtube.com/watch?v=EhUpsq2i6k0\nWhy: example-based explanations help connect ideas to step-by-step solving.\n\n### 3. Practice and teach-back\nResource: Practice videos/questions for Acid vs Base\nhttps://www.youtube.com/watch?v=K_nTcQknwpw\nWhy: use one practice item, then explain your answer back to a parent."
+      },
+      "tonightActions": [
+        {
+          "preset": "quiz",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "parent_led_practice",
+          "include": true,
+          "text": ""
+        },
+        {
+          "preset": "explain_to_parent",
+          "include": true,
+          "text": ""
+        }
+      ],
+      "audience": {
+        "mode": "whole_class",
+        "recipientCount": 28,
+        "selectedStudentIds": []
+      },
+      "sentAt": "2026-04-06T08:54:44.480Z",
+      "threadId": "card-thread-9c5dd6e4-62d6-4b5f-8d82-e6cdce10f5ce",
+      "studentFeedbacks": [
+        {
+          "studentId": "student-2",
+          "watchedVideo": true,
+          "chatedWithAI": true,
+          "status": "learning"
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning"
+        }
+      ]
+    },
+    {
       "id": "card-art-g5-au-2026-04-06",
       "schemaVersion": 4,
       "createdAt": "2026-04-06T09:00:00.000Z",
-      "updatedAt": "2026-04-06T14:30:15.000Z",
+      "updatedAt": "2026-04-06T12:31:22.562Z",
       "authorUserId": "teacher-1",
       "classId": "AU-QLD-G5-ART",
       "classLessonTitle": "Week 1 — The Magic of Color: The Color Wheel",
@@ -167,75 +258,115 @@
           "chatedWithAI": false,
           "status": "finished",
           "finishedType": "pretty_easy"
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning",
+          "actionPractice": true,
+          "actionQuiz": true
+        },
+        {
+          "studentId": "student-2",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning",
+          "actionPractice": true,
+          "actionQuiz": true
         }
       ],
       "parentFeedbacks": [
         {
           "parentId": "parent-g5-01",
-          "doNotUnderstand": false
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
+        },
+        {
+          "parentId": "parent-1",
+          "doNotUnderstand": false,
+          "tonightActionsDone": [
+            "quiz",
+            "parent_led_practice",
+            "explain_to_parent"
+          ]
         }
       ]
     },
     {
-      "id": "card-au-g6-lit-2026-04-02",
+      "id": "card-c0c035b8-4692-476f-9a31-9eac8cd8f5f6",
       "schemaVersion": 4,
-      "createdAt": "2026-04-02T09:15:22.410Z",
-      "updatedAt": "2026-04-02T17:30:10.105Z",
+      "createdAt": "2026-04-06T12:11:16.222Z",
+      "updatedAt": "2026-04-06T13:20:21.223Z",
       "authorUserId": "teacher-2",
-      "classId": "AU-NSW-G6-ENG-B",
-      "classLessonTitle": "Introduction to Figurative Language: Similes & Metaphors",
-      "grade": "G6",
-      "subject": "English",
-      "topic": "Figurative Language",
-      "teacherNotes": "This lesson aligns with the Australian Curriculum (AC9E6LA08), focusing on identifying and using vivid, emotive vocabulary to enhance narrative writing.",
-      "parentSummary": "This week, students began exploring how authors use figurative language—specifically similes and metaphors—to make their writing more descriptive and engaging. We focused on 'showing, not telling' through creative comparisons.",
+      "classId": null,
+      "classLessonTitle": "Week 14 — Factoring review",
+      "grade": "G7",
+      "subject": "Science",
+      "topic": "Human Teeth",
+      "teacherNotes": "",
+      "parentSummary": "This week, your child is learning about human teeth in science. They will review how teeth work and why they are important for eating and health. You can help by talking with your child about their teeth and asking them to name different types of teeth. This helps them remember and feel confident. Keep it simple and fun!",
       "translatedSummaries": {
-        "en": "This week, students began exploring how authors use figurative language—specifically similes and metaphors—to make their writing more descriptive and engaging. We focused on 'showing, not telling' through creative comparisons.",
-        "zh": "本周，学生们开始探索作者如何利用比喻修辞（特别是明喻和暗喻）来增强写作的描述性和趣味性。我们重点练习了如何通过创意比拟来实现“展示而非陈述”的表达方式。",
-        "fr": "Cette semaine, les élèves ont commencé à explorer comment les auteurs utilisent le langage figuré — en particulier les comparaisons et les métaphores — pour rendre leur écriture plus descriptive et attrayante. Nous nous sommes concentrés sur le concept « montrer au lieu de dire » grâce à des comparaisons créatives."
+        "zh": "这周，您的孩子在科学课上学习人类的牙齿。他们会复习牙齿的作用以及牙齿对吃东西和健康的重要性。您可以和孩子聊聊他们的牙齿，让他们说出不同种类的牙齿名称。这样可以帮助他们记住知识，增强自信。保持轻松有趣！",
+        "en": "This week, your child is learning about human teeth in science. They will review how teeth work and why they are important for eating and health. You can help by talking with your child about their teeth and asking them to name different types of teeth. This helps them remember and feel confident. Keep it simple and fun!",
+        "fr": "Cette semaine, votre enfant apprend sur les dents humaines en sciences. Il révise comment les dents fonctionnent et pourquoi elles sont importantes pour manger et la santé. Vous pouvez aider en parlant avec votre enfant de ses dents et en lui demandant de nommer différents types de dents. Cela l’aide à se souvenir et à gagner en confiance. Faites simple et amusant !"
       },
       "childKnowledge": {
-        "heroImageUrl": "https://static.vecteezy.com/system/resources/previews/023/078/948/non_2x/cartoon-kids-character-reading-a-book-in-sitting-pose-vector.jpg",
-        "heroImageAlt": "Stack of colorful children's storybooks with a focus on imagination — Figurative Language (English · G6)",
-        "content": "Below are 3 fun videos to help you understand the magic of Similes and Metaphors! Watch them and see if you can find any examples in your favorite book.\n\n1. The Basics: What is a Simile?\nVideo: Similes and Metaphors for Kids | Homeschool Pop\nhttps://www.youtube.com/watch?v=5V3ZdTFxoX4\nDescription: A great starting point to learn how to spot comparisons using 'like' or 'as' and how they make stories more colorful.\n\n2. Deep Dive: Simile vs. Metaphor\nVideo: Metaphor and Similes | EasyTeaching\nhttps://www.youtube.com/watch?v=xH5EgQS8ZIE\nDescription: Learn the key differences between these two tools and why authors choose one over the other to create mood.\n\n3. Advanced Fun: Idioms and Figures of Speech\nVideo: Similes, Metaphors & Idioms | Homeschool Pop\nhttps://www.youtube.com/watch?v=35PzoZWJpIM\nDescription: Take it a step further! Explore common idioms and see how figurative language is used in everyday English conversations."
+        "heroImageUrl": "https://i.ytimg.com/vi/co4kSPqRi9o/mqdefault.jpg",
+        "heroImageAlt": "Video cover for Human Teeth (Science - G7)",
+        "source": "curricullm",
+        "warning": null,
+        "content": "Welcome to our exploration of human teeth! This week, we’ll discover how teeth work, why they are important, and how to take care of them. Understanding your teeth helps you keep a healthy smile and learn about the amazing biology inside your mouth.\n\n### 1. Getting started\nResource: Intro videos for Human Teeth\nhttps://www.youtube.com/watch?v=rnIny_riefs\nWhy: opens a beginner-friendly video list so you can choose a clear first explanation.\n\n### 2. Build understanding\nResource: Animated worked examples for Human Teeth\nhttps://www.youtube.com/watch?v=co4kSPqRi9o\nWhy: example-based explanations help connect ideas to step-by-step solving.\n\n### 3. Practice and teach-back\nResource: Practice videos/questions for Human Teeth\nhttps://www.youtube.com/watch?v=ViKyGc-l3W0\nWhy: use one practice item, then explain your answer back to a parent."
       },
       "tonightActions": [
         {
           "preset": "quiz",
           "include": true,
-          "text": "Identify if the sentence 'Her smile was as bright as the sun' is a simile or a metaphor."
+          "text": ""
         },
         {
           "preset": "parent_led_practice",
           "include": true,
-          "text": "Take a look around the room and try to describe an object using a simile (e.g., 'This chair is as soft as a cloud')."
+          "text": ""
         },
         {
           "preset": "explain_to_parent",
           "include": true,
-          "text": "Tell your parents why an author might say 'Life is a rollercoaster' instead of just saying 'Life has many ups and downs'."
+          "text": ""
         }
       ],
       "audience": {
         "mode": "whole_class",
-        "recipientCount": 26,
+        "recipientCount": 28,
         "selectedStudentIds": []
       },
-      "sentAt": "2026-04-02T09:20:00.000Z",
-      "threadId": "card-thread-au-g6-literature-intro",
-      "studentFeedbacks": [
-        {
-          "studentId": "student-au-601",
-          "watchedVideo": true,
-          "chatedWithAI": false,
-          "status": "finished",
-          "finishedType": "think_get_it"
-        }
-      ],
+      "sentAt": "2026-04-06T12:11:16.222Z",
+      "threadId": "card-thread-c0c035b8-4692-476f-9a31-9eac8cd8f5f6",
       "parentFeedbacks": [
         {
-          "parentId": "parent-au-601",
-          "doNotUnderstand": false
+          "parentId": "parent-1",
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
+        }
+      ],
+      "studentFeedbacks": [
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": false,
+          "status": "not_started",
+          "actionQuiz": false,
+          "actionPractice": false,
+          "actionTeachBack": false
+        },
+        {
+          "studentId": "student-2",
+          "watchedVideo": false,
+          "chatedWithAI": false,
+          "status": "not_started",
+          "actionQuiz": false,
+          "actionPractice": false,
+          "actionTeachBack": false
         }
       ]
     },
@@ -243,7 +374,7 @@
       "id": "card-hist-g9-au-industrial-rev-v2",
       "schemaVersion": 4,
       "createdAt": "2026-04-03T11:20:00.000Z",
-      "updatedAt": "2026-04-06T15:45:10.000Z",
+      "updatedAt": "2026-04-06T08:55:43.310Z",
       "authorUserId": "teacher-2",
       "classId": "G9-HIST-NSW-01",
       "classLessonTitle": "Chapter 01 — The Industrial Revolution: Global Impact",
@@ -293,6 +424,13 @@
           "chatedWithAI": true,
           "status": "finished",
           "finishedType": "think_get_it"
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning",
+          "actionQuiz": true
         }
       ],
       "parentFeedbacks": [
@@ -490,11 +628,11 @@
       "schemaVersion": 4,
       "studentId": "student-1",
       "localDate": "2026-04-06",
-      "pleasant": 10,
-      "mood": "tired",
+      "pleasant": 30,
+      "mood": "neutral",
       "note": "",
       "createdAt": "2026-04-05T15:50:19.357Z",
-      "updatedAt": "2026-04-05T15:50:19.357Z"
+      "updatedAt": "2026-04-06T10:40:57.657Z"
     },
     {
       "id": "sm:student-2:2026-03-31",
@@ -587,5 +725,46 @@
       "email": "mr.li@example.com",
       "role": "teacher"
     }
+  ],
+  "reports": [
+    {
+      "id": "rep-1775461621844",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-06T07:47:01.844Z",
+      "updatedAt": "2026-04-06T07:47:01.844Z",
+      "authorUserId": "teacher-2",
+      "sentAt": "2026-04-06T07:47:01.844Z",
+      "title": "Math 9 — Unit test: Quadratic functions (class report)",
+      "summary": "Mean score sits in the mid band; students who did well handled vertex form and the discriminant. The most common slip was sign errors when moving terms across the equals sign—worth one short review before the next quiz.",
+      "body": "Hello families,\n\nHere’s a concise read-out from this week’s quadratic functions unit test (paper + structured working).\n\nWhat went well\n• Graphing parabolas from vertex form and reading turning points.\n• Most students showed clear working for factorisation when a = 1.\n\nFocus for revision\n• Double-check signs when you add/subtract both sides (small error → wrong roots).\n• “Completing the square” — review Example 3 in the learning card pack.\n\nNext step\n• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.",
+      "audience": {
+        "toStudents": true,
+        "toParents": true
+      },
+      "messageThreadIds": {
+        "student": "rep-1775461621844-s",
+        "parent": "rep-1775461621844-p"
+      }
+    }    
+  ],
+  "broadcasts": [
+    {
+      "id": "bc-1775463890635",
+      "schemaVersion": 1,
+      "createdAt": "2026-04-06T08:24:50.635Z",
+      "updatedAt": "2026-04-06T08:24:50.635Z",
+      "authorUserId": "teacher-2",
+      "sentAt": "2026-04-04T08:24:50.635Z",
+      "title": "Happy Easter Holiday",
+      "body": "Please note that our class will be on break for the Easter holiday. There will be no classes during this period.\n\nWe hope you and your family have a wonderful and relaxing holiday. Classes will resume after the break as usual.\n\nBest regards,\nMr. Li",
+      "audience": {
+        "toStudents": true,
+        "toParents": true
+      },
+      "messageThreadIds": {
+        "student": "bc-1775463890635-s",
+        "parent": "bc-1775463890635-p"
+      }
+    }    
   ]
 }

@@ -50,6 +50,8 @@ export interface ThreadMessage {
   teacherReport?: TeacherReportPayload;
   /** One broadcast in the unified broadcast thread (title + body shown as a card). `sentAt` is ISO 8601 for the time row. */
   broadcastPost?: { title: string; body: string; sentAt?: string };
+  /** Broadcast / class report author (`UserBackend.id`); used to resolve display name from `users`. */
+  authorUserId?: string;
 }
 
 /** Parent dashboard children linked to mood check-ins (demo roster). */

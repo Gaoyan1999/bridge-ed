@@ -903,7 +903,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 ) : null}
                 {msgs.length > 0
                   ? msgs.map((m, idx) => (
-                      <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>
+                      <div key={`${idx}-${m.who}`} className={cx('msg', m.type === 'out' ? 'msg--out' : 'msg--in')}>                        
                         <div className="msg__who">{msgWhoLabel(m.who, t)}</div>
                         {m.type === 'in' ? (
                           <>

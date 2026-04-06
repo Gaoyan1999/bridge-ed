@@ -1,7 +1,8 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBridge } from '@/bridge/BridgeContext';
 import type { TeacherBroadcastPayload } from '@/bridge/types';
+import type { UserBackend } from '@/data/entity/user-backend';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
 import { ReportModal } from '@/bridge/components/ReportModal';
 import { TeacherCardPreviewTodoModal } from '@/bridge/components/TeacherCardPreviewTodoModal';
@@ -10,77 +11,147 @@ import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { FieldTextInput } from '@/bridge/components/ui/FieldTextInput';
 
-const BOOK_SLOT_OPTIONS = [
-  { value: '__none__', label: 'Choose a slot' },
-  { value: 'mon', label: 'Mon 18:00–18:20' },
-  { value: 'wed', label: 'Wed 17:30–17:50' },
-  { value: 'fri', label: 'Fri 16:00–16:20' },
-] as const;
+const BOOK_SLOT_VALUES = ['__none__', '1600', '1730', '1800'] as const;
 
-function BookModal({ onClose }: { onClose: () => void }) {
-  const [success, setSuccess] = useState(false);
+type BookModalSelectFieldProps = {
+  id: string;
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  options: readonly { value: string; label: string }[];
+  placeholder?: string;
+  hint?: string;
+};
+
+function BookModalSelectField({
+  id,
+  label,
+  value,
+  onValueChange,
+  options,
+  placeholder,
+  hint,
+}: BookModalSelectFieldProps) {
+  return (
+    <>
+      <FieldSelect
+        id={id}
+        label={label}
+        value={value}
+        onValueChange={onValueChange}
+        options={options}
+        placeholder={placeholder}
+      />
+      {hint ? <p className="field__hint book-form__hint">{hint}</p> : null}
+    </>
+  );
+}
+
+function BookModal({
+  onClose,
+  teachers,
+  onSent,
+}: {
+  onClose: () => void;
+  teachers: UserBackend[];
+  onSent?: () => void;
+}) {
+  const { t } = useTranslation();
+  const [bookTeacher, setBookTeacher] = useState<string>('');
   const [bookDate, setBookDate] = useState('');
-  const [bookSlot, setBookSlot] = useState<string>(BOOK_SLOT_OPTIONS[0]!.value);
+  const [bookSlot, setBookSlot] = useState<string>(BOOK_SLOT_VALUES[0]);
   const [bookTopic, setBookTopic] = useState('');
+  const teacherOptions = teachers.map((u) => ({ value: u.id, label: u.name }));
+  const allSlotOptions = useMemo(
+    () =>
+      [
+        { value: '1600', label: '16:00-16:20', hour: 16, minute: 0 },
+        { value: '1730', label: '17:30-17:50', hour: 17, minute: 30 },
+        { value: '1800', label: '18:00-18:20', hour: 18, minute: 0 },
+      ] as const,
+    [],
+  );
+  const slotOptions = useMemo(() => {
+    if (!bookDate) {
+      return [{ value: '__none__', label: t('chat.bookModal.pickSlot') }, ...allSlotOptions];
+    }
+    const now = new Date();
+    const today = `${now.getFullYear()}-${`${now.getMonth() + 1}`.padStart(2, '0')}-${`${now.getDate()}`.padStart(2, '0')}`;
+    if (bookDate > today) return [{ value: '__none__', label: t('chat.bookModal.pickSlot') }, ...allSlotOptions];
+    if (bookDate < today) return [{ value: '__none__', label: t('chat.bookModal.pickSlot') }];
+    const curMinutes = now.getHours() * 60 + now.getMinutes();
+    const future = allSlotOptions.filter((s) => s.hour * 60 + s.minute > curMinutes);
+    return [{ value: '__none__', label: t('chat.bookModal.pickSlot') }, ...future];
+  }, [allSlotOptions, bookDate, t]);
+  useEffect(() => {
+    if (bookSlot === '__none__') return;
+    if (!slotOptions.some((s) => s.value === bookSlot)) setBookSlot('__none__');
+  }, [bookSlot, slotOptions]);
+  const hasAvailableSlots = slotOptions.length > 1;
+  const submit = () => {
+    if (!bookTeacher || bookSlot === '__none__') return;
+    onSent?.();
+    onClose();
+  };
   return (
     <>
       <div className="modal__header">
-        <h3 id="modal-book-title" className="modal__title">
-          Book a 1:1
+        <h3 id="modal-book-title" className="modal__title modal__title--xs">
+          {t('chat.bookModal.title')}
         </h3>
       </div>
-      {!success ? (
-        <form
-          className="book-form"
-          id="form-book"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (bookSlot === '__none__') return;
-            setSuccess(true);
-          }}
-        >
-          <div className="modal__scroll">
-            <FieldTextInput
-              id="book-date"
-              label="Preferred date"
-              type="date"
-              value={bookDate}
-              onChange={setBookDate}
-              isRequired
-            />
-            <FieldSelect
-              id="book-slot"
-              label="Time slot"
-              value={bookSlot}
-              onValueChange={setBookSlot}
-              options={[...BOOK_SLOT_OPTIONS]}
-            />
-            <FieldTextInput
-              id="book-topic"
-              label="Topic (optional)"
-              value={bookTopic}
-              onChange={setBookTopic}
-              placeholder="e.g. factoring homework"
-            />
-          </div>
-          <div className="modal__footer">
-            <div className="modal__actions">
-              <Button variant="text" type="button" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button variant="primary" pill type="submit">
-                Send request
-              </Button>
-            </div>
-          </div>
-        </form>
-      ) : (
+      <form
+        className="book-form"
+        id="form-book"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+      >
         <div className="modal__scroll">
-          <p className="form-success" id="book-success" role="status" hidden={!success}>
-            Request sent (demo). Your teacher will confirm the slot.
-          </p>
+          <BookModalSelectField
+            id="book-teacher"
+            label={t('chat.bookModal.pickTeacher')}
+            value={bookTeacher}
+            onValueChange={setBookTeacher}
+            options={teacherOptions}
+            placeholder={t('chat.bookModal.pickTeacher')}
+          />
+          <FieldTextInput
+            id="book-date"
+            label={t('chat.bookModal.preferredDate')}
+            type="date"
+            value={bookDate}
+            onChange={setBookDate}
+            inputClassName="book-form__date-input"
+            isRequired
+          />
+          <BookModalSelectField
+            id="book-slot"
+            label={t('chat.bookModal.timeSlot')}
+            value={bookSlot}
+            onValueChange={setBookSlot}
+            options={slotOptions}            
+          />
+          <FieldTextInput
+            id="book-topic"
+            label={t('chat.bookModal.topicOptional')}
+            value={bookTopic}
+            onChange={setBookTopic}
+            placeholder={t('chat.bookModal.topicPlaceholder')}
+          />
         </div>
-      )}
+        <div className="modal__footer">
+          <div className="modal__actions">
+            <Button variant="text" type="button" onClick={onClose}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="primary" pill type="submit">
+              {t('chat.bookModal.sendRequest')}
+            </Button>
+          </div>
+        </div>
+      </form>
     </>
   );
 }
@@ -160,7 +231,8 @@ function BroadcastModal({
 
 export function BridgeModals() {
   const { t } = useTranslation();
-  const { modal, closeModal, pushTeacherReport, pushBroadcast, bumpLearningCards } = useBridge();
+  const { modal, closeModal, pushTeacherReport, pushBroadcast, bumpLearningCards, users } = useBridge();
+  const teacherUsers = users.filter((u) => u.role === 'teacher');
   const [bridgeToast, setBridgeToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -223,8 +295,12 @@ export function BridgeModals() {
     return withToast(
       <div className="modal" id="modal-book" role="dialog" aria-modal="true" aria-labelledby="modal-book-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
-        <div className="modal__box modal__box--rounded">
-          <BookModal onClose={onBackdropClose} />
+        <div className="modal__box modal__box--rounded modal__box--book">
+          <BookModal
+            onClose={onBackdropClose}
+            teachers={teacherUsers}
+            onSent={() => setBridgeToast(t('chat.bookModal.success'))}
+          />
         </div>
       </div>,
     );

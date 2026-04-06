@@ -104,6 +104,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
       learningCard: m.learningCard ? { ...m.learningCard } : undefined,
       teacherReport: m.teacherReport ? { ...m.teacherReport } : undefined,
       broadcastPost: m.broadcastPost ? { ...m.broadcastPost } : undefined,
+      authorUserId: m.authorUserId,
     }));
   }
   return out;
@@ -227,14 +228,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         setThreads((prev) => {
           const next = { ...prev };
           for (const r of reports) {
-            const msg = threadMessageFromReportBackend(r);
+            const msg = threadMessageFromReportBackend(r, users);
             if (r.audience.toStudents) {
               const tid = r.messageThreadIds?.student ?? `${r.id}-s`;
-              if (!next[tid]) next[tid] = [{ ...msg }];
+              // Always refresh: first hydration may run before `users` loads, leaving `who` as raw id.
+              next[tid] = [{ ...msg }];
             }
             if (r.audience.toParents) {
               const tid = r.messageThreadIds?.parent ?? `${r.id}-p`;
-              if (!next[tid]) next[tid] = [{ ...msg }];
+              next[tid] = [{ ...msg }];
             }
           }
           return next;
@@ -274,7 +276,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [users]);
 
   /** Hydrate broadcast threads + inbox from IndexedDB `BroadcastBackend` rows only (no mock thread text). */
   useEffect(() => {
@@ -290,12 +292,14 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
         setThreads((prev) => {
           const next = { ...prev };
-          next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({ ...threadMessageFromBroadcastBackend(b) }));
+          next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({
+            ...threadMessageFromBroadcastBackend(b, users),
+          }));
           next[BROADCAST_FEED_THREAD_ID_STUDENT] = studentRows.map((b) => ({
-            ...threadMessageFromBroadcastBackend(b),
+            ...threadMessageFromBroadcastBackend(b, users),
           }));
           next[BROADCAST_FEED_THREAD_ID_TEACHER] = teacherRows.map((b) => ({
-            ...threadMessageFromBroadcastBackendTeacherView(b),
+            ...threadMessageFromBroadcastBackendTeacherView(b, users),
           }));
           return next;
         });
@@ -441,13 +445,18 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     const { title, summary, body, toStudents, toParents } = payload;
     const dateStr = new Date().toISOString().slice(0, 10);
     const baseId = `rep-${Date.now()}`;
-    const threadLine = threadMessageFromTeacherReportPayload({
-      title,
-      summary,
-      body,
-      toStudents,
-      toParents,
-    });
+    const authorId = resolveTeacherAuthorId(users, currentUserId);
+    const threadLine = threadMessageFromTeacherReportPayload(
+      {
+        title,
+        summary,
+        body,
+        toStudents,
+        toParents,
+      },
+      authorId,
+      users,
+    );
 
     const iso = new Date().toISOString();
     const reportRecord: ReportBackend = {
@@ -455,7 +464,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       schemaVersion: REPORT_SCHEMA_VERSION,
       createdAt: iso,
       updatedAt: iso,
-      authorUserId: resolveTeacherAuthorId(users, currentUserId),
+      authorUserId: authorId,
       sentAt: iso,
       title,
       summary,
@@ -513,7 +522,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     const { title, body, toStudents, toParents } = payload;
     const dateStr = new Date().toISOString().slice(0, 10);
     const baseId = `bc-${Date.now()}`;
-    const threadLine = threadMessageFromTeacherBroadcastPayload(payload);
+    const authorId = resolveTeacherAuthorId(users, currentUserId);
+    const threadLine = threadMessageFromTeacherBroadcastPayload(payload, undefined, authorId, users);
 
     const iso = new Date().toISOString();
     const record: BroadcastBackend = {
@@ -521,7 +531,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       schemaVersion: BROADCAST_SCHEMA_VERSION,
       createdAt: iso,
       updatedAt: iso,
-      authorUserId: resolveTeacherAuthorId(users, currentUserId),
+      authorUserId: authorId,
       sentAt: iso,
       title,
       body,
