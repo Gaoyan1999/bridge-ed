@@ -4,12 +4,15 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
 } from 'react';
+import { BOOKING_PENDING_THREAD_ID } from '@/bridge/parent-booking-ids';
+import { threadMessageFromParentBooking } from '@/bridge/parent-booking-thread';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import {
   BROADCAST_FEED_THREAD_ID_PARENT,
@@ -36,19 +39,13 @@ import type {
   ThreadMessage,
 } from '@/bridge/types';
 import { resolveParentSummaryFromLearningCardItem } from '@/data';
+import { bookingTargetsTeacher, resolveTeacherAuthorId } from '@/bridge/teacher-user';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
 import { BROADCAST_SCHEMA_VERSION, type BroadcastBackend } from '@/data/entity/broadcast-backend';
+import { PARENT_BOOKING_SCHEMA_VERSION, type ParentBookingBackend } from '@/data/entity/parent-booking-backend';
 import { REPORT_SCHEMA_VERSION, type ReportBackend } from '@/data/entity/report-backend';
 import type { UserBackend } from '@/data/entity/user-backend';
-
-function resolveTeacherAuthorId(users: UserBackend[], currentUserId: string | null): string {
-  if (currentUserId) {
-    const u = users.find((x) => x.id === currentUserId);
-    if (u?.role === 'teacher') return u.id;
-  }
-  return users.find((u) => u.role === 'teacher')?.id ?? 'teacher-1';
-}
 
 function sortBroadcastsBySentAsc(a: BroadcastBackend, b: BroadcastBackend): number {
   return a.sentAt.localeCompare(b.sentAt) || a.id.localeCompare(b.id);
@@ -105,6 +102,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
       teacherReport: m.teacherReport ? { ...m.teacherReport } : undefined,
       broadcastPost: m.broadcastPost ? { ...m.broadcastPost } : undefined,
       authorUserId: m.authorUserId,
+      bookingDetail: m.bookingDetail ? { ...m.bookingDetail } : undefined,
     }));
   }
   return out;
@@ -162,6 +160,13 @@ interface BridgeContextValue {
   /** Bump when student mood entries change so parent dashboard refetches. */
   studentMoodsEpoch: number;
   bumpStudentMoods: () => void;
+  /** Persisted parent booking requests (IndexedDB). */
+  parentBookings: ParentBookingBackend[];
+  /** Pending booking count for the current teacher (sidebar badge). */
+  pendingBookingCount: number;
+  submitParentBooking: (payload: { teacherId: string; date: string; bookSlot: string; topic: string }) => void;
+  respondToParentBooking: (bookingId: string, action: 'accept' | 'reject') => void;
+  findBookingByThreadId: (threadId: string) => ParentBookingBackend | undefined;
 }
 
 const BridgeContext = createContext<BridgeContextValue | null>(null);
@@ -188,6 +193,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
   const [studentMoodsEpoch, setStudentMoodsEpoch] = useState(0);
+  const [parentBookings, setParentBookings] = useState<ParentBookingBackend[]>([]);
 
   useEffect(() => {
     const syncHashToModule = () => setModuleState(parseModuleFromHash());
@@ -353,6 +359,97 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     };
   }, [users, currentUserId]);
 
+  const loadParentBookings = useCallback(() => {
+    return getDataLayer()
+      .parentBookings.listAll()
+      .then((rows) => {
+        setParentBookings(rows);
+      })
+      .catch(() => {
+        setParentBookings([]);
+      });
+  }, []);
+
+  useEffect(() => {
+    void loadParentBookings();
+  }, [loadParentBookings]);
+
+  /** Merge persisted `ParentBookingBackend` rows into Messages inbox + threads. */
+  useEffect(() => {
+    const teacherId = resolveTeacherAuthorId(users, currentUserId);
+    const confirmedForTeacher = parentBookings.filter(
+      (b) => bookingTargetsTeacher(b, teacherId) && b.status === 'confirmed' && b.messageThreadId,
+    );
+
+    const allConfirmedThreadIds = new Set(
+      parentBookings.filter((b) => b.status === 'confirmed' && b.messageThreadId).map((b) => b.messageThreadId!),
+    );
+
+    setThreads((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) {
+        if (key.startsWith('booking-') && !allConfirmedThreadIds.has(key)) {
+          delete next[key];
+        }
+      }
+      for (const b of confirmedForTeacher) {
+        const tid = b.messageThreadId!;
+        next[tid] = [{ ...threadMessageFromParentBooking(b, users) }];
+      }
+      return next;
+    });
+
+    setInboxByRole((prev) => {
+      const teacherIdsToReplace = new Set<string>();
+      for (const b of confirmedForTeacher) {
+        if (b.messageThreadId) teacherIdsToReplace.add(b.messageThreadId);
+      }
+
+      const teacherStripped = prev.teacher.filter(
+        (i) => !teacherIdsToReplace.has(i.id) && i.id !== BOOKING_PENDING_THREAD_ID,
+      );
+
+      const teacherAdds: InboxItem[] = [];
+      for (const b of confirmedForTeacher) {
+        if (!b.messageThreadId) continue;
+        const student = users.find((u) => u.id === b.studentId);
+        const name = student?.name ?? b.studentId;
+        teacherAdds.push({
+          id: b.messageThreadId,
+          title: `Booking: ${name}'s parents`,
+          date: b.date,
+          kind: 'dm',
+        });
+      }
+
+      const parentStripped = prev.parent.filter((i) => !allConfirmedThreadIds.has(i.id));
+
+      const parentAdds: InboxItem[] = [];
+      if (currentUserId) {
+        const cur = users.find((u) => u.id === currentUserId);
+        if (cur?.role === 'parent') {
+          for (const b of parentBookings) {
+            if (b.parentId !== currentUserId || b.status !== 'confirmed' || !b.messageThreadId) continue;
+            const student = users.find((u) => u.id === b.studentId);
+            const name = student?.name ?? b.studentId;
+            parentAdds.push({
+              id: b.messageThreadId,
+              title: `Booking: ${name}'s parents`,
+              date: b.date,
+              kind: 'dm',
+            });
+          }
+        }
+      }
+
+      return {
+        ...prev,
+        teacher: dedupeInboxByIdKeepFirst([...teacherAdds, ...teacherStripped]),
+        parent: dedupeInboxByIdKeepFirst([...parentAdds, ...parentStripped]),
+      };
+    });
+  }, [parentBookings, users, currentUserId]);
+
   const role: Role =
     users.length > 0
       ? ((users.find((u) => u.id === currentUserId)?.role ?? 'teacher') as Role)
@@ -369,6 +466,81 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
   const currentUser: UserBackend | undefined =
     users.length > 0 && currentUserId ? users.find((u) => u.id === currentUserId) : undefined;
+
+  const pendingBookingCount = useMemo(() => {
+    if (!currentUserId) return 0;
+    const u = users.find((x) => x.id === currentUserId);
+    if (u?.role !== 'teacher') return 0;
+    const tid = resolveTeacherAuthorId(users, currentUserId);
+    return parentBookings.filter((b) => bookingTargetsTeacher(b, tid) && b.status === 'pending').length;
+  }, [parentBookings, users, currentUserId]);
+
+  const findBookingByThreadId = useCallback(
+    (threadId: string) => parentBookings.find((b) => b.messageThreadId === threadId),
+    [parentBookings],
+  );
+
+  const submitParentBooking = useCallback(
+    (payload: { teacherId: string; date: string; bookSlot: string; topic: string }) => {
+      if (!currentUser || currentUser.role !== 'parent') return;
+      const studentId = currentUser.children?.[0];
+      if (!studentId) return;
+      if (!payload.date.trim() || payload.bookSlot === '__none__') return;
+      const parentId = currentUser.id;
+      const iso = new Date().toISOString();
+      const id = `pb-${Date.now()}`;
+      const record: ParentBookingBackend = {
+        id,
+        schemaVersion: PARENT_BOOKING_SCHEMA_VERSION,
+        createdAt: iso,
+        updatedAt: iso,
+        parentId,
+        studentId,
+        teacherId: payload.teacherId,
+        date: payload.date,
+        bookSlot: payload.bookSlot,
+        topic: payload.topic.trim(),
+        status: 'pending',
+      };
+      void getDataLayer()
+        .parentBookings.put(record)
+        .then(() => loadParentBookings())
+        .catch(() => {
+          /* ignore */
+        });
+    },
+    [currentUser, loadParentBookings],
+  );
+
+  const respondToParentBooking = useCallback(
+    (bookingId: string, action: 'accept' | 'reject') => {
+      void getDataLayer()
+        .parentBookings.get(bookingId)
+        .then((existing) => {
+          if (!existing || existing.status !== 'pending') return;
+          const iso = new Date().toISOString();
+          if (action === 'reject') {
+            return getDataLayer().parentBookings.put({
+              ...existing,
+              status: 'cancelled',
+              updatedAt: iso,
+            });
+          }
+          const messageThreadId = `booking-${existing.id}`;
+          return getDataLayer().parentBookings.put({
+            ...existing,
+            status: 'confirmed',
+            updatedAt: iso,
+            messageThreadId,
+          });
+        })
+        .then(() => loadParentBookings())
+        .catch(() => {
+          /* ignore */
+        });
+    },
+    [loadParentBookings],
+  );
 
   const setModule = (m: Module) => {
     if (!MODULES.includes(m)) return;
@@ -701,6 +873,11 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     bumpLearningCards,
     studentMoodsEpoch,
     bumpStudentMoods,
+    parentBookings,
+    pendingBookingCount,
+    submitParentBooking,
+    respondToParentBooking,
+    findBookingByThreadId,
   };
 
   return <BridgeContext.Provider value={value}>{children}</BridgeContext.Provider>;

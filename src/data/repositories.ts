@@ -4,6 +4,7 @@ import type { LearningCardBackend } from './entity/learning-card-backend';
 import type { ReportBackend } from './entity/report-backend';
 import type { StudentMoodBackend } from './entity/student-mood-backend';
 import type { TeacherTodoListBackend } from './entity/teacher-todo-list-backend';
+import type { ParentBookingBackend } from './entity/parent-booking-backend';
 import type { UserBackend } from './entity/user-backend';
 
 export interface LearningCardsRepository {
@@ -58,6 +59,13 @@ export interface TeacherTodoListsRepository {
   put(doc: TeacherTodoListBackend): Promise<void>;
 }
 
+export interface ParentBookingsRepository {
+  listAll(): Promise<ParentBookingBackend[]>;
+  get(id: string): Promise<ParentBookingBackend | undefined>;
+  put(booking: ParentBookingBackend): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
 /** App data — swap implementation via `VITE_DATA_SOURCE`. */
 export interface DataLayer {
   readonly mode: DataSourceMode;
@@ -67,4 +75,5 @@ export interface DataLayer {
   readonly reports: ReportsRepository;
   readonly broadcasts: BroadcastsRepository;
   readonly teacherTodoLists: TeacherTodoListsRepository;
+  readonly parentBookings: ParentBookingsRepository;
 }

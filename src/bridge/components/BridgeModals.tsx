@@ -50,10 +50,12 @@ function BookModalSelectField({
 function BookModal({
   onClose,
   teachers,
+  onSubmit,
   onSent,
 }: {
   onClose: () => void;
   teachers: UserBackend[];
+  onSubmit?: (payload: { teacherId: string; date: string; bookSlot: string; topic: string }) => void;
   onSent?: () => void;
 }) {
   const { t } = useTranslation();
@@ -87,9 +89,14 @@ function BookModal({
     if (bookSlot === '__none__') return;
     if (!slotOptions.some((s) => s.value === bookSlot)) setBookSlot('__none__');
   }, [bookSlot, slotOptions]);
-  const hasAvailableSlots = slotOptions.length > 1;
   const submit = () => {
-    if (!bookTeacher || bookSlot === '__none__') return;
+    if (!bookTeacher || bookSlot === '__none__' || !bookDate.trim()) return;
+    onSubmit?.({
+      teacherId: bookTeacher,
+      date: bookDate,
+      bookSlot: bookSlot,
+      topic: bookTopic,
+    });
     onSent?.();
     onClose();
   };
@@ -231,7 +238,8 @@ function BroadcastModal({
 
 export function BridgeModals() {
   const { t } = useTranslation();
-  const { modal, closeModal, pushTeacherReport, pushBroadcast, bumpLearningCards, users } = useBridge();
+  const { modal, closeModal, pushTeacherReport, pushBroadcast, bumpLearningCards, users, submitParentBooking } =
+    useBridge();
   const teacherUsers = users.filter((u) => u.role === 'teacher');
   const [bridgeToast, setBridgeToast] = useState<string | null>(null);
 
@@ -299,6 +307,7 @@ export function BridgeModals() {
           <BookModal
             onClose={onBackdropClose}
             teachers={teacherUsers}
+            onSubmit={submitParentBooking}
             onSent={() => setBridgeToast(t('chat.bookModal.success'))}
           />
         </div>

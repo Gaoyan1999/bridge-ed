@@ -3,6 +3,7 @@ import type {
   BroadcastsRepository,
   DataLayer,
   LearningCardsRepository,
+  ParentBookingsRepository,
   ReportsRepository,
   StudentMoodsRepository,
   TeacherTodoListsRepository,
@@ -16,7 +17,9 @@ import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import { normalizeReportBackend } from '../report-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
+import type { ParentBookingBackend } from '../entity/parent-booking-backend';
 import type { UserBackend } from '../entity/user-backend';
+import { normalizeParentBookingBackend } from '../parent-booking-mappers';
 import { normalizeTeacherTodoListBackend } from '../teacher-todo-list-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
@@ -222,6 +225,34 @@ class IndexedDbBroadcastsRepo implements BroadcastsRepository {
   }
 }
 
+function sortBookingsByUpdatedDesc(a: ParentBookingBackend, b: ParentBookingBackend): number {
+  const ta = Date.parse(a.updatedAt);
+  const tb = Date.parse(b.updatedAt);
+  const na = Number.isFinite(ta) ? ta : 0;
+  const nb = Number.isFinite(tb) ? tb : 0;
+  return nb - na;
+}
+
+class IndexedDbParentBookingsRepo implements ParentBookingsRepository {
+  async listAll(): Promise<ParentBookingBackend[]> {
+    const rows = await bridgeDb.parentBookings.toArray();
+    return rows.map((r) => normalizeParentBookingBackend(r)).sort(sortBookingsByUpdatedDesc);
+  }
+
+  async get(id: string): Promise<ParentBookingBackend | undefined> {
+    const raw = await bridgeDb.parentBookings.get(id);
+    return raw ? normalizeParentBookingBackend(raw) : undefined;
+  }
+
+  async put(booking: ParentBookingBackend): Promise<void> {
+    await bridgeDb.parentBookings.put(normalizeParentBookingBackend(booking));
+  }
+
+  async delete(id: string): Promise<void> {
+    await bridgeDb.parentBookings.delete(id);
+  }
+}
+
 class IndexedDbTeacherTodoListsRepo implements TeacherTodoListsRepository {
   async get(userId: string): Promise<TeacherTodoListBackend | undefined> {
     const id = userId.trim();
@@ -243,4 +274,5 @@ export class IndexedDbDataLayer implements DataLayer {
   readonly reports = new IndexedDbReportsRepo();
   readonly broadcasts = new IndexedDbBroadcastsRepo();
   readonly teacherTodoLists = new IndexedDbTeacherTodoListsRepo();
+  readonly parentBookings = new IndexedDbParentBookingsRepo();
 }

@@ -113,10 +113,7 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
   parent: [{ id: 'n2', title: 'Ms. Lee: note on next week’s quiz', date: '2026-03-30', kind: 'dm' }],
   student: [],
-  teacher: [
-    { id: 't1', title: 'Booking: Alex Wang’s parent', date: '2026-04-02', kind: 'booking' },
-    { id: 't2', title: 'Draft: broadcast', date: '2026-04-01', kind: 'draft' },
-  ],
+  teacher: [{ id: 't2', title: 'Draft: broadcast', date: '2026-04-01', kind: 'draft' }],
 };
 
 export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
@@ -127,13 +124,6 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
       text: 'Next week’s quiz focuses on variations of the in-class examples. If your child gets stuck on a step, send the question number.',
     },
     { who: 'You', type: 'out', text: 'Thanks—we’ll focus on example 3 this weekend.' },
-  ],
-  t1: [
-    {
-      who: 'System',
-      type: 'in',
-      text: 'Booking request: Wed 5:30–5:50 PM, topic “factoring homework” (Alex Wang’s parent).',
-    },
   ],
   t2: [{ who: 'You', type: 'in', text: 'Draft not sent yet. Open Broadcast to continue editing.' }],
   'mock-chat-parent-g1': [

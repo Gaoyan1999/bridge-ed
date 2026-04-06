@@ -4,6 +4,7 @@ import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { ReportBackend } from '../entity/report-backend';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
+import type { ParentBookingBackend } from '../entity/parent-booking-backend';
 import type { UserBackend } from '../entity/user-backend';
 
 export class BridgeEdDB extends Dexie {
@@ -13,6 +14,7 @@ export class BridgeEdDB extends Dexie {
   reports!: Table<ReportBackend, string>;
   broadcasts!: Table<BroadcastBackend, string>;
   teacherTodoLists!: Table<TeacherTodoListBackend, string>;
+  parentBookings!: Table<ParentBookingBackend, string>;
 
   constructor() {
     super('bridge-ed');
@@ -72,6 +74,15 @@ export class BridgeEdDB extends Dexie {
       reports: 'id, authorUserId, createdAt, updatedAt, sentAt',
       broadcasts: 'id, authorUserId, createdAt, updatedAt, sentAt',
       teacherTodoLists: 'userId, updatedAt',
+    });
+    this.version(12).stores({
+      learningCards: 'id, authorUserId, classId, createdAt, updatedAt, sentAt',
+      studentMoods: 'id, studentId, localDate, createdAt, [studentId+localDate]',
+      users: 'id, email, role',
+      reports: 'id, authorUserId, createdAt, updatedAt, sentAt',
+      broadcasts: 'id, authorUserId, createdAt, updatedAt, sentAt',
+      teacherTodoLists: 'userId, updatedAt',
+      parentBookings: 'id, teacherId, parentId, status, updatedAt, [teacherId+status]',
     });
   }
 }
