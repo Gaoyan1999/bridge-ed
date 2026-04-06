@@ -231,7 +231,24 @@
       "view": "查看",
       "studentDetailTitle": "学生详情",
       "studentDetailBody": "演示：此处将显示联系方式、历史学习卡反馈与预约记录。",
-      "thisWeek": "本周"
+      "thisWeek": "本周",
+      "cardPreview": {
+        "demoHint": "以下为示例参与数据，用于界面预览，后续将接入真实班级数据。",
+        "feedbackTitle": "参与概览",
+        "studentVideos": "视频打开次数（学生）",
+        "parentNeedHelp": "点击「需要帮助」的家长数",
+        "studentsTitle": "学生",
+        "studentStatusDistribution": "状态分布",
+        "studentStatusChartAria": "本学习卡学生进度",
+        "parentsTitle": "家长",
+        "colName": "姓名",
+        "colStatus": "状态",
+        "colVideos": "已看视频数",
+        "colNeedHelp": "需要帮助",
+        "needHelpYes": "是",
+        "needHelpNo": "—",
+        "openKnowledge": "在知识中打开"
+      }
     }
   },
   "learningCard": {

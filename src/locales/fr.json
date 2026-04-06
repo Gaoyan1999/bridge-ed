@@ -231,7 +231,24 @@
       "view": "Voir",
       "studentDetailTitle": "Détail élève",
       "studentDetailBody": "Démo : coordonnées, retours sur les fiches et historique des rendez-vous apparaîtraient ici.",
-      "thisWeek": "Cette semaine"
+      "thisWeek": "Cette semaine",
+      "cardPreview": {
+        "demoHint": "Données d’engagement d’exemple pour la maquette — branchement des données réelles plus tard.",
+        "feedbackTitle": "Synthèse d’engagement",
+        "studentVideos": "Ouvertures vidéo (élèves)",
+        "parentNeedHelp": "Parents ayant appuyé sur « Besoin d’aide »",
+        "studentsTitle": "Élèves",
+        "studentStatusDistribution": "Répartition des statuts",
+        "studentStatusChartAria": "Progression des élèves sur cette fiche",
+        "parentsTitle": "Parents",
+        "colName": "Nom",
+        "colStatus": "Statut",
+        "colVideos": "Vidéos vues",
+        "colNeedHelp": "Besoin d’aide",
+        "needHelpYes": "Oui",
+        "needHelpNo": "—",
+        "openKnowledge": "Ouvrir dans Savoirs"
+      }
     }
   },
   "learningCard": {

@@ -231,7 +231,24 @@
       "view": "View",
       "studentDetailTitle": "Student detail",
       "studentDetailBody": "Demo: contact info, past learning-card feedback, and booking history would appear here.",
-      "thisWeek": "This week"
+      "thisWeek": "This week",
+      "cardPreview": {
+        "demoHint": "Sample engagement data for layout preview — will connect to live class data later.",
+        "feedbackTitle": "Engagement summary",
+        "studentVideos": "Video opens (students)",
+        "parentNeedHelp": "Parents who tapped “Need help”",
+        "studentsTitle": "Students",
+        "studentStatusDistribution": "Learning progress",
+        "studentStatusChartAria": "Student progress on this card",
+        "parentsTitle": "Parents",
+        "colName": "Name",
+        "colStatus": "Status",
+        "colVideos": "Videos watched",
+        "colNeedHelp": "Need help",
+        "needHelpYes": "Yes",
+        "needHelpNo": "—",
+        "openKnowledge": "Open in Knowledge"
+      }
     }
   },
   "learningCard": {
