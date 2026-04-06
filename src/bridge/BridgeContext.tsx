@@ -174,6 +174,8 @@ const BridgeContext = createContext<BridgeContextValue | null>(null);
 function parseModuleFromHash(): Module {
   const raw = (typeof window !== 'undefined' ? window.location.hash : '') || '#dashboard';
   const h = raw.slice(1).toLowerCase();
+  /** Legacy sidebar link; practice sheets live under Knowledge for students. */
+  if (h === 'quiz') return 'knowledge';
   if (MODULES.includes(h as Module)) return h as Module;
   return 'dashboard';
 }

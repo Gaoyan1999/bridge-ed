@@ -83,6 +83,11 @@ export function isParentFacingTonightPreset(preset: LearningCardTonightActionPre
   return preset !== 'explain_to_parent';
 }
 
+/** Composer pills for student Knowledge: teach-back only; quiz and hands-on are parent-led. */
+export function isStudentFacingTonightPreset(preset: LearningCardTonightActionPreset): boolean {
+  return preset === 'explain_to_parent';
+}
+
 /** One row per preset; `text` is optional teacher notes (stored, not shown in UI yet). */
 export type LearningCardTonightAction = {
   preset: LearningCardTonightActionPreset;

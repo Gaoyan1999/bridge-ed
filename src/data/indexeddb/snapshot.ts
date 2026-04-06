@@ -11,12 +11,14 @@ import {
   type StudentMoodBackend,
 } from '../entity/student-mood-backend';
 import type { UserBackend, UserRole } from '../entity/user-backend';
+import type { QuizBackend } from '../entity/quiz-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
+import { normalizeQuizBackend, type QuizBackendInput } from '../quiz-mappers';
 import { normalizeBroadcastBackend } from '../broadcast-mappers';
 import { normalizeReportBackend } from '../report-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
-export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 3 as const;
+export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 4 as const;
 
 export type BridgeIndexedDbSnapshot = {
   snapshotVersion: typeof BRIDGE_INDEXEDDB_SNAPSHOT_VERSION;
@@ -26,6 +28,8 @@ export type BridgeIndexedDbSnapshot = {
   users: UserBackend[];
   reports: ReportBackend[];
   broadcasts: BroadcastBackend[];
+  /** Structured worksheets from Knowledge quiz flow (`quizzes` store). */
+  quizzes: QuizBackend[];
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -138,12 +142,29 @@ function isBroadcastRow(v: unknown): v is BroadcastBackend {
   );
 }
 
+function isQuizRow(v: unknown): v is QuizBackendInput {
+  if (!isRecord(v)) return false;
+  if (typeof v.id !== 'string' || typeof v.parentId !== 'string' || typeof v.studentId !== 'string') return false;
+  if (v.learningCardId !== undefined && typeof v.learningCardId !== 'string') return false;
+  if (typeof v.createdAt !== 'string') return false;
+  if (v.status !== 'pending' && v.status !== 'completed') return false;
+  if (!Array.isArray(v.questions)) return false;
+  for (const q of v.questions) {
+    if (!isRecord(q)) return false;
+    if (typeof q.question !== 'string' || !Array.isArray(q.options)) return false;
+    if (!q.options.every((o) => typeof o === 'string')) return false;
+    if (typeof q.correctAnswer !== 'string') return false;
+  }
+  return true;
+}
+
 export async function exportIndexedDbSnapshot(): Promise<BridgeIndexedDbSnapshot> {
   const learningCards = await bridgeDb.learningCards.toArray();
   const studentMoods = await bridgeDb.studentMoods.toArray();
   const users = await bridgeDb.users.toArray();
   const reports = await bridgeDb.reports.toArray();
   const broadcasts = await bridgeDb.broadcasts.toArray();
+  const quizzes = await bridgeDb.quizzes.toArray();
   return {
     snapshotVersion: BRIDGE_INDEXEDDB_SNAPSHOT_VERSION,
     exportedAt: new Date().toISOString(),
@@ -152,6 +173,7 @@ export async function exportIndexedDbSnapshot(): Promise<BridgeIndexedDbSnapshot
     users,
     reports,
     broadcasts,
+    quizzes,
   };
 }
 
@@ -166,8 +188,8 @@ async function clearAllBridgeDbStores(): Promise<void> {
 }
 
 /**
- * Clears every object store in `bridge-ed`, then bulk-puts learning cards, student moods, users, reports, and broadcasts.
- * `studentMoods` / `users` / `reports` / `broadcasts` may be empty arrays; omit only when importing legacy JSON (treated as `[]`).
+ * Clears every object store in `bridge-ed`, then bulk-puts learning cards, student moods, users, reports, broadcasts, and quizzes.
+ * `studentMoods` / `users` / `reports` / `broadcasts` / `quizzes` may be empty arrays; omit only when importing legacy JSON (treated as `[]`).
  */
 export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise<void> {
   if (!isRecord(data)) {
@@ -238,5 +260,18 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
   }
   if (broadcasts.length > 0) {
     await bridgeDb.broadcasts.bulkPut(broadcasts);
+  }
+
+  const quizzesRaw = Array.isArray(data.quizzes) ? data.quizzes : [];
+  const quizzes: QuizBackend[] = [];
+  for (let i = 0; i < quizzesRaw.length; i++) {
+    const row = quizzesRaw[i];
+    if (!isQuizRow(row)) {
+      throw new Error(`Invalid quizzes[${i}]: expected a full QuizBackend record.`);
+    }
+    quizzes.push(normalizeQuizBackend(row));
+  }
+  if (quizzes.length > 0) {
+    await bridgeDb.quizzes.bulkPut(quizzes);
   }
 }

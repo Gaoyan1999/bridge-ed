@@ -5,6 +5,7 @@ import type { ReportBackend } from './entity/report-backend';
 import type { StudentMoodBackend } from './entity/student-mood-backend';
 import type { TeacherTodoListBackend } from './entity/teacher-todo-list-backend';
 import type { ParentBookingBackend } from './entity/parent-booking-backend';
+import type { QuizBackend } from './entity/quiz-backend';
 import type { UserBackend } from './entity/user-backend';
 
 export interface LearningCardsRepository {
@@ -66,6 +67,20 @@ export interface ParentBookingsRepository {
   delete(id: string): Promise<void>;
 }
 
+export interface QuizzesRepository {
+  /** All worksheets / structured quizzes saved for this parent (newest first). */
+  listForParent(parentId: string): Promise<QuizBackend[]>;
+  /** Worksheets assigned to this student (`studentId` on the row). */
+  listForStudent(studentId: string): Promise<QuizBackend[]>;
+  /** Worksheets for this student on one learning card. */
+  listForStudentAndLearningCard(studentId: string, learningCardId: string): Promise<QuizBackend[]>;
+  /** Worksheets for one learning card (same `learningCardId` as `LearningCardBackend.id`). */
+  listForParentAndLearningCard(parentId: string, learningCardId: string): Promise<QuizBackend[]>;
+  get(id: string): Promise<QuizBackend | undefined>;
+  put(quiz: QuizBackend): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
 /** App data — swap implementation via `VITE_DATA_SOURCE`. */
 export interface DataLayer {
   readonly mode: DataSourceMode;
@@ -76,4 +91,5 @@ export interface DataLayer {
   readonly broadcasts: BroadcastsRepository;
   readonly teacherTodoLists: TeacherTodoListsRepository;
   readonly parentBookings: ParentBookingsRepository;
+  readonly quizzes: QuizzesRepository;
 }

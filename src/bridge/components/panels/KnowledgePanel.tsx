@@ -1,10 +1,11 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type {
   LearningCardBackend,
   LearningCardStudentFeedback,
   LearningCardStudentFinishedType,
   LearningCardStudentLearningStatus,
 } from '@/data/entity/learning-card-backend';
+import type { QuizBackend } from '@/data/entity/quiz-backend';
 
 type StudentLearningStatusKey = LearningCardStudentLearningStatus;
 
@@ -17,8 +18,29 @@ type KnowledgeInboxRow = {
   studentFinishedType?: LearningCardStudentFinishedType;
 };
 
+/** Text of the AI reply right after a `/make-quiz` user message; otherwise last assistant message. */
+function findLastQuizReplyText(msgs: ThreadMessage[]): string {
+  for (let i = msgs.length - 2; i >= 0; i--) {
+    const cur = msgs[i];
+    const cmd = cur?.type === 'out' ? cur.text?.trim() : '';
+    if (cmd === '/make-quiz' || cmd === '/quiz') {
+      const next = msgs[i + 1];
+      if (next?.type === 'in') return next.text ?? '';
+    }
+  }
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    if (msgs[i]?.type === 'in') return msgs[i]?.text ?? '';
+  }
+  return '';
+}
+
+type QuizWorksheetBannerState = {
+  threadId: string;
+  phase: 'offer' | 'generating' | 'done';
+};
+
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronDown, ImagePlus } from 'lucide-react';
+import { Check, ChevronDown, ImagePlus, Sparkles, X } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
@@ -26,14 +48,17 @@ import type { TFunction } from 'i18next';
 import {
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
   isParentFacingTonightPreset,
+  isStudentFacingTonightPreset,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
+  type ThreadMessage,
 } from '@/bridge/types';
 import { LearningCardParentKnowledgeView } from '@/bridge/components/LearningCardParentPanel';
 import { KnowledgeChildDiscovery } from '@/bridge/components/KnowledgeChildDiscovery';
 import { Markdown } from '@/bridge/components/Markdown';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { KnowledgeParentEmptyExample } from '@/bridge/components/KnowledgeParentEmptyExample';
+import { KnowledgeStudentQuizBlock } from '@/bridge/components/KnowledgeStudentQuizBlock';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
@@ -82,10 +107,12 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject'>): {
 }
 
 function knowledgeTonightSlashCommand(preset: LearningCardTonightActionPreset): string {
-  if (preset === 'quiz') return '/quiz';
+  if (preset === 'quiz') return '/make-quiz';
   if (preset === 'parent_led_practice') return '/practice';
   return '/teach-back';
 }
+
+const KNOWLEDGE_EVAL_QUIZ_CMD = '/eval-quiz';
 
 function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t: TFunction): string {
   if (preset === 'parent_led_practice') return t('knowledge.practice.button');
@@ -342,12 +369,15 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const [streamingReply, setStreamingReply] = useState('');
   const [streamingThreadId, setStreamingThreadId] = useState<string | null>(null);
   const [challengeFeedbackOpen, setChallengeFeedbackOpen] = useState(false);
+  /** Parent: after Quiz action completes — offer → generating worksheet → done (banner stays). */
+  const [quizWorksheetBanner, setQuizWorksheetBanner] = useState<QuizWorksheetBannerState | null>(null);
   const [cardBackends, setCardBackends] = useState<LearningCardBackend[]>([]);
   const cardBackendsRef = useRef(cardBackends);
   cardBackendsRef.current = cardBackends;
 
   const cards = useMemo(() => cardBackends.map(learningCardBackendToItem), [cardBackends]);
   const knowledgeFileInputRef = useRef<HTMLInputElement>(null);
+  const knowledgeThreadEndRef = useRef<HTMLDivElement>(null);
   const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
     onReject: (reason) => {
       if (reason === 'size') window.alert(t('common.imageTooLarge'));
@@ -548,8 +578,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     [currentCard],
   );
   const composerTonightSteps = useMemo(() => {
-    if (role !== 'parent') return includedSteps;
-    return includedSteps.filter((a) => isParentFacingTonightPreset(a.preset));
+    if (role === 'parent') {
+      return includedSteps.filter((a) => isParentFacingTonightPreset(a.preset));
+    }
+    if (role === 'student') {
+      return includedSteps.filter((a) => isStudentFacingTonightPreset(a.preset));
+    }
+    return includedSteps;
   }, [role, includedSteps]);
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
   const buildCardContext = useCallback(
@@ -575,6 +610,10 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
   useEffect(() => {
     setChallengeFeedbackOpen(false);
+  }, [threadId]);
+
+  useEffect(() => {
+    setQuizWorksheetBanner(null);
   }, [threadId]);
 
   useEffect(() => {
@@ -711,6 +750,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           type: 'in',
           text: result.reply,
         });
+        if (role === 'parent' && preset === 'quiz') {
+          setQuizWorksheetBanner({ threadId, phase: 'offer' });
+        }
       } catch (e) {
         appendKnowledgeMessage(threadId, {
           who: 'BridgeEd AI',
@@ -738,6 +780,114 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     ],
   );
 
+  const runEvalQuizAfterWorksheet = useCallback(
+    async (savedQuiz: QuizBackend) => {
+      if (!threadId) return;
+      setTonightActionBusy(true);
+      appendKnowledgeMessage(threadId, { who: 'You', type: 'out', text: KNOWLEDGE_EVAL_QUIZ_CMD });
+      if (role === 'student' && studentUserId) {
+        const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+        const fb = b ? getStudentFeedbackForUser(b, studentUserId) : null;
+        void persistStudentPatch({
+          chatedWithAI: true,
+          ...(fb?.status === 'not_started' ? { status: 'learning' as const } : {}),
+        });
+      }
+      try {
+        setStreamingThreadId(threadId);
+        setStreamingReply('');
+        const api = getLlmApi();
+        const result = await api.evalQuiz({
+          questions: savedQuiz.questions.map((q) => ({ ...q })),
+        });
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: result.reply,
+        });
+      } catch (e) {
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: e instanceof Error ? e.message : t('knowledge.evalQuizFailed'),
+        });
+      } finally {
+        setStreamingReply('');
+        setStreamingThreadId(null);
+        setTonightActionBusy(false);
+      }
+    },
+    [threadId, appendKnowledgeMessage, role, studentUserId, persistStudentPatch, t],
+  );
+
+  const threadMsgCount = threadId ? (knowledgeThreads[threadId]?.length ?? 0) : 0;
+  const showAiAnalyzing = streamingThreadId === threadId && streamingReply.trim().length === 0;
+
+  useLayoutEffect(() => {
+    if (!active || !canUseKnowledge) return;
+    knowledgeThreadEndRef.current?.scrollIntoView({ block: 'end' });
+  }, [
+    active,
+    canUseKnowledge,
+    threadId,
+    threadMsgCount,
+    streamingReply,
+    showAiAnalyzing,
+    quizWorksheetBanner,
+  ]);
+
+  const dismissQuizWorksheetOffer = useCallback(() => {
+    setQuizWorksheetBanner(null);
+  }, []);
+
+  const confirmQuizWorksheetOffer = useCallback(() => {
+    if (!threadId) return;
+    setQuizWorksheetBanner((b) => {
+      if (b?.threadId !== threadId || b.phase !== 'offer') return b;
+      return { threadId, phase: 'generating' };
+    });
+
+    void (async () => {
+      try {
+        const quizText = findLastQuizReplyText(msgs);
+        const api = getLlmApi();
+        const result = await api.knowledgeGenerateStructuredQuiz(quizText);
+        const structuredPayloadJson = JSON.stringify(result);
+        const dl = getDataLayer();
+        const pid = parentUserId.trim();
+        const childIds = parentChildrenIds.length > 0 ? parentChildrenIds : [''];
+        const createdAt = new Date().toISOString();
+        const questions = result.questions.map((q) => ({
+          question: q.question,
+          options: [...q.options],
+          correctAnswer: q.correctAnswer,
+        }));
+        const learningCardId = (currentBackend?.id ?? currentCard?.id ?? '').trim();
+        for (const sid of childIds) {
+          await dl.quizzes.put({
+            id: crypto.randomUUID(),
+            learningCardId,
+            parentId: pid,
+            studentId: sid,
+            createdAt,
+            questions,
+            status: 'completed',
+            sourceQuizText: quizText,
+            structuredPayloadJson,
+          });
+        }
+        setQuizWorksheetBanner((b) =>
+          b?.threadId === threadId ? { threadId, phase: 'done' } : b,
+        );
+      } catch (e) {
+        window.alert(e instanceof Error ? e.message : t('knowledge.quizWorksheetGenerateError'));
+        setQuizWorksheetBanner((b) =>
+          b?.threadId === threadId ? { threadId, phase: 'offer' } : b,
+        );
+      }
+    })();
+  }, [threadId, msgs, parentUserId, parentChildrenIds, currentBackend?.id, currentCard?.id, t]);
+
   if (!canUseKnowledge) {
     return (
       <section
@@ -753,7 +903,20 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
   const emptyHint = role === 'student' ? t('knowledge.emptyStudent') : t('knowledge.emptyParent');
   const showParentEmptyExample = role === 'parent' && items.length === 0;
-  const showAiAnalyzing = streamingThreadId === threadId && streamingReply.trim().length === 0;
+  const showQuizWorksheetBanner =
+    role === 'parent' &&
+    !!threadId &&
+    quizWorksheetBanner != null &&
+    quizWorksheetBanner.threadId === threadId &&
+    (quizWorksheetBanner.phase !== 'offer' ||
+      (streamingThreadId === null && !tonightActionBusy));
+
+  const quizWorksheetBannerText =
+    quizWorksheetBanner?.phase === 'offer'
+      ? t('knowledge.quizWorksheetOfferPrompt')
+      : quizWorksheetBanner?.phase === 'generating'
+        ? t('knowledge.quizWorksheetGenerating')
+        : t('knowledge.quizWorksheetDone');
 
   const renderKnowledgeInboxItem = (item: KnowledgeInboxRow) => (
     <button
@@ -944,6 +1107,46 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                     </div>
                   </div>
                 ) : null}
+                {showQuizWorksheetBanner ? (
+                  <div
+                    className="knowledge-quiz-worksheet-offer"
+                    role="region"
+                    aria-label={t('knowledge.quizWorksheetOfferRegionAria')}
+                    aria-busy={quizWorksheetBanner?.phase === 'generating'}
+                  >
+                    <div className="knowledge-quiz-worksheet-offer__lead">
+                      <span className="learning-card-wizard-promo__icon" aria-hidden>
+                        <Sparkles strokeWidth={2} size={22} />
+                      </span>
+                      <p className="knowledge-quiz-worksheet-offer__text">{quizWorksheetBannerText}</p>
+                    </div>
+                    {quizWorksheetBanner?.phase === 'offer' ? (
+                      <div className="knowledge-quiz-worksheet-offer__actions">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          pill
+                          className="btn--sm knowledge-quiz-worksheet-offer__icon-btn"
+                          aria-label={t('knowledge.quizWorksheetOfferYesAria')}
+                          onClick={confirmQuizWorksheetOffer}
+                        >
+                          <Check strokeWidth={2.25} size={18} aria-hidden />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          pill
+                          className="btn--sm knowledge-quiz-worksheet-offer__icon-btn"
+                          aria-label={t('knowledge.quizWorksheetOfferNoAria')}
+                          onClick={dismissQuizWorksheetOffer}
+                        >
+                          <X strokeWidth={2.25} size={18} aria-hidden />
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+                <div ref={knowledgeThreadEndRef} aria-hidden />
               </div>
               <input
                 ref={knowledgeFileInputRef}
@@ -998,6 +1201,15 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                       >
                         <ImagePlus strokeWidth={2} size={20} aria-hidden />
                       </Button>
+                      {role === 'student' && studentUserId && currentBackend?.id ? (
+                        <KnowledgeStudentQuizBlock
+                          studentUserId={studentUserId}
+                          learningCardId={currentBackend.id}
+                          learningCardsEpoch={learningCardsEpoch}
+                          onSubmittedForEval={runEvalQuizAfterWorksheet}
+                          actionDisabled={!threadId || tonightActionBusy || streamingThreadId === threadId}
+                        />
+                      ) : null}
                       {composerTonightSteps.length > 0 ? (
                         <div
                           className="knowledge-tonight-actions knowledge-tonight-actions--composer"
@@ -1013,7 +1225,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                               className="btn--sm knowledge-tonight-actions__btn"
                               id={`btn-knowledge-tonight-${action.preset}`}
                               title={LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset].title}
-                              disabled={tonightActionBusy || !threadId}
+                              disabled={tonightActionBusy || !threadId || streamingThreadId === threadId}
                               onClick={() => runTonightActionFlow(action.preset)}
                             >
                               {knowledgeTonightActionLabel(action.preset, t)}

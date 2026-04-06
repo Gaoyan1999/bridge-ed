@@ -71,7 +71,7 @@
     },
     "student": {
       "chat": "Annonces de classe et messages de l’enseignant.",
-      "knowledge": "Choisissez une fiche de cours et discutez avec BridgeEd IA — idées de pratique et explications courtes.",
+      "knowledge": "Choisissez une fiche de cours et discutez avec BridgeEd IA — idées de pratique, explications courtes ; les fiches générées depuis un quiz apparaissent sur cette fiche.",
       "mood": "Indiquez votre ressenti, les facteurs qui influencent votre humeur, puis envoyez — vos parents verront le résumé hebdomadaire sur le tableau de bord."
     },
     "teacher": {
@@ -87,9 +87,30 @@
     "messages": "Messages",
     "mood": "Humeur"
   },
+  "quiz": {
+    "student": {
+      "loading": "Chargement des fiches…",
+      "empty": "Pas encore de fiche. Quand un parent génère une fiche depuis un quiz Savoirs, elle apparaîtra ici.",
+      "listAria": "Vos fiches de pratique",
+      "back": "Retour à la liste",
+      "questionAria": "Question {{n}}",
+      "submit": "Enregistrer les réponses",
+      "saving": "Enregistrement…"
+    }
+  },
   "knowledge": {
     "emptyStudent": "Pas encore de fiches. Quand l’enseignant en enverra une à la classe, elle apparaîtra ici.",
     "emptyParent": "Pas encore de fiches. Ouvrez le tableau de bord pour voir ce que l’enseignant a partagé.",
+    "studentQuizSectionAria": "Fiche de pratique pour cette carte",
+    "studentQuizKicker": "Fiche de pratique",
+    "studentQuizEmpty": "Pas encore de fiche. Quand un parent en génère une depuis un quiz Savoirs, elle apparaîtra ici.",
+    "studentQuizRowTitle": "Fiche · {{date}}",
+    "studentQuizOpen": "Ouvrir",
+    "studentQuizReview": "Voir / modifier",
+    "studentQuizModalTitle": "Fiche de pratique",
+    "studentQuizTake": "Faire le quiz",
+    "studentQuizRequestEval": "Retour IA",
+    "evalQuizFailed": "Impossible d’obtenir un retour IA sur ta fiche.",
     "selectCard": "Choisir une fiche",
     "composerPlaceholder": "Posez une question sur le sujet de la fiche ou collez un exercice…",
     "demoThread": "Ouvrez cette fiche depuis le tableau de bord pour démarrer le fil IA.",
@@ -129,12 +150,20 @@
     "challengeFeedbackPlaceholder": "ex. Trop long · Je veux un autre sujet · Je ne sais pas par où commencer…",
     "challengeFeedbackSubmit": "Envoyer et terminer",
     "challengeFeedbackRequired": "Écris un petit mot pour qu’on comprenne.",
+    "quizWorksheetOfferPrompt": "Souhaitez-vous que BridgeEd transforme ces questions de quiz en fiche d’exercices pour votre enfant ?",
+    "quizWorksheetOfferYesAria": "Oui, créer une fiche",
+    "quizWorksheetOfferNoAria": "Non merci",
+    "quizWorksheetOfferRegionAria": "Suite après le quiz — fiche d’exercices",
+    "quizWorksheetOfferTodoAlert": "La génération de fiche à partir de ce quiz sera branchée ici.",
+    "quizWorksheetGenerating": "Génération de la fiche…",
+    "quizWorksheetDone": "Une fiche d’exercices a été générée pour votre ou vos enfants.",
+    "quizWorksheetGenerateError": "Impossible de générer la fiche. Réessayez.",
     "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
     "ariaSubjectStatus": "Matière et statut",
     "ariaInboxLabels": "Matière et votre suivi",
     "inboxListAria": "Fiches d’apprentissage",
     "taskShort": {
-      "quiz": "Quiz",
+      "quiz": "Créer un quiz",
       "parent_led_practice": "Mise en pratique",
       "explain_to_parent": "Explication"
     },

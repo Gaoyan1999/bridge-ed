@@ -1,4 +1,5 @@
 ﻿import type { LearningCardChildKnowledge } from '@/bridge/types';
+import type { QuizQuestion } from '@/data/entity/quiz-backend';
 import { getApiBaseUrl, getUseLlm } from '@/data/config';
 
 /** Request body for `POST /learning-cards/generate` (CurricuLLM). */
@@ -117,6 +118,22 @@ export type KnowledgeTonightCommandResult = {
   reply: string;
 };
 
+/** Structured multiple-choice items for a generated worksheet (per child). */
+export type StructuredQuizQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+};
+
+export type StructuredQuizResult = {
+  questions: StructuredQuizQuestion[];
+};
+
+/** Full MCQ rows (stem, options, model answer, student answer) for `evalQuiz`. */
+export type EvalQuizInput = {
+  questions: QuizQuestion[];
+};
+
 export type ChatRespondHistoryMessage = {
   who: string;
   type: 'in' | 'out';
@@ -171,6 +188,31 @@ const MOCK_KNOWLEDGE_TEACH_BACK_REPLY =
   '- Use **one drawing, gesture, or everyday example** so they can 鈥渟ee鈥?it.\n' +
   '- End with: 鈥淭he part I鈥檓 most sure about is ___; the part I want to check is ___.鈥漒n\n' +
   'When you鈥檙e done, your parent can react or ask one follow-up question here.';
+
+const MOCK_EVAL_QUIZ_REPLY =
+  '**AI feedback (demo)**\n\n' +
+  'Thanks for submitting your worksheet. Here is a quick read:\n\n' +
+  '- You connected the main ideas clearly.\n' +
+  '- On any item where your answer differs from the model answer, try saying *why* you picked it in one sentence.\n\n' +
+  'Reply with what felt easy or tricky, and we can go deeper next.';
+
+function mockKnowledgeGenerateStructuredQuiz(quizText: string): StructuredQuizResult {
+  const hint = quizText.trim().slice(0, 120) || 'this topic';
+  return {
+    questions: [
+      {
+        question: `Based on the quiz discussion, what is the main idea of “${hint}”?`,
+        options: ['Option A', 'Option B', 'Option C', 'Option D'],
+        correctAnswer: 'Option B',
+      },
+      {
+        question: 'Which step should come first when reviewing?',
+        options: ['Plan', 'Guess', 'Skip', 'Ignore'],
+        correctAnswer: 'Plan',
+      },
+    ],
+  };
+}
 
 async function mockExplainTerminologyToParents(
   input: LearningCardGenerateInput,
@@ -371,7 +413,7 @@ export class LlmApi {
   }
 
   /**
-   * Knowledge thread: response after user sends `/quiz`.
+   * Knowledge thread: response after user sends `/make-quiz`.
    * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/quiz`.
    */
   async knowledgeQuiz(input: KnowledgeTonightCommandInput = {}): Promise<KnowledgeTonightCommandResult> {
@@ -432,6 +474,51 @@ export class LlmApi {
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || 'Failed to run Knowledge teach-back.');
+    }
+    return res.json() as Promise<KnowledgeTonightCommandResult>;
+  }
+
+  /**
+   * Turn Knowledge quiz assistant text into structured MCQ items for worksheets.
+   * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/structured-quiz`.
+   */
+  async knowledgeGenerateStructuredQuiz(quizText: string): Promise<StructuredQuizResult> {
+    const body = quizText.trim();
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 2000));
+      return mockKnowledgeGenerateStructuredQuiz(body);
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/learning-cards/knowledge-tonight/structured-quiz`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quizText: body }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to generate structured quiz.');
+    }
+    return res.json() as Promise<StructuredQuizResult>;
+  }
+
+  /**
+   * After `/eval-quiz` in the Knowledge thread: evaluate a worksheet (questions + student answers).
+   * Mock when `VITE_USE_LLM` is false; otherwise `POST /learning-cards/knowledge-tonight/eval-quiz`.
+   */
+  async evalQuiz(input: EvalQuizInput): Promise<KnowledgeTonightCommandResult> {
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 420));
+      return { reply: MOCK_EVAL_QUIZ_REPLY };
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/learning-cards/knowledge-tonight/eval-quiz`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to evaluate worksheet.');
     }
     return res.json() as Promise<KnowledgeTonightCommandResult>;
   }
