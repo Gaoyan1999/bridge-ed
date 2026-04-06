@@ -825,7 +825,6 @@ body {
   margin: 0 0 0.5rem;
   font-size: 0.68rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
@@ -927,7 +926,6 @@ body {
   margin: 0 0 0.5rem;
   font-size: 0.7rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
 }
@@ -1209,7 +1207,6 @@ body {
   margin: 0 0 0.5rem;
   font-size: 0.78rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
 }
@@ -1278,7 +1275,6 @@ html.theme-dark .teacher-card-preview__module {
   margin: 0 0 0.45rem;
   font-size: 0.8125rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
 }
@@ -1631,7 +1627,6 @@ html.theme-dark .teacher-card-preview__module {
   font-size: 0.8125rem;
   font-weight: 650;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -2392,7 +2387,6 @@ html.theme-dark .learning-card-ai-hint__icon-wrap {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.09em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -3050,7 +3044,6 @@ html.theme-dark .learning-card-confirm__highlight {
   margin-bottom: 0.4rem;
   color: var(--text-muted);
   font-size: 0.72rem;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
@@ -3335,7 +3328,6 @@ html.theme-dark .learning-card-confirm__highlight {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   color: var(--text-muted);
   font-weight: bold;
 }
@@ -3346,7 +3338,6 @@ html.theme-dark .learning-card-confirm__highlight {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-muted);
   background: color-mix(in srgb, var(--surface) 55%, var(--page-bg) 45%);
   border-bottom: 1px solid var(--border-light);
@@ -3885,6 +3876,7 @@ html.theme-dark .panel--chat .inbox-item__kind--private {
 
 .inbox-item__title {
   margin-bottom: 0.35rem;
+  font-weight: 500;
 }
 
 .inbox-item__block {
@@ -4563,7 +4555,6 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   font-weight: 600;
   letter-spacing: 0.05em;
   color: #80868b;
-  text-transform: uppercase;
   margin-bottom: 0.35rem;
 }
 
@@ -4631,7 +4622,6 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   font-weight: 600;
   margin-bottom: 0.35rem;
   color: var(--text-muted);
-  text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
@@ -4668,7 +4658,6 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
 .report-card__label {
   font-size: 0.6875rem;
   color: var(--text-muted);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
 }
@@ -4711,7 +4700,6 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   background: var(--page-bg);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--text-muted);
 }
@@ -4761,6 +4749,13 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   max-height: min(94vh, 980px);
 }
 
+/* Compact size for Book a 1:1 dialog */
+.modal__box.modal__box--book {
+  max-width: min(92vw, 520px);
+  height: auto;
+  max-height: min(84vh, 620px);
+}
+
 .modal__header {
   flex-shrink: 0;
   padding: 1.35rem 1.5rem 0;
@@ -4797,6 +4792,13 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   letter-spacing: -0.02em;
 }
 
+.modal__title--xs {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  font-weight: 600;
+  color: var(--text-muted);  
+}
+
 .modal__body {
   margin: 0 0 1rem;
   line-height: 1.55;
@@ -4809,6 +4811,30 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.book-form__hint {
+  margin-top: -0.4rem;
+  margin-bottom: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+/* Lightweight but polished native date picker input */
+.book-form__date-input {
+  border-radius: 10px;
+  border-color: color-mix(in srgb, var(--border-light) 84%, var(--link-blue) 16%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.92));
+}
+
+.book-form__date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.82;
+}
+
+html.theme-dark .book-form__date-input {
+  background: linear-gradient(180deg, rgba(54, 59, 73, 0.95), rgba(43, 47, 59, 0.95));
+  border-color: rgba(138, 180, 248, 0.35);
 }
 
 .modal__box--fit {
@@ -5021,7 +5047,6 @@ html.theme-dark .knowledge-child-discovery {
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 

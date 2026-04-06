@@ -161,7 +161,19 @@
     "selectThread": "Choisir une conversation",
     "bookTime": "Prendre rendez-vous",
     "noMessagesInThread": "Aucun message dans cette conversation.",
-    "broadcastSent": "Diffusion envoyée."
+    "broadcastSent": "Diffusion envoyée.",
+    "bookModal": {
+      "title": "Prendre un rendez-vous 1:1",
+      "pickTeacher": "Choisir l'enseignant",
+      "pickSlot": "Choisir un créneau",
+      "preferredDate": "Date souhaitée",
+      "timeSlot": "Créneau horaire disponible",
+      "noSlots": "Aucun créneau disponible pour cette date. Veuillez choisir une autre date.",
+      "topicOptional": "Sujet (facultatif)",
+      "topicPlaceholder": "ex. devoirs de factorisation",
+      "sendRequest": "Envoyer la demande",
+      "success": "Demande envoyée (démo). L'enseignant confirmera le créneau."
+    }
   },
   "mood": {
     "emotion": "Émotion",

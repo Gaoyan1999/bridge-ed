@@ -130,7 +130,7 @@ export function ChatPanel({ active }: { active: boolean }) {
 
   const placeholder =
     role === 'parent'
-      ? t('chat.placeholderParent')
+      ? t('chat.placeholder')
       : role === 'teacher'
         ? t('chat.placeholderTeacher')
         : t('chat.placeholderStudent');

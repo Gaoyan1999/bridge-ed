@@ -146,6 +146,7 @@
     "placeholderParent": "Type a message to your teacher…",
     "placeholderTeacher": "Type a message to this family or class…",
     "placeholderStudent": "Type a message…",
+    "placeholder": "Type a message…",
     "emptyInbox": "No messages yet.",
     "inboxBroadcastFeedTitle": "Announcements",
     "broadcast": "Broadcast",
@@ -161,7 +162,19 @@
     "selectThread": "Select a thread",
     "bookTime": "Book a time",
     "noMessagesInThread": "No messages in this thread.",
-    "broadcastSent": "Broadcast sent."
+    "broadcastSent": "Broadcast sent.",
+    "bookModal": {
+      "title": "Book a 1:1",
+      "pickTeacher": "Pick teacher",
+      "pickSlot": "Choose a slot",
+      "preferredDate": "Preferred date",
+      "timeSlot": "Available time slot",
+      "noSlots": "No available slots for this date. Please choose another date.",
+      "topicOptional": "Topic (optional)",
+      "topicPlaceholder": "e.g. factoring homework",
+      "sendRequest": "Send request",
+      "success": "Your teacher will confirm the slot."
+    }
   },
   "mood": {
     "emotion": "Emotion",

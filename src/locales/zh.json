@@ -161,7 +161,19 @@
     "selectThread": "选择会话",
     "bookTime": "预约时间",
     "noMessagesInThread": "此会话暂无消息。",
-    "broadcastSent": "广播已发送。"
+    "broadcastSent": "广播已发送。",
+    "bookModal": {
+      "title": "预约 1:1",
+      "pickTeacher": "选择老师",
+      "pickSlot": "选择时间段",
+      "preferredDate": "期望日期",
+      "timeSlot": "可用时间段",
+      "noSlots": "该日期没有可选时间段，请选择其他日期。",
+      "topicOptional": "主题（可选）",
+      "topicPlaceholder": "例如：因式分解作业",
+      "sendRequest": "发送请求",
+      "success": "请求已发送（演示）。老师会确认该时间段。"
+    }
   },
   "mood": {
     "emotion": "情绪",
