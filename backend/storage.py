@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from uuid import uuid4
 from datetime import datetime, timezone
+from typing import Any
 
 from .models import LearningCard, LearningCardCreate
 
@@ -42,41 +43,55 @@ def _write_cards(cards: list[LearningCard]) -> None:
     DATA_FILE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def _normalize_legacy_fields(payload: dict[str, Any]) -> dict[str, Any]:
+    # Accept legacy card shape while storing canonical fields used by the frontend.
+    if not payload.get("topic"):
+        legacy_title = payload.get("title")
+        if isinstance(legacy_title, str):
+            payload["topic"] = legacy_title
+    if not payload.get("parentSummary"):
+        legacy_summary = payload.get("teacherSummary")
+        if isinstance(legacy_summary, str):
+            payload["parentSummary"] = legacy_summary
+    if "tonightActions" not in payload:
+        legacy_actions = payload.get("parentActions")
+        if isinstance(legacy_actions, list):
+            payload["tonightActions"] = [{"preset": "quiz", "include": True, "text": str(v)} for v in legacy_actions]
+    return payload
+
+
+def _build_learning_card(payload: dict[str, Any], *, card_id: str | None = None, keep_created_at: str | None = None) -> LearningCard:
+    now = utc_now_iso()
+    payload = _normalize_legacy_fields(payload)
+    payload["id"] = card_id or str(payload.get("id") or uuid4())
+    payload["createdAt"] = keep_created_at or str(payload.get("createdAt") or now)
+    payload["updatedAt"] = now
+    return LearningCard.model_validate(payload)
+
+
 def create_card(input_data: LearningCardCreate) -> LearningCard:
-    timestamp = utc_now_iso()
-    card = LearningCard(
-        id=str(uuid4()),
-        title=input_data.title.strip(),
-        teacherSummary=input_data.teacherSummary.strip(),
-        parentActions=[item.strip() for item in input_data.parentActions if item.strip()],
-        createdAt=timestamp,
-        updatedAt=timestamp,
-    )
+    payload = input_data.model_dump(exclude_none=True)
+    card = _build_learning_card(payload)
     cards = list_cards()
     cards.append(card)
     _write_cards(cards)
     return card
 
 
-def update_card(card_id: str, input_data: LearningCardCreate) -> LearningCard | None:
+def update_card(card_id: str, input_data: LearningCardCreate) -> LearningCard:
     cards = list_cards()
     updated: LearningCard | None = None
     next_cards: list[LearningCard] = []
+    payload = input_data.model_dump(exclude_none=True)
     for card in cards:
         if card.id == card_id:
-            updated = LearningCard(
-                id=card.id,
-                title=input_data.title.strip(),
-                teacherSummary=input_data.teacherSummary.strip(),
-                parentActions=[item.strip() for item in input_data.parentActions if item.strip()],
-                createdAt=card.createdAt,
-                updatedAt=utc_now_iso(),
-            )
+            updated = _build_learning_card(payload, card_id=card.id, keep_created_at=card.createdAt)
             next_cards.append(updated)
         else:
             next_cards.append(card)
     if updated is None:
-        return None
+        updated = _build_learning_card(payload, card_id=card_id)
+        next_cards.append(updated)
     _write_cards(next_cards)
     return updated
 

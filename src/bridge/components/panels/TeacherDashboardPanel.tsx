@@ -4,7 +4,7 @@ import { useBridge } from '@/bridge/BridgeContext';
 import type { LearningCardItem } from '@/bridge/types';
 import { DASH_PUBLISH, DASH_SCHEDULE, DASH_STATS, DASH_STUDENTS, DASH_TODOS } from '@/bridge/mockData';
 import { getDataLayer, getDebugMode } from '@/data';
-import { learningCardBackendToItem } from '@/data/learning-card-mappers';
+import { HARDCODED_LEARNING_CARD_AUTHOR_USER_ID, learningCardBackendToItem } from '@/data/learning-card-mappers';
 import { DashboardCard } from '@/bridge/components/DashboardCard';
 import { DashboardShell } from '@/bridge/components/DashboardShell';
 import { LearningCardTile } from '@/bridge/components/LearningCardTile';
@@ -23,7 +23,8 @@ export function TeacherDashboardPanel({ active, dashHint }: { active: boolean; d
     removeKnowledgeThreadForDeletedCard,
     currentUser,
   } = useBridge();
-  const teacherAuthorId = currentUser?.role === 'teacher' ? currentUser.id : '';
+  const teacherAuthorId =
+    currentUser?.role === 'teacher' ? currentUser.id : HARDCODED_LEARNING_CARD_AUTHOR_USER_ID;
   const [studentFilter, setStudentFilter] = useState('');
   const [learningCards, setLearningCards] = useState<LearningCardItem[]>([]);
   const debugMode = getDebugMode();
