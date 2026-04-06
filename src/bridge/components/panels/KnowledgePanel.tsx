@@ -90,6 +90,12 @@ function knowledgeTonightActionLabel(preset: LearningCardTonightActionPreset, t:
   return t(`knowledge.taskShort.${preset}`);
 }
 
+function uiLangFromI18n(raw: string): 'en' | 'zh' | 'fr' {
+  const short = raw.split('-')[0]?.toLowerCase() ?? 'en';
+  if (short === 'zh' || short === 'fr') return short;
+  return 'en';
+}
+
 /** Inbox rows keep subject + status on opposite ends; thread header shows subject tags only (status stays in the list). */
 function KnowledgeCardLabels({
   card,
@@ -314,7 +320,7 @@ function msgWhoLabel(who: string, tf: (k: string) => string): string {
 }
 
 export function KnowledgePanel({ active }: { active: boolean }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     role,
     learningCardsEpoch,
@@ -329,6 +335,8 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   const hints = panelHintsForRole(t, role);
   const [input, setInput] = useState('');
   const [tonightActionBusy, setTonightActionBusy] = useState(false);
+  const [streamingReply, setStreamingReply] = useState('');
+  const [streamingThreadId, setStreamingThreadId] = useState<string | null>(null);
   const [challengeFeedbackOpen, setChallengeFeedbackOpen] = useState(false);
   const [cardBackends, setCardBackends] = useState<LearningCardBackend[]>([]);
   const cardBackendsRef = useRef(cardBackends);
@@ -511,6 +519,26 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     return steps;
   }, [currentCard, role]);
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
+  const buildCardContext = useCallback(
+    (historyRows: Array<{ who: string; type: 'in' | 'out'; text: string }>) => {
+      if (!currentCard || !currentBackend) return undefined;
+      const userTurns = historyRows.filter((m) => m.type === 'out').length;
+      return {
+        topic: currentBackend.topic || currentCard.title,
+        grade: currentBackend.grade || '',
+        subject: currentBackend.subject || currentCard.subject,
+        classLessonTitle: currentBackend.classLessonTitle || '',
+        parentSummary: currentBackend.parentSummary || currentCard.summary || '',
+        tonightActions: (currentBackend.tonightActions || []).map((a) => ({
+          preset: a.preset,
+          include: a.include,
+          text: a.text || '',
+        })),
+        isFirstExplanation: userTurns === 0,
+      };
+    },
+    [currentCard, currentBackend],
+  );
 
   useEffect(() => {
     setChallengeFeedbackOpen(false);
@@ -535,15 +563,26 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     const roleForApi = role === 'teacher' ? 'parent' : role;
     const doReply = async () => {
       if (!threadId || !apiMessage) return;
+      setStreamingThreadId(threadId);
+      setStreamingReply('');
       try {
         const api = getLlmApi();
-        const result = await api.knowledgeChatRespond({
-          role: roleForApi,
-          threadId,
-          threadTitle: currentCard?.title ?? '',
-          message: apiMessage,
-          history,
-        });
+        const result = await api.knowledgeChatRespondStream(
+          {
+            role: roleForApi,
+            uiLang: uiLangFromI18n(i18n.resolvedLanguage ?? i18n.language ?? 'en'),
+            threadId,
+            threadTitle: currentCard?.title ?? '',
+            message: apiMessage,
+            history,
+            cardContext: buildCardContext(history),
+          },
+          {
+            onDelta: (delta) => {
+              setStreamingReply((prev) => prev + delta);
+            },
+          },
+        );
         appendKnowledgeMessage(threadId, {
           who: 'BridgeEd AI',
           type: 'in',
@@ -555,6 +594,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           type: 'in',
           text: e instanceof Error ? e.message : 'Chat response failed.',
         });
+      } finally {
+        setStreamingReply('');
+        setStreamingThreadId(null);
       }
     };
 
@@ -613,13 +655,24 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       }));
       const roleForApi = role === 'teacher' ? 'parent' : role;
       try {
-        const result = await api.knowledgeChatRespond({
-          role: roleForApi,
-          threadId,
-          threadTitle: title ?? '',
-          message: cmd,
-          history,
-        });
+        setStreamingThreadId(threadId);
+        setStreamingReply('');
+        const result = await api.knowledgeChatRespondStream(
+          {
+            role: roleForApi,
+            uiLang: uiLangFromI18n(i18n.resolvedLanguage ?? i18n.language ?? 'en'),
+            threadId,
+            threadTitle: title ?? '',
+            message: cmd,
+            history,
+            cardContext: buildCardContext(history),
+          },
+          {
+            onDelta: (delta) => {
+              setStreamingReply((prev) => prev + delta);
+            },
+          },
+        );
         appendKnowledgeMessage(threadId, {
           who: 'BridgeEd AI',
           type: 'in',
@@ -632,6 +685,8 @@ export function KnowledgePanel({ active }: { active: boolean }) {
           text: e instanceof Error ? e.message : 'Knowledge tonight command failed.',
         });
       } finally {
+        setStreamingReply('');
+        setStreamingThreadId(null);
         setTonightActionBusy(false);
       }
     },
@@ -639,11 +694,14 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       threadId,
       tonightActionBusy,
       appendKnowledgeMessage,
+      buildCardContext,
       currentCard?.title,
       role,
       persistStudentPatch,
       persistParentEngagementToChildren,
       studentUserId,
+      i18n.language,
+      i18n.resolvedLanguage,
     ],
   );
 
@@ -662,6 +720,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
   const emptyHint = role === 'student' ? t('knowledge.emptyStudent') : t('knowledge.emptyParent');
   const showParentEmptyExample = role === 'parent' && items.length === 0;
+  const showAiAnalyzing = streamingThreadId === threadId && streamingReply.trim().length === 0;
 
   const renderKnowledgeInboxItem = (item: KnowledgeInboxRow) => (
     <button
@@ -814,6 +873,25 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                       </div>
                     ))
                   : null}
+                {streamingThreadId === threadId && streamingReply.trim().length > 0 ? (
+                  <div className={cx('msg', 'msg--in')}>
+                    <div className="msg__who">{t('common.bridgedAi')}</div>
+                    <Markdown className="markdown-content--msg-in">{streamingReply}</Markdown>
+                  </div>
+                ) : null}
+                {showAiAnalyzing ? (
+                  <div className={cx('msg', 'msg--in', 'knowledge-ai-thinking')}>
+                    <div className="msg__who">{t('common.bridgedAi')}</div>
+                    <div className="knowledge-ai-thinking__row" aria-live="polite">
+                      <span className="knowledge-ai-thinking__label">Analyzing</span>
+                      <span className="knowledge-ai-thinking__dots" aria-hidden>
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
               </div>
               <input
                 ref={knowledgeFileInputRef}

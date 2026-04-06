@@ -1,14 +1,34 @@
 from __future__ import annotations
 
+import json
 import os
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from .config import get_bool_env
-from .models import LearningCard, LearningCardCreate, LearningCardGenerateRequest, LearningCardGenerateResponse
-from .models import ChatRespondRequest, ChatRespondResponse
-from .curricullm_service import generate_learning_card, respond_in_chat
+from .models import (
+    ChatRespondRequest,
+    ChatRespondResponse,
+    KnowledgeTonightCommandRequest,
+    KnowledgeTonightCommandResponse,
+    LearningCard,
+    LearningCardChildKnowledgeGenerateRequest,
+    LearningCardChildKnowledgeHeroResponse,
+    LearningCardChildKnowledgeResponse,
+    LearningCardCreate,
+    LearningCardGenerateRequest,
+    LearningCardGenerateResponse,
+)
+from .curricullm_service import (
+    build_child_knowledge_hero,
+    generate_child_knowledge,
+    generate_learning_card,
+    respond_in_chat,
+    respond_knowledge_tonight,
+    stream_respond_in_chat,
+)
 from .storage import create_card, delete_card, get_card, list_cards, update_card
 
 
@@ -75,5 +95,65 @@ def learning_cards_generate(input_data: LearningCardGenerateRequest) -> Learning
 def chat_respond(input_data: ChatRespondRequest) -> ChatRespondResponse:
     try:
         return respond_in_chat(input_data)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/chat/respond/stream")
+def chat_respond_stream(input_data: ChatRespondRequest) -> StreamingResponse:
+    def event_stream():
+        try:
+            for chunk in stream_respond_in_chat(input_data):
+                if not chunk:
+                    continue
+                yield f"data: {json.dumps({'delta': chunk}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as exc:
+            yield f"data: {json.dumps({'error': str(exc)}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+    )
+
+
+@app.post("/learning-cards/child-knowledge/hero", response_model=LearningCardChildKnowledgeHeroResponse)
+def child_knowledge_hero(input_data: LearningCardChildKnowledgeGenerateRequest) -> LearningCardChildKnowledgeHeroResponse:
+    try:
+        return build_child_knowledge_hero(input_data)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/child-knowledge", response_model=LearningCardChildKnowledgeResponse)
+def child_knowledge(input_data: LearningCardChildKnowledgeGenerateRequest) -> LearningCardChildKnowledgeResponse:
+    try:
+        return generate_child_knowledge(input_data)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/knowledge-tonight/quiz", response_model=KnowledgeTonightCommandResponse)
+def knowledge_tonight_quiz(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
+    try:
+        return respond_knowledge_tonight("quiz", input_data.cardTitle)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/knowledge-tonight/practice", response_model=KnowledgeTonightCommandResponse)
+def knowledge_tonight_practice(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
+    try:
+        return respond_knowledge_tonight("practice", input_data.cardTitle)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/knowledge-tonight/teach-back", response_model=KnowledgeTonightCommandResponse)
+def knowledge_tonight_teach_back(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
+    try:
+        return respond_knowledge_tonight("teach-back", input_data.cardTitle)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
