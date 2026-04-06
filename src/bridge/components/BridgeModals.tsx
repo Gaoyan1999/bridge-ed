@@ -89,11 +89,9 @@ function BookModal({ onClose }: { onClose: () => void }) {
 function TeacherCardPreviewTodoModal({
   card,
   onClose,
-  onContinue,
 }: {
   card: LearningCardItem;
   onClose: () => void;
-  onContinue: () => void;
 }) {
   const { t } = useTranslation();
   const engagement = useMemo(() => getMockTeacherCardEngagement(card.id), [card.id]);
@@ -206,10 +204,7 @@ function TeacherCardPreviewTodoModal({
       <div className="modal__footer">
         <div className="modal__actions">
           <Button variant="text" type="button" onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
-          <Button variant="primary" pill type="button" onClick={onContinue}>
-            {t('dashboard.teacher.cardPreview.openKnowledge')}
+            {t('common.close')}
           </Button>
         </div>
       </div>
@@ -389,7 +384,7 @@ function ReportModal({
 }
 
 export function BridgeModals() {
-  const { modal, closeModal, pushTeacherReport, bumpLearningCards, openKnowledgeFromCard } = useBridge();
+  const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -492,14 +487,7 @@ export function BridgeModals() {
       >
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
         <div className="modal__box modal__box--rounded modal__box--xlarge modal__box--teacher-card-preview">
-          <TeacherCardPreviewTodoModal
-            card={card}
-            onClose={onBackdropClose}
-            onContinue={() => {
-              onBackdropClose();
-              openKnowledgeFromCard(card);
-            }}
-          />
+          <TeacherCardPreviewTodoModal card={card} onClose={onBackdropClose} />
         </div>
       </div>
     );
