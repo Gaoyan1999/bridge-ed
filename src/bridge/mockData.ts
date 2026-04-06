@@ -1,10 +1,6 @@
 import type { LearningCardStudentFinishedType } from '@/data/entity/learning-card-backend';
 import type { StudentMoodKind } from '@/data/entity/student-mood-backend';
-import type { InboxItem, LearningCardItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
-import { normalizeTonightActions } from '@/data/learning-card-mappers';
-
-/** Demo fixtures: teacher “tonight” presets (IndexedDB import uses full `LearningCardItem`). */
-const DEMO_TONIGHT_ALL = normalizeTonightActions([]);
+import type { InboxItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
 
 export const MODULES = ['dashboard', 'chat', 'knowledge', 'mood'] as const;
 
@@ -79,193 +75,6 @@ export const DASH_SCHEDULE: ScheduleDay[] = [
   { day: 'Thu 4/4', items: ['—'] },
   { day: 'Fri 4/5', items: ['Quiz draft due'] },
 ];
-
-/** Parent dashboard demo cards — also used to build IndexedDB import fixtures. */
-export const PARENT_DASH_CARDS_RAW: LearningCardItem[] = [
-  {
-    grade: '',
-    id: 'card-pythagoras',
-    title: 'Pythagorean theorem',
-    subject: 'Math · Geometry',
-    summary: 'What right triangles have in common, and why a² + b² = c².',
-    at: Date.parse('2026-04-01T09:30:00'),
-    threadId: 'card-thread-pythagoras',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-calculus',
-    title: 'What is calculus?',
-    subject: 'Math · Calculus',
-    summary: 'Derivatives as “how fast something is changing” with everyday examples.',
-    at: Date.parse('2026-04-02T11:00:00'),
-    threadId: 'card-thread-calculus',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-fractions',
-    title: 'What is a fraction?',
-    subject: 'Math · Arithmetic',
-    summary: 'Parts of a whole in plain language—numerator, denominator, and a pizza-slice mental model.',
-    at: Date.parse('2026-04-03T16:45:00'),
-    threadId: 'card-thread-fractions',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-shakespeare',
-    title: 'Who is Shakespeare?',
-    subject: 'Literature',
-    summary: 'Why we still read Shakespeare and how to help with reading at home.',
-    at: Date.parse('2026-04-04T10:15:00'),
-    threadId: 'card-thread-shakespeare',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-atmospheric-pressure',
-    title: 'What is atmospheric pressure?',
-    subject: 'Science',
-    summary: 'Air pushes on everything around us; how we feel it and a simple “column of air” picture.',
-    at: Date.parse('2026-04-05T08:20:00'),
-    threadId: 'card-thread-atmospheric-pressure',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-water-cycle',
-    title: 'What is the water cycle?',
-    subject: 'Science · Earth',
-    summary: 'Evaporation, clouds, and rain in one easy loop—no jargon overload.',
-    at: Date.parse('2026-04-06T13:00:00'),
-    threadId: 'card-thread-water-cycle',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-quadratic-equations',
-    title: 'Quadratic equations in standard form',
-    subject: 'Math · Algebra',
-    summary: 'From ax² + bx + c = 0 to factoring and the quadratic formula—when to use which.',
-    at: Date.parse('2026-04-07T09:00:00'),
-    threadId: 'card-thread-quadratic-equations',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-photosynthesis',
-    title: 'What is photosynthesis?',
-    subject: 'Science · Biology',
-    summary: 'How plants turn light, water, and CO₂ into sugar and oxygen—simple words, one diagram.',
-    at: Date.parse('2026-04-07T15:30:00'),
-    threadId: 'card-thread-photosynthesis',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-metaphor',
-    title: 'What is a metaphor?',
-    subject: 'English · Writing',
-    summary: 'Not literal comparison—how metaphors work in poems and everyday speech.',
-    at: Date.parse('2026-04-08T10:20:00'),
-    threadId: 'card-thread-metaphor',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-periodic-table',
-    title: 'Reading the periodic table',
-    subject: 'Science · Chemistry',
-    summary: 'Groups, periods, and atomic number—why the table’s shape is not random.',
-    at: Date.parse('2026-04-09T08:45:00'),
-    threadId: 'card-thread-periodic-table',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-linear-graphs',
-    title: 'Linear functions on a graph',
-    subject: 'Math · Algebra',
-    summary: 'Slope and y-intercept in context: “rise over run” without the stress.',
-    at: Date.parse('2026-04-09T14:10:00'),
-    threadId: 'card-thread-linear-graphs',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-civil-war',
-    title: 'The U.S. Civil War — big picture',
-    subject: 'History · U.S.',
-    summary: 'Causes, turning points, and why we study it—without a 50-name quiz.',
-    at: Date.parse('2026-04-10T11:00:00'),
-    threadId: 'card-thread-civil-war',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-cells',
-    title: 'Plant vs animal cells',
-    subject: 'Science · Biology',
-    summary: 'Cell wall, chloroplasts, nucleus—what to remember for the diagram label sheet.',
-    at: Date.parse('2026-04-11T09:50:00'),
-    threadId: 'card-thread-cells',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-persuasive-essay',
-    title: 'Building a persuasive paragraph',
-    subject: 'English',
-    summary: 'Claim, evidence, reasoning—one paragraph at a time before the full essay.',
-    at: Date.parse('2026-04-12T16:00:00'),
-    threadId: 'card-thread-persuasive-essay',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-renaissance',
-    title: 'What was the Renaissance?',
-    subject: 'History · World',
-    summary: 'Art, ideas, and “rebirth”—how to talk about it at dinner without a textbook tone.',
-    at: Date.parse('2026-04-13T10:05:00'),
-    threadId: 'card-thread-renaissance',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-probability',
-    title: 'Probability in everyday situations',
-    subject: 'Math · Statistics',
-    summary: 'Simple events, “and” vs “or,” and why a coin flip is still 50–50.',
-    at: Date.parse('2026-04-14T13:25:00'),
-    threadId: 'card-thread-probability',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-constitution',
-    title: 'The Constitution — three branches',
-    subject: 'History · Civics',
-    summary: 'Legislative, executive, judicial—checks and balances in one page.',
-    at: Date.parse('2026-04-15T08:15:00'),
-    threadId: 'card-thread-constitution',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-  {
-    grade: '',
-    id: 'card-art-perspective',
-    title: 'One-point perspective in drawing',
-    subject: 'Art',
-    summary: 'Horizon line and vanishing point—why hallways “feel” deep on paper.',
-    at: Date.parse('2026-04-16T14:40:00'),
-    threadId: 'card-thread-art-perspective',
-    tonightActions: DEMO_TONIGHT_ALL,
-  },
-];
-
-/** Newest first (by `at`). */
-export const PARENT_DASH_CARDS: LearningCardItem[] = [...PARENT_DASH_CARDS_RAW].sort((a, b) => b.at - a.at);
 
 export const PARENT_DASH_SCHEDULE: ScheduleDay[] = [
   {
@@ -439,78 +248,164 @@ export type TeacherCardEngagementMock = {
   tonightActionUptake: TeacherCardTonightActionUptakeMock;
 };
 
-const MOCK_ENGAGEMENT_BASE: TeacherCardEngagementMock = {
-  students: [
-    { id: 's1', name: 'Alex Wang', status: 'todo', watchedVideos: 0 },
-    { id: 's2', name: 'Betty Li', status: 'todo', watchedVideos: 1 },
-    { id: 's3', name: 'Carol Zhang', status: 'todo', watchedVideos: 0 },
-    { id: 's4', name: 'David Chen', status: 'todo', watchedVideos: 1 },
-    { id: 's5', name: 'Emma Liu', status: 'todo', watchedVideos: 0 },
-    { id: 's6', name: 'Frank Wu', status: 'todo', watchedVideos: 0 },
-    { id: 's7', name: 'Grace Huang', status: 'todo', watchedVideos: 1 },
-    { id: 's8', name: 'Henry Zhao', status: 'todo', watchedVideos: 0 },
-    { id: 's9', name: 'Iris Lin', status: 'todo', watchedVideos: 0 },
-    { id: 's10', name: 'Jack Ma', status: 'doing', watchedVideos: 1 },
-    { id: 's11', name: 'Kelly Zhou', status: 'doing', watchedVideos: 2 },
-    { id: 's12', name: 'Leo Sun', status: 'doing', watchedVideos: 1 },
-    { id: 's13', name: 'Mia Xu', status: 'doing', watchedVideos: 2 },
-    { id: 's14', name: 'Nina Gao', status: 'doing', watchedVideos: 1 },
-    { id: 's15', name: 'Oscar Tang', status: 'doing', watchedVideos: 2 },
-    { id: 's16', name: 'Penny Qian', status: 'doing', watchedVideos: 1 },
-    { id: 's17', name: 'Quinn Ren', status: 'doing', watchedVideos: 2 },
-    { id: 's18', name: 'Rachel Shen', status: 'doing', watchedVideos: 1 },
-    { id: 's19', name: 'Sam Ye', status: 'doing', watchedVideos: 2 },
-    { id: 's20', name: 'Tina Yu', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
-    { id: 's21', name: 'Uma Jia', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
-    { id: 's22', name: 'Victor He', status: 'done', watchedVideos: 4, finishedType: 'challenge' },
-    { id: 's23', name: 'Wendy Bai', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
-    { id: 's24', name: 'Xander Cai', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
-    { id: 's25', name: 'Yara Ding', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
-    { id: 's26', name: 'Zara Fang', status: 'done', watchedVideos: 4, finishedType: 'think_get_it' },
-    { id: 's27', name: 'Aaron Guo', status: 'done', watchedVideos: 2, finishedType: 'challenge' },
-    { id: 's28', name: 'Bella Hu', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
-    { id: 's29', name: 'Carl Jin', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
-    { id: 's30', name: 'Dana Kong', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
-  ],
-  parents: [
-    { id: 'p1', name: 'Ms. Wang', status: 'done', needHelp: false },
-    { id: 'p2', name: 'Mr. Li', status: 'doing', needHelp: false },
-    { id: 'p3', name: 'Ms. Zhang', status: 'todo', needHelp: true },
-    { id: 'p4', name: 'Mr. Chen', status: 'todo', needHelp: false },
-    { id: 'p5', name: 'Ms. Liu', status: 'doing', needHelp: false },
-    { id: 'p6', name: 'Mr. Wu', status: 'done', needHelp: false },
-    { id: 'p7', name: 'Ms. Huang', status: 'todo', needHelp: false },
-    { id: 'p8', name: 'Mr. Zhao', status: 'doing', needHelp: true },
-    { id: 'p9', name: 'Ms. Lin', status: 'done', needHelp: false },
-    { id: 'p10', name: 'Mr. Ma', status: 'todo', needHelp: false },
-    { id: 'p11', name: 'Ms. Zhou', status: 'doing', needHelp: false },
-    { id: 'p12', name: 'Mr. Sun', status: 'done', needHelp: false },
-    { id: 'p13', name: 'Ms. Xu', status: 'todo', needHelp: false },
-    { id: 'p14', name: 'Mr. Gao', status: 'doing', needHelp: false },
-    { id: 'p15', name: 'Ms. Tang', status: 'done', needHelp: true },
-    { id: 'p16', name: 'Mr. Qian', status: 'todo', needHelp: false },
-    { id: 'p17', name: 'Ms. Ren', status: 'doing', needHelp: false },
-    { id: 'p18', name: 'Mr. Shen', status: 'done', needHelp: false },
-    { id: 'p19', name: 'Ms. Ye', status: 'todo', needHelp: false },
-    { id: 'p20', name: 'Mr. Yu', status: 'doing', needHelp: false },
-    { id: 'p21', name: 'Ms. Jia', status: 'done', needHelp: false },
-    { id: 'p22', name: 'Mr. He', status: 'todo', needHelp: true },
-    { id: 'p23', name: 'Ms. Bai', status: 'doing', needHelp: false },
-    { id: 'p24', name: 'Mr. Cai', status: 'done', needHelp: false },
-    { id: 'p25', name: 'Ms. Ding', status: 'todo', needHelp: false },
-    { id: 'p26', name: 'Mr. Fang', status: 'doing', needHelp: false },
-    { id: 'p27', name: 'Ms. Guo', status: 'done', needHelp: false },
-    { id: 'p28', name: 'Mr. Hu', status: 'todo', needHelp: false },
-  ],
-  tonightActionUptake: {
-    quizFamilyCount: 12,
-    practiceFamilyCount: 8,
-    teachBackFamilyCount: 3,
-  },
+/** Fixed roster for teacher card preview (names only; status/uptake come from `createTeacherEngagementMock`). */
+const TEACHER_ENGAGEMENT_STUDENT_ROSTER: Array<{ id: string; name: string }> = [
+  { id: 's1', name: 'Alex Wang' },
+  { id: 's2', name: 'Betty Li' },
+  { id: 's3', name: 'Carol Zhang' },
+  { id: 's4', name: 'David Chen' },
+  { id: 's5', name: 'Emma Liu' },
+  { id: 's6', name: 'Frank Wu' },
+  { id: 's7', name: 'Grace Huang' },
+  { id: 's8', name: 'Henry Zhao' },
+  { id: 's9', name: 'Iris Lin' },
+  { id: 's10', name: 'Jack Ma' },
+  { id: 's11', name: 'Kelly Zhou' },
+  { id: 's12', name: 'Leo Sun' },
+  { id: 's13', name: 'Mia Xu' },
+  { id: 's14', name: 'Nina Gao' },
+  { id: 's15', name: 'Oscar Tang' },
+  { id: 's16', name: 'Penny Qian' },
+  { id: 's17', name: 'Quinn Ren' },
+  { id: 's18', name: 'Rachel Shen' },
+  { id: 's19', name: 'Sam Ye' },
+  { id: 's20', name: 'Tina Yu' },
+  { id: 's21', name: 'Uma Jia' },
+  { id: 's22', name: 'Victor He' },
+  { id: 's23', name: 'Wendy Bai' },
+  { id: 's24', name: 'Xander Cai' },
+  { id: 's25', name: 'Yara Ding' },
+  { id: 's26', name: 'Zara Fang' },
+  { id: 's27', name: 'Aaron Guo' },
+  { id: 's28', name: 'Bella Hu' },
+  { id: 's29', name: 'Carl Jin' },
+  { id: 's30', name: 'Dana Kong' },
+];
+
+const TEACHER_ENGAGEMENT_PARENT_ROSTER: Array<{
+  id: string;
+  name: string;
+  status: TeacherCardEngagementStatus;
+}> = [
+  { id: 'p1', name: 'Ms. Wang', status: 'done' },
+  { id: 'p2', name: 'Mr. Li', status: 'doing' },
+  { id: 'p3', name: 'Ms. Zhang', status: 'todo' },
+  { id: 'p4', name: 'Mr. Chen', status: 'todo' },
+  { id: 'p5', name: 'Ms. Liu', status: 'doing' },
+  { id: 'p6', name: 'Mr. Wu', status: 'done' },
+  { id: 'p7', name: 'Ms. Huang', status: 'todo' },
+  { id: 'p8', name: 'Mr. Zhao', status: 'doing' },
+  { id: 'p9', name: 'Ms. Lin', status: 'done' },
+  { id: 'p10', name: 'Mr. Ma', status: 'todo' },
+  { id: 'p11', name: 'Ms. Zhou', status: 'doing' },
+  { id: 'p12', name: 'Mr. Sun', status: 'done' },
+  { id: 'p13', name: 'Ms. Xu', status: 'todo' },
+  { id: 'p14', name: 'Mr. Gao', status: 'doing' },
+  { id: 'p15', name: 'Ms. Tang', status: 'done' },
+  { id: 'p16', name: 'Mr. Qian', status: 'todo' },
+  { id: 'p17', name: 'Ms. Ren', status: 'doing' },
+  { id: 'p18', name: 'Mr. Shen', status: 'done' },
+  { id: 'p19', name: 'Ms. Ye', status: 'todo' },
+  { id: 'p20', name: 'Mr. Yu', status: 'doing' },
+  { id: 'p21', name: 'Ms. Jia', status: 'done' },
+  { id: 'p22', name: 'Mr. He', status: 'todo' },
+  { id: 'p23', name: 'Ms. Bai', status: 'doing' },
+  { id: 'p24', name: 'Mr. Cai', status: 'done' },
+  { id: 'p25', name: 'Ms. Ding', status: 'todo' },
+  { id: 'p26', name: 'Mr. Fang', status: 'doing' },
+  { id: 'p27', name: 'Ms. Guo', status: 'done' },
+  { id: 'p28', name: 'Mr. Hu', status: 'todo' },
+];
+
+type TeacherEngagementVariantConfig = {
+  splits: { todo: number; doing: number; done: number };
+  uptake: TeacherCardTonightActionUptakeMock;
 };
 
+/** Several demo distributions so opening different cards does not always show the same charts. */
+const TEACHER_ENGAGEMENT_VARIANTS: TeacherEngagementVariantConfig[] = [
+  {
+    splits: { todo: 10, doing: 9, done: 11 },
+    uptake: { quizFamilyCount: 12, practiceFamilyCount: 8, teachBackFamilyCount: 3 },
+  },
+  {
+    splits: { todo: 6, doing: 11, done: 13 },
+    uptake: { quizFamilyCount: 20, practiceFamilyCount: 5, teachBackFamilyCount: 2 },
+  },
+  {
+    splits: { todo: 14, doing: 8, done: 8 },
+    uptake: { quizFamilyCount: 7, practiceFamilyCount: 14, teachBackFamilyCount: 4 },
+  },
+  {
+    splits: { todo: 4, doing: 7, done: 19 },
+    uptake: { quizFamilyCount: 16, practiceFamilyCount: 15, teachBackFamilyCount: 6 },
+  },
+  {
+    splits: { todo: 18, doing: 9, done: 3 },
+    uptake: { quizFamilyCount: 4, practiceFamilyCount: 6, teachBackFamilyCount: 1 },
+  },
+  {
+    splits: { todo: 12, doing: 10, done: 8 },
+    uptake: { quizFamilyCount: 10, practiceFamilyCount: 10, teachBackFamilyCount: 8 },
+  },
+];
+
+const TEACHER_ENGAGEMENT_FINISHED_ROTATION: LearningCardStudentFinishedType[] = [
+  'pretty_easy',
+  'think_get_it',
+  'challenge',
+];
+
+function createTeacherEngagementMock(variantIndex: number): TeacherCardEngagementMock {
+  const nVariants = TEACHER_ENGAGEMENT_VARIANTS.length;
+  const v = ((variantIndex % nVariants) + nVariants) % nVariants;
+  const cfg = TEACHER_ENGAGEMENT_VARIANTS[v];
+  const { todo, doing, done } = cfg.splits;
+  const n = TEACHER_ENGAGEMENT_STUDENT_ROSTER.length;
+  if (todo + doing + done !== n) {
+    throw new Error(`Teacher engagement variant ${v}: splits must sum to ${n}`);
+  }
+
+  const students: TeacherCardStudentEngagementRow[] = TEACHER_ENGAGEMENT_STUDENT_ROSTER.map((row, i) => {
+    let status: TeacherCardEngagementStatus;
+    if (i < todo) status = 'todo';
+    else if (i < todo + doing) status = 'doing';
+    else status = 'done';
+    const finishedType =
+      status === 'done' ? TEACHER_ENGAGEMENT_FINISHED_ROTATION[(i + v) % TEACHER_ENGAGEMENT_FINISHED_ROTATION.length] : undefined;
+    const watchedVideos =
+      status === 'todo'
+        ? (i + v) % 2
+        : status === 'doing'
+          ? 1 + ((i + v) % 3)
+          : 2 + ((i + v) % 4);
+    return { ...row, status, finishedType, watchedVideos };
+  });
+
+  const parents: TeacherCardParentEngagementRow[] = TEACHER_ENGAGEMENT_PARENT_ROSTER.map((row, i) => ({
+    ...row,
+    needHelp: (i + v * 2) % 7 === 0 || (i * 5 + v * 3) % 11 === 0,
+  }));
+
+  return {
+    students,
+    parents,
+    tonightActionUptake: cfg.uptake,
+  };
+}
+
+function hashCardIdToVariantIndex(cardId: string, modulo: number): number {
+  let h = 0;
+  for (let i = 0; i < cardId.length; i++) {
+    h = (Math.imul(31, h) + cardId.charCodeAt(i)) >>> 0;
+  }
+  return modulo === 0 ? 0 : h % modulo;
+}
+
+/** How many mock distributions exist for `getMockTeacherCardEngagement` (stable per `cardId`). */
+export const TEACHER_ENGAGEMENT_VARIANT_COUNT = TEACHER_ENGAGEMENT_VARIANTS.length;
+
 /** Mock engagement for the teacher “open card” dialog. Swap for API-backed aggregates later. */
-export function getMockTeacherCardEngagement(_cardId: string): TeacherCardEngagementMock {
-  void _cardId;
-  return MOCK_ENGAGEMENT_BASE;
+export function getMockTeacherCardEngagement(cardId: string): TeacherCardEngagementMock {
+  return createTeacherEngagementMock(hashCardIdToVariantIndex(cardId, TEACHER_ENGAGEMENT_VARIANTS.length));
 }
