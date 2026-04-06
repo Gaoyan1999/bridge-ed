@@ -108,6 +108,10 @@ export function ChatPanel({ active }: { active: boolean }) {
   const current = displayItems.find((i) => i.id === threadId);
   const msgs = threadId ? threads[threadId] ?? [] : [];
 
+  /** Report + broadcast feeds are read-only (no back-and-forth in this panel). */
+  const showComposer =
+    !!current && current.kind !== 'report' && current.kind !== 'broadcast';
+
   const placeholder =
     role === 'parent'
       ? t('chat.placeholderParent')
@@ -276,70 +280,74 @@ export function ChatPanel({ active }: { active: boolean }) {
               })
             )}
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="sr-only"
-            id="chat-file-input"
-            aria-hidden
-            tabIndex={-1}
-            onChange={(e) => {
-              void addFromFileList(e.target.files);
-              e.target.value = '';
-            }}
-          />
-          <Composer
-            inputId="chat-input"
-            className="chat-composer"
-            label={t('common.message')}
-            value={input}
-            onChange={setInput}
-            placeholder={placeholder}
-            previewSlot={
-              pending.length > 0 ? (
-                <div className="composer__preview-strip">
-                  {pending.map((p) => (
-                    <div key={p.id} className="composer__preview-chip">
-                      <img src={p.dataUrl} alt="" />
-                      <button
-                        type="button"
-                        className="composer__preview-remove"
-                        aria-label={t('common.removeAttachment')}
-                        onClick={() => remove(p.id)}
-                      >
-                        ×
-                      </button>
+          {showComposer ? (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="sr-only"
+                id="chat-file-input"
+                aria-hidden
+                tabIndex={-1}
+                onChange={(e) => {
+                  void addFromFileList(e.target.files);
+                  e.target.value = '';
+                }}
+              />
+              <Composer
+                inputId="chat-input"
+                className="chat-composer"
+                label={t('common.message')}
+                value={input}
+                onChange={setInput}
+                placeholder={placeholder}
+                previewSlot={
+                  pending.length > 0 ? (
+                    <div className="composer__preview-strip">
+                      {pending.map((p) => (
+                        <div key={p.id} className="composer__preview-chip">
+                          <img src={p.dataUrl} alt="" />
+                          <button
+                            type="button"
+                            className="composer__preview-remove"
+                            aria-label={t('common.removeAttachment')}
+                            onClick={() => remove(p.id)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : null
-            }
-            actions={
-              <>
-                <Button
-                  type="button"
-                  variant="text"
-                  className="btn--sm composer__attach-btn"
-                  id="chat-attach-image"
-                  aria-label={t('common.attachImage')}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <ImagePlus strokeWidth={2} size={20} aria-hidden />
-                </Button>
-                <Button
-                  variant="primary"
-                  pill
-                  className="btn--sm"
-                id="chat-send"
-                onClick={() => send()}
-              >
-                  {t('common.send')}
-                </Button>
-              </>
-            }
-          />
+                  ) : null
+                }
+                actions={
+                  <>
+                    <Button
+                      type="button"
+                      variant="text"
+                      className="btn--sm composer__attach-btn"
+                      id="chat-attach-image"
+                      aria-label={t('common.attachImage')}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <ImagePlus strokeWidth={2} size={20} aria-hidden />
+                    </Button>
+                    <Button
+                      variant="primary"
+                      pill
+                      className="btn--sm"
+                      id="chat-send"
+                      onClick={() => send()}
+                    >
+                      {t('common.send')}
+                    </Button>
+                  </>
+                }
+              />
+            </>
+          ) : null}
         </div>
       </div>
     </section>

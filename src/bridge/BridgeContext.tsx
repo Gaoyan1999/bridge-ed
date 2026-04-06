@@ -14,8 +14,13 @@ import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
 import {
   BROADCAST_FEED_THREAD_ID_PARENT,
   BROADCAST_FEED_THREAD_ID_STUDENT,
+  BROADCAST_FEED_THREAD_ID_TEACHER,
 } from '@/bridge/broadcast-inbox-ids';
-import { threadMessageFromBroadcastBackend, threadMessageFromTeacherBroadcastPayload } from '@/bridge/broadcast-thread';
+import {
+  threadMessageFromBroadcastBackend,
+  threadMessageFromBroadcastBackendTeacherView,
+  threadMessageFromTeacherBroadcastPayload,
+} from '@/bridge/broadcast-thread';
 import {
   threadMessageFromReportBackend,
   threadMessageFromTeacherReportPayload,
@@ -43,6 +48,19 @@ function resolveTeacherAuthorId(users: UserBackend[], currentUserId: string | nu
     if (u?.role === 'teacher') return u.id;
   }
   return users.find((u) => u.role === 'teacher')?.id ?? 'teacher-1';
+}
+
+function sortBroadcastsBySentAsc(a: BroadcastBackend, b: BroadcastBackend): number {
+  return a.sentAt.localeCompare(b.sentAt) || a.id.localeCompare(b.id);
+}
+
+/** Rows for the teacher’s merged feed (same author filter as `broadcasts.listByAuthorUserId`). */
+function broadcastRowsForTeacher(rows: BroadcastBackend[], authorId: string): BroadcastBackend[] {
+  return rows.filter((r) => {
+    if (r.authorUserId === authorId) return true;
+    if (authorId === 'teacher-1' && r.authorUserId === '1') return true;
+    return false;
+  });
 }
 
 function dedupeInboxByIdKeepFirst(items: InboxItem[]): InboxItem[] {
@@ -258,33 +276,33 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  /** Restore broadcast threads + inbox from IndexedDB after refresh. */
+  /** Hydrate broadcast threads + inbox from IndexedDB `BroadcastBackend` rows only (no mock thread text). */
   useEffect(() => {
     let cancelled = false;
     void getDataLayer()
       .broadcasts.listAll()
       .then((rows) => {
-        if (cancelled || rows.length === 0) return;
-        const bySentAsc = (a: BroadcastBackend, b: BroadcastBackend) =>
-          a.sentAt.localeCompare(b.sentAt) || a.id.localeCompare(b.id);
-        const parentRows = rows.filter((r) => r.audience.toParents).sort(bySentAsc);
-        const studentRows = rows.filter((r) => r.audience.toStudents).sort(bySentAsc);
+        if (cancelled) return;
+        const authorId = resolveTeacherAuthorId(users, currentUserId);
+        const parentRows = rows.filter((r) => r.audience.toParents).sort(sortBroadcastsBySentAsc);
+        const studentRows = rows.filter((r) => r.audience.toStudents).sort(sortBroadcastsBySentAsc);
+        const teacherRows = broadcastRowsForTeacher(rows, authorId).sort(sortBroadcastsBySentAsc);
 
         setThreads((prev) => {
           const next = { ...prev };
-          if (parentRows.length > 0) {
-            next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({ ...threadMessageFromBroadcastBackend(b) }));
-          }
-          if (studentRows.length > 0) {
-            next[BROADCAST_FEED_THREAD_ID_STUDENT] = studentRows.map((b) => ({
-              ...threadMessageFromBroadcastBackend(b),
-            }));
-          }
+          next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({ ...threadMessageFromBroadcastBackend(b) }));
+          next[BROADCAST_FEED_THREAD_ID_STUDENT] = studentRows.map((b) => ({
+            ...threadMessageFromBroadcastBackend(b),
+          }));
+          next[BROADCAST_FEED_THREAD_ID_TEACHER] = teacherRows.map((b) => ({
+            ...threadMessageFromBroadcastBackendTeacherView(b),
+          }));
           return next;
         });
         setInboxByRole((prev) => {
           const parentAdds: InboxItem[] = [];
           const studentAdds: InboxItem[] = [];
+          const teacherAdds: InboxItem[] = [];
           if (parentRows.length > 0) {
             const latest = parentRows[parentRows.length - 1]!.sentAt.slice(0, 10);
             parentAdds.push({
@@ -303,12 +321,23 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
               kind: 'broadcast',
             });
           }
+          if (teacherRows.length > 0) {
+            const latest = teacherRows[teacherRows.length - 1]!.sentAt.slice(0, 10);
+            teacherAdds.push({
+              id: BROADCAST_FEED_THREAD_ID_TEACHER,
+              title: '',
+              date: latest,
+              kind: 'broadcast',
+            });
+          }
           const parentNoBroadcast = prev.parent.filter((i) => i.kind !== 'broadcast');
           const studentNoBroadcast = prev.student.filter((i) => i.kind !== 'broadcast');
+          const teacherNoBroadcast = prev.teacher.filter((i) => i.kind !== 'broadcast');
           return {
             ...prev,
             parent: dedupeInboxByIdKeepFirst([...parentAdds, ...parentNoBroadcast]),
             student: dedupeInboxByIdKeepFirst([...studentAdds, ...studentNoBroadcast]),
+            teacher: dedupeInboxByIdKeepFirst([...teacherAdds, ...teacherNoBroadcast]),
           };
         });
       })
@@ -318,7 +347,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [users, currentUserId]);
 
   const role: Role =
     users.length > 0
@@ -520,6 +549,12 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         const existing = next[sid] ?? [];
         next[sid] = [...existing, { ...threadLine }];
       }
+      if (toParents || toStudents) {
+        const tid = BROADCAST_FEED_THREAD_ID_TEACHER;
+        const existingTeacher = next[tid] ?? [];
+        const lineTeacher: ThreadMessage = { ...threadLine, who: 'You', type: 'out' };
+        next[tid] = [...existingTeacher, lineTeacher];
+      }
       return next;
     });
 
@@ -538,6 +573,15 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         next.student = next.student.filter((i) => i.kind !== 'broadcast');
         next.student.unshift({
           id: BROADCAST_FEED_THREAD_ID_STUDENT,
+          title: '',
+          date: dateStr,
+          kind: 'broadcast',
+        });
+      }
+      if (toParents || toStudents) {
+        next.teacher = next.teacher.filter((i) => i.kind !== 'broadcast');
+        next.teacher.unshift({
+          id: BROADCAST_FEED_THREAD_ID_TEACHER,
           title: '',
           date: dateStr,
           kind: 'broadcast',
