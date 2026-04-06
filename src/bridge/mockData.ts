@@ -1,3 +1,4 @@
+import type { LearningCardStudentFinishedType } from '@/data/entity/learning-card-backend';
 import type { StudentMoodKind } from '@/data/entity/student-mood-backend';
 import type { InboxItem, LearningCardItem, ParentMoodChildProfile, Role, ScheduleDay, ThreadMessage } from './types';
 import { normalizeTonightActions } from '@/data/learning-card-mappers';
@@ -376,6 +377,8 @@ export type TeacherCardStudentEngagementRow = {
   status: TeacherCardEngagementStatus;
   /** How many suggested videos the student marked as watched (demo aggregate). */
   watchedVideos: number;
+  /** When `status === 'done'`, matches Knowledge finish menu (demo). */
+  finishedType?: LearningCardStudentFinishedType;
 };
 
 export type TeacherCardParentEngagementRow = {
@@ -412,17 +415,17 @@ const MOCK_ENGAGEMENT_BASE: TeacherCardEngagementMock = {
     { id: 's17', name: 'Quinn Ren', status: 'doing', watchedVideos: 2 },
     { id: 's18', name: 'Rachel Shen', status: 'doing', watchedVideos: 1 },
     { id: 's19', name: 'Sam Ye', status: 'doing', watchedVideos: 2 },
-    { id: 's20', name: 'Tina Yu', status: 'done', watchedVideos: 3 },
-    { id: 's21', name: 'Uma Jia', status: 'done', watchedVideos: 2 },
-    { id: 's22', name: 'Victor He', status: 'done', watchedVideos: 4 },
-    { id: 's23', name: 'Wendy Bai', status: 'done', watchedVideos: 3 },
-    { id: 's24', name: 'Xander Cai', status: 'done', watchedVideos: 2 },
-    { id: 's25', name: 'Yara Ding', status: 'done', watchedVideos: 3 },
-    { id: 's26', name: 'Zara Fang', status: 'done', watchedVideos: 4 },
-    { id: 's27', name: 'Aaron Guo', status: 'done', watchedVideos: 2 },
-    { id: 's28', name: 'Bella Hu', status: 'done', watchedVideos: 3 },
-    { id: 's29', name: 'Carl Jin', status: 'done', watchedVideos: 2 },
-    { id: 's30', name: 'Dana Kong', status: 'done', watchedVideos: 3 },
+    { id: 's20', name: 'Tina Yu', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
+    { id: 's21', name: 'Uma Jia', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
+    { id: 's22', name: 'Victor He', status: 'done', watchedVideos: 4, finishedType: 'challenge' },
+    { id: 's23', name: 'Wendy Bai', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
+    { id: 's24', name: 'Xander Cai', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
+    { id: 's25', name: 'Yara Ding', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
+    { id: 's26', name: 'Zara Fang', status: 'done', watchedVideos: 4, finishedType: 'think_get_it' },
+    { id: 's27', name: 'Aaron Guo', status: 'done', watchedVideos: 2, finishedType: 'challenge' },
+    { id: 's28', name: 'Bella Hu', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
+    { id: 's29', name: 'Carl Jin', status: 'done', watchedVideos: 2, finishedType: 'think_get_it' },
+    { id: 's30', name: 'Dana Kong', status: 'done', watchedVideos: 3, finishedType: 'pretty_easy' },
   ],
   parents: [
     { id: 'p1', name: 'Ms. Wang', status: 'done', needHelp: false },

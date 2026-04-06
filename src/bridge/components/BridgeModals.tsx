@@ -1,11 +1,9 @@
-import { useEffect, useId, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useId, useState } from 'react';
 import { Checkbox } from 'react-aria-components';
 import { useBridge } from '@/bridge/BridgeContext';
-import { getMockTeacherCardEngagement, REPORT_DRAFT_BODY, REPORT_DRAFT_TITLE } from '@/bridge/mockData';
-import type { LearningCardItem } from '@/bridge/types';
+import { REPORT_DRAFT_BODY, REPORT_DRAFT_TITLE } from '@/bridge/mockData';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
-import { StudentStatusPieChart } from '@/bridge/components/StudentStatusPieChart';
+import { TeacherCardPreviewTodoModal } from '@/bridge/components/TeacherCardPreviewTodoModal';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
@@ -82,132 +80,6 @@ function BookModal({ onClose }: { onClose: () => void }) {
           </p>
         </div>
       )}
-    </>
-  );
-}
-
-function TeacherCardPreviewTodoModal({
-  card,
-  onClose,
-}: {
-  card: LearningCardItem;
-  onClose: () => void;
-}) {
-  const { t } = useTranslation();
-  const engagement = useMemo(() => getMockTeacherCardEngagement(card.id), [card.id]);
-  const totalVideoOpens = useMemo(
-    () => engagement.students.reduce((acc, row) => acc + row.watchedVideos, 0),
-    [engagement.students],
-  );
-  const needHelpCount = useMemo(
-    () => engagement.parents.filter((p) => p.needHelp).length,
-    [engagement.parents],
-  );
-
-  const studentStatusCounts = useMemo(() => {
-    const c = { todo: 0, doing: 0, done: 0 };
-    for (const s of engagement.students) c[s.status]++;
-    return c;
-  }, [engagement.students]);
-
-  const statusLabel = (s: 'todo' | 'doing' | 'done') =>
-    s === 'todo' ? t('knowledge.lcProgressShort.todo') : s === 'doing' ? t('knowledge.lcProgressShort.doing') : t('knowledge.lcProgressShort.done');
-
-  return (
-    <>
-      <div className="modal__header">
-        <h3 id="modal-teacher-card-preview-title" className="modal__title">
-          {card.title}
-        </h3>
-        <p className="teacher-card-preview__meta">
-          {[card.grade, card.subject].filter(Boolean).join(' · ')}
-        </p>
-      </div>
-      <div className="modal__scroll">
-        <p className="teacher-card-preview__hint">{t('dashboard.teacher.cardPreview.demoHint')}</p>
-
-        <div className="teacher-card-preview__stats" role="group" aria-label={t('dashboard.teacher.cardPreview.feedbackTitle')}>
-          <div className="teacher-card-preview__stat">
-            <div className="teacher-card-preview__stat-value">{totalVideoOpens}</div>
-            <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.studentVideos')}</div>
-          </div>
-          <div className="teacher-card-preview__stat">
-            <div className="teacher-card-preview__stat-value">{needHelpCount}</div>
-            <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.parentNeedHelp')}</div>
-          </div>
-        </div>
-
-        <section className="teacher-card-preview__section" aria-labelledby="teacher-card-preview-students">
-          <h4 id="teacher-card-preview-students" className="teacher-card-preview__section-title">
-            {t('dashboard.teacher.cardPreview.studentsTitle')}
-          </h4>
-          <p className="teacher-card-preview__subsection-lede">{t('dashboard.teacher.cardPreview.studentStatusDistribution')}</p>
-          <div className="teacher-card-preview__students-dashboard">
-            <StudentStatusPieChart
-              counts={studentStatusCounts}
-              labels={{
-                todo: t('knowledge.lcProgressShort.todo'),
-                doing: t('knowledge.lcProgressShort.doing'),
-                done: t('knowledge.lcProgressShort.done'),
-              }}
-              chartAriaLabel={t('dashboard.teacher.cardPreview.studentStatusChartAria')}
-            />
-            <div className="table-wrap table-wrap--flush">
-              <table className="data-table data-table--compact teacher-card-preview__table">
-                <thead>
-                  <tr>
-                    <th>{t('dashboard.teacher.cardPreview.colName')}</th>
-                    <th>{t('dashboard.teacher.cardPreview.colVideos')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {engagement.students.map((row) => (
-                    <tr key={row.id}>
-                      <td>{row.name}</td>
-                      <td>{row.watchedVideos}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section className="teacher-card-preview__section" aria-labelledby="teacher-card-preview-parents">
-          <h4 id="teacher-card-preview-parents" className="teacher-card-preview__section-title">
-            {t('dashboard.teacher.cardPreview.parentsTitle')}
-          </h4>
-          <div className="table-wrap table-wrap--flush">
-            <table className="data-table data-table--compact teacher-card-preview__table">
-              <thead>
-                <tr>
-                  <th>{t('dashboard.teacher.cardPreview.colName')}</th>
-                  <th>{t('dashboard.teacher.cardPreview.colStatus')}</th>
-                  <th>{t('dashboard.teacher.cardPreview.colNeedHelp')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {engagement.parents.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.name}</td>
-                    <td>
-                      <span className={`teacher-lc-status teacher-lc-status--${row.status}`}>{statusLabel(row.status)}</span>
-                    </td>
-                    <td>{row.needHelp ? t('dashboard.teacher.cardPreview.needHelpYes') : t('dashboard.teacher.cardPreview.needHelpNo')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-      <div className="modal__footer">
-        <div className="modal__actions">
-          <Button variant="text" type="button" onClick={onClose}>
-            {t('common.close')}
-          </Button>
-        </div>
-      </div>
     </>
   );
 }
