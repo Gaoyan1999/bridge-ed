@@ -242,7 +242,6 @@
         "moduleFeedbackLede": "家长端信号与已完成学生端的自评。",
         "parentFeedbackPanelTitle": "家长",
         "parentNeedHelpLine": "{{total}} 位家长中有 {{count}} 位点击了「需要帮助」。",
-        "parentNeedHelpBarAria": "共 {{total}} 位家长，其中 {{count}} 位点击需要帮助，占 {{pct}}%。",
         "studentFeedbackPanelTitle": "学生（已完成）",
         "studentFeedbackPanelLede": "已有 {{count}} 名学生标记为已完成；自评分布如下：",
         "finishedFeedbackChartAria": "已完成学生的自评分布",

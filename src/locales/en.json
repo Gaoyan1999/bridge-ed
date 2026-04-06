@@ -242,7 +242,6 @@
         "moduleFeedbackLede": "Signals from parents and from students who finished the card.",
         "parentFeedbackPanelTitle": "Parents",
         "parentNeedHelpLine": "{{count}} of {{total}} parents tapped “Need help”.",
-        "parentNeedHelpBarAria": "{{count}} of {{total}} parents tapped Need help, {{pct}} percent of parents.",
         "studentFeedbackPanelTitle": "Students (finished)",
         "studentFeedbackPanelLede": "{{count}} students marked DONE; breakdown of how they felt:",
         "finishedFeedbackChartAria": "Finished students by self-reported understanding",

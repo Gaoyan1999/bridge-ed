@@ -22,7 +22,6 @@ export function TeacherCardPreviewTodoModal({
     [engagement.parents],
   );
   const parentTotal = engagement.parents.length;
-  const needHelpPct = parentTotal > 0 ? Math.round((needHelpCount / parentTotal) * 1000) / 10 : 0;
 
   const studentStatusCounts = useMemo(() => {
     const c = { todo: 0, doing: 0, done: 0 };
@@ -122,20 +121,6 @@ export function TeacherCardPreviewTodoModal({
                   total: parentTotal,
                 })}
               </p>
-              <div
-                className="teacher-card-preview__need-help-bar"
-                role="img"
-                aria-label={t('dashboard.teacher.cardPreview.parentNeedHelpBarAria', {
-                  count: needHelpCount,
-                  total: parentTotal,
-                  pct: needHelpPct,
-                })}
-              >
-                <div
-                  className="teacher-card-preview__need-help-bar-fill"
-                  style={{ width: `${Math.min(100, needHelpPct)}%` }}
-                />
-              </div>
             </div>
 
             <div
