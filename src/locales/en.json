@@ -148,6 +148,8 @@
     "placeholderStudent": "Type a message…",
     "emptyInbox": "No messages yet.",
     "broadcast": "Broadcast",
+    "inboxKindReport": "Report",
+    "inboxKindBroadcast": "Broadcast",
     "selectThread": "Select a thread",
     "bookTime": "Book a time",
     "noMessagesInThread": "No messages in this thread."

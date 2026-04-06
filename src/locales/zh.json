@@ -148,6 +148,8 @@
     "placeholderStudent": "输入消息…",
     "emptyInbox": "暂无消息。",
     "broadcast": "广播",
+    "inboxKindReport": "报告",
+    "inboxKindBroadcast": "广播",
     "selectThread": "选择会话",
     "bookTime": "预约时间",
     "noMessagesInThread": "此会话暂无消息。"

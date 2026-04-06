@@ -9,7 +9,10 @@ export function normalizeReportBackend(raw: unknown): ReportBackend {
   if (!id) throw new Error('ReportBackend: missing id');
 
   const now = new Date().toISOString();
-  const aud = r.audience && typeof r.audience === 'object' ? r.audience : {};
+  const aud: Record<string, unknown> =
+    r.audience && typeof r.audience === 'object' && !Array.isArray(r.audience)
+      ? (r.audience as Record<string, unknown>)
+      : {};
 
   return {
     id,

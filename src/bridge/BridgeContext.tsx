@@ -211,14 +211,14 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
               const pid = r.messageThreadIds?.parent ?? `${r.id}-p`;
               if (!parentSeen.has(pid)) {
                 parentSeen.add(pid);
-                parentAdds.push({ id: pid, title: `[Report] ${r.title}`, date: dateStr, kind: 'report' });
+                parentAdds.push({ id: pid, title: r.title, date: dateStr, kind: 'report' });
               }
             }
             if (r.audience.toStudents) {
               const sid = r.messageThreadIds?.student ?? `${r.id}-s`;
               if (!studentSeen.has(sid)) {
                 studentSeen.add(sid);
-                studentAdds.push({ id: sid, title: `[Report] ${r.title}`, date: dateStr, kind: 'report' });
+                studentAdds.push({ id: sid, title: r.title, date: dateStr, kind: 'report' });
               }
             }
           }
@@ -379,7 +379,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         const sid = `${baseId}-s`;
         next.student.unshift({
           id: sid,
-          title: `[Report] ${title}`,
+          title,
           date: dateStr,
           kind: 'report',
         });
@@ -388,7 +388,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
         const pid = `${baseId}-p`;
         next.parent.unshift({
           id: pid,
-          title: `[Report] ${title}`,
+          title,
           date: dateStr,
           kind: 'report',
         });
