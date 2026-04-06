@@ -147,12 +147,15 @@
     "placeholderTeacher": "Type a message to this family or class…",
     "placeholderStudent": "Type a message…",
     "emptyInbox": "No messages yet.",
+    "inboxSectionBroadcasts": "Broadcasts",
+    "inboxSectionOther": "Other",
     "broadcast": "Broadcast",
     "inboxKindReport": "Report",
     "inboxKindBroadcast": "Broadcast",
     "selectThread": "Select a thread",
     "bookTime": "Book a time",
-    "noMessagesInThread": "No messages in this thread."
+    "noMessagesInThread": "No messages in this thread.",
+    "broadcastSent": "Broadcast sent."
   },
   "mood": {
     "emotion": "Emotion",

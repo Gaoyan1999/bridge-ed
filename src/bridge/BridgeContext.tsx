@@ -11,14 +11,25 @@ import {
   type SetStateAction,
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
+import { threadMessageFromBroadcastBackend, threadMessageFromTeacherBroadcastPayload } from '@/bridge/broadcast-thread';
 import {
   threadMessageFromReportBackend,
   threadMessageFromTeacherReportPayload,
 } from '@/bridge/teacher-report-thread';
-import type { InboxItem, LearningCardItem, ModalState, Module, Role, TeacherReportPayload, ThreadMessage } from '@/bridge/types';
+import type {
+  InboxItem,
+  LearningCardItem,
+  ModalState,
+  Module,
+  Role,
+  TeacherBroadcastPayload,
+  TeacherReportPayload,
+  ThreadMessage,
+} from '@/bridge/types';
 import { resolveParentSummaryFromLearningCardItem } from '@/data';
 import { VIEW_AS_USER_STORAGE_KEY } from '@/bridge/view-storage';
 import { getDataLayer } from '@/data';
+import { BROADCAST_SCHEMA_VERSION, type BroadcastBackend } from '@/data/entity/broadcast-backend';
 import { REPORT_SCHEMA_VERSION, type ReportBackend } from '@/data/entity/report-backend';
 import type { UserBackend } from '@/data/entity/user-backend';
 
@@ -99,6 +110,7 @@ interface BridgeContextValue {
   selectedInboxId: string | null;
   setSelectedInboxId: Dispatch<SetStateAction<string | null>>;
   pushTeacherReport: (payload: TeacherReportPayload) => void;
+  pushBroadcast: (payload: TeacherBroadcastPayload) => void;
   /** Parent (or teacher “preview as parent”): open AI chat for a learning card in Knowledge. */
   openKnowledgeFromCard: (card: LearningCardItem) => void;
   appendChatMessage: (threadId: string, msg: ThreadMessage) => void;
@@ -219,6 +231,65 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
               if (!studentSeen.has(sid)) {
                 studentSeen.add(sid);
                 studentAdds.push({ id: sid, title: r.title, date: dateStr, kind: 'report' });
+              }
+            }
+          }
+          return {
+            ...prev,
+            parent: dedupeInboxByIdKeepFirst([...parentAdds, ...prev.parent]),
+            student: dedupeInboxByIdKeepFirst([...studentAdds, ...prev.student]),
+          };
+        });
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** Restore broadcast threads + inbox from IndexedDB after refresh. */
+  useEffect(() => {
+    let cancelled = false;
+    void getDataLayer()
+      .broadcasts.listAll()
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        setThreads((prev) => {
+          const next = { ...prev };
+          for (const b of rows) {
+            const msg = threadMessageFromBroadcastBackend(b);
+            if (b.audience.toStudents) {
+              const tid = b.messageThreadIds?.student ?? `${b.id}-s`;
+              if (!next[tid]) next[tid] = [{ ...msg }];
+            }
+            if (b.audience.toParents) {
+              const tid = b.messageThreadIds?.parent ?? `${b.id}-p`;
+              if (!next[tid]) next[tid] = [{ ...msg }];
+            }
+          }
+          return next;
+        });
+        setInboxByRole((prev) => {
+          const parentSeen = new Set(prev.parent.map((i) => i.id));
+          const studentSeen = new Set(prev.student.map((i) => i.id));
+          const parentAdds: InboxItem[] = [];
+          const studentAdds: InboxItem[] = [];
+          for (const b of rows) {
+            const dateStr = b.sentAt.slice(0, 10);
+            if (b.audience.toParents) {
+              const pid = b.messageThreadIds?.parent ?? `${b.id}-p`;
+              if (!parentSeen.has(pid)) {
+                parentSeen.add(pid);
+                parentAdds.push({ id: pid, title: b.title, date: dateStr, kind: 'broadcast' });
+              }
+            }
+            if (b.audience.toStudents) {
+              const sid = b.messageThreadIds?.student ?? `${b.id}-s`;
+              if (!studentSeen.has(sid)) {
+                studentSeen.add(sid);
+                studentAdds.push({ id: sid, title: b.title, date: dateStr, kind: 'broadcast' });
               }
             }
           }
@@ -397,6 +468,71 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const pushBroadcast = (payload: TeacherBroadcastPayload) => {
+    const { title, body, toStudents, toParents } = payload;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const baseId = `bc-${Date.now()}`;
+    const threadLine = threadMessageFromTeacherBroadcastPayload(payload);
+
+    const iso = new Date().toISOString();
+    const record: BroadcastBackend = {
+      id: baseId,
+      schemaVersion: BROADCAST_SCHEMA_VERSION,
+      createdAt: iso,
+      updatedAt: iso,
+      authorUserId: resolveTeacherAuthorId(users, currentUserId),
+      sentAt: iso,
+      title,
+      body,
+      audience: { toStudents, toParents },
+      messageThreadIds: {
+        ...(toStudents ? { student: `${baseId}-s` } : {}),
+        ...(toParents ? { parent: `${baseId}-p` } : {}),
+      },
+    };
+    void getDataLayer()
+      .broadcasts.put(record)
+      .catch(() => {
+        /* ignore IndexedDB write errors */
+      });
+
+    setThreads((prev) => {
+      const next = { ...prev };
+      if (toStudents) {
+        const sid = `${baseId}-s`;
+        next[sid] = [{ ...threadLine }];
+      }
+      if (toParents) {
+        const pid = `${baseId}-p`;
+        next[pid] = [{ ...threadLine }];
+      }
+      return next;
+    });
+
+    setInboxByRole((prev) => {
+      const next = { ...prev, parent: [...prev.parent], student: [...prev.student], teacher: [...prev.teacher] };
+      if (toStudents) {
+        const sid = `${baseId}-s`;
+        next.student.unshift({
+          id: sid,
+          title,
+          date: dateStr,
+          kind: 'broadcast',
+        });
+      }
+      if (toParents) {
+        const pid = `${baseId}-p`;
+        next.parent.unshift({
+          id: pid,
+          title,
+          date: dateStr,
+          kind: 'broadcast',
+        });
+      }
+      return next;
+    });
+  };
+
   const seedKnowledgeThreadIfEmpty = useCallback(
     (card: LearningCardItem) => {
       const id = card.threadId;
@@ -482,6 +618,7 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     selectedKnowledgeThreadId,
     setSelectedKnowledgeThreadId,
     pushTeacherReport,
+    pushBroadcast,
     openKnowledgeFromCard,
     appendChatMessage,
     appendKnowledgeMessage,

@@ -3127,6 +3127,24 @@ html.theme-dark .learning-card-confirm__highlight {
   min-height: 0;
 }
 
+.inbox__section-label {
+  padding: 0.5rem 1rem 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--page-bg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.inbox__section-divider {
+  height: 0;
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--border-light);
+}
+
 .inbox-item {
   display: block;
   width: 100%;

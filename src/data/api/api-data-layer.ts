@@ -8,12 +8,14 @@
  */
 import { ApiError, apiRequest } from './api-client';
 import type {
+  BroadcastsRepository,
   DataLayer,
   LearningCardsRepository,
   ReportsRepository,
   StudentMoodsRepository,
   UsersRepository,
 } from '../repositories';
+import type { BroadcastBackend } from '../entity/broadcast-backend';
 import type { LearningCardBackend } from '../entity/learning-card-backend';
 import type { ReportBackend } from '../entity/report-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
@@ -140,10 +142,35 @@ class ApiReportsRepo implements ReportsRepository {
   }
 }
 
+class ApiBroadcastsRepo implements BroadcastsRepository {
+  async listAll(): Promise<BroadcastBackend[]> {
+    return [];
+  }
+
+  async listByAuthorUserId(authorUserId: string): Promise<BroadcastBackend[]> {
+    void authorUserId;
+    return [];
+  }
+
+  async get(id: string): Promise<BroadcastBackend | undefined> {
+    void id;
+    return undefined;
+  }
+
+  async put(broadcast: BroadcastBackend): Promise<void> {
+    void broadcast;
+  }
+
+  async delete(id: string): Promise<void> {
+    void id;
+  }
+}
+
 export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
   readonly studentMoods = new ApiStudentMoodsRepo();
   readonly users = new ApiUsersRepo();
   readonly reports = new ApiReportsRepo();
+  readonly broadcasts = new ApiBroadcastsRepo();
 }

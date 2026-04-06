@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImagePlus } from 'lucide-react';
 import type { InboxItem } from '@/bridge/types';
@@ -12,6 +12,16 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
+
+function groupInboxItemsForMessages(items: InboxItem[]): { broadcasts: InboxItem[]; others: InboxItem[] } {
+  const byDateDesc = (a: InboxItem, b: InboxItem) => {
+    const c = b.date.localeCompare(a.date);
+    return c !== 0 ? c : b.id.localeCompare(a.id);
+  };
+  const broadcasts = items.filter((i) => i.kind === 'broadcast').sort(byDateDesc);
+  const others = items.filter((i) => i.kind !== 'broadcast').sort(byDateDesc);
+  return { broadcasts, others };
+}
 
 function ChatInboxItemContent({ item }: { item: InboxItem }) {
   const { t } = useTranslation();
@@ -59,20 +69,29 @@ export function ChatPanel({ active }: { active: boolean }) {
       else if (reason === 'type') window.alert(t('common.imagesOnly'));
     },
   });
-  const items = inboxByRole[role];
-  const inboxKey = items.map((i) => i.id).join(',');
+  const inboxItems = inboxByRole[role];
+  const inboxKey = inboxItems.map((i) => i.id).join(',');
+  const { broadcasts: inboxBroadcasts, others: inboxOthers } = useMemo(
+    () => groupInboxItemsForMessages(inboxItems),
+    [inboxItems],
+  );
+  const displayItems = useMemo(() => [...inboxBroadcasts, ...inboxOthers], [inboxBroadcasts, inboxOthers]);
 
   useEffect(() => {
-    const list = inboxByRole[role];
-    if (!list.length) {
+    if (!displayItems.length) {
       setSelectedInboxId(null);
       return;
     }
-    setSelectedInboxId((cur) => (cur && list.some((i) => i.id === cur) ? cur : list[0]!.id));
-  }, [role, inboxKey, inboxByRole, setSelectedInboxId]);
+    setSelectedInboxId((cur) =>
+      cur && displayItems.some((i) => i.id === cur) ? cur : displayItems[0]!.id,
+    );
+  }, [role, inboxKey, inboxByRole, displayItems, setSelectedInboxId]);
 
-  const threadId = selectedInboxId && items.some((i) => i.id === selectedInboxId) ? selectedInboxId : items[0]?.id;
-  const current = items.find((i) => i.id === threadId);
+  const threadId =
+    selectedInboxId && displayItems.some((i) => i.id === selectedInboxId)
+      ? selectedInboxId
+      : displayItems[0]?.id;
+  const current = displayItems.find((i) => i.id === threadId);
   const msgs = threadId ? threads[threadId] ?? [] : [];
 
   const placeholder =
@@ -131,22 +150,50 @@ export function ChatPanel({ active }: { active: boolean }) {
 
       <div className="chat-layout chat-layout--rounded">
         <div className="inbox" id="inbox-list">
-          {!items.length ? (
+          {!displayItems.length ? (
             <p className="panel__hint" style={{ padding: '1rem' }}>
               {t('chat.emptyInbox')}
             </p>
           ) : (
-            items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={cx('inbox-item', item.id === threadId && 'is-active')}
-                data-id={item.id}
-                onClick={() => setSelectedInboxId(item.id)}
-              >
-                <ChatInboxItemContent item={item} />
-              </button>
-            ))
+            <>
+              {inboxBroadcasts.length > 0 ? (
+                <>
+                  <div className="inbox__section-label">{t('chat.inboxSectionBroadcasts')}</div>
+                  {inboxBroadcasts.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={cx('inbox-item', item.id === threadId && 'is-active')}
+                      data-id={item.id}
+                      onClick={() => setSelectedInboxId(item.id)}
+                    >
+                      <ChatInboxItemContent item={item} />
+                    </button>
+                  ))}
+                </>
+              ) : null}
+              {inboxBroadcasts.length > 0 && inboxOthers.length > 0 ? (
+                <div className="inbox__section-divider" role="separator" aria-hidden />
+              ) : null}
+              {inboxOthers.length > 0 ? (
+                <>
+                  {inboxBroadcasts.length > 0 ? (
+                    <div className="inbox__section-label">{t('chat.inboxSectionOther')}</div>
+                  ) : null}
+                  {inboxOthers.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={cx('inbox-item', item.id === threadId && 'is-active')}
+                      data-id={item.id}
+                      onClick={() => setSelectedInboxId(item.id)}
+                    >
+                      <ChatInboxItemContent item={item} />
+                    </button>
+                  ))}
+                </>
+              ) : null}
+            </>
           )}
         </div>
         <div className="thread-pane">

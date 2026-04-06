@@ -27,6 +27,14 @@ export type TeacherReportPayload = {
   toParents: boolean;
 };
 
+/** Class broadcast — persisted as `BroadcastBackend` in IndexedDB. */
+export type TeacherBroadcastPayload = {
+  title: string;
+  body: string;
+  toStudents: boolean;
+  toParents: boolean;
+};
+
 export interface ThreadMessage {
   who: string;
   type: 'in' | 'out';
