@@ -108,21 +108,7 @@ export function TeacherCardPreviewTodoModal({
             </div>
           </div>
 
-          <div className="teacher-card-preview__feedback-grid">
-            <div
-              className="teacher-card-preview__feedback-panel teacher-card-preview__feedback-panel--parents"
-              aria-labelledby="teacher-card-preview-parent-feedback"
-            >
-              <h5 id="teacher-card-preview-parent-feedback" className="teacher-card-preview__feedback-panel-title">
-                {t('dashboard.teacher.cardPreview.parentFeedbackPanelTitle')}
-              </h5>
-              <p className="teacher-card-preview__feedback-stat">
-                {t('dashboard.teacher.cardPreview.parentNeedHelpLine', {
-                  count: needHelpCount
-                })}
-              </p>
-            </div>
-
+          <div className="teacher-card-preview__feedback-layout">
             <div
               className="teacher-card-preview__feedback-panel teacher-card-preview__feedback-panel--students"
               aria-labelledby="teacher-card-preview-student-feedback"
@@ -143,17 +129,16 @@ export function TeacherCardPreviewTodoModal({
                 <p className="teacher-card-preview__feedback-empty">{t('dashboard.teacher.cardPreview.studentFeedbackEmpty')}</p>
               )}
             </div>
-          </div>
 
-          <div
-            className="teacher-card-preview__section teacher-card-preview__tonight-actions"
-            aria-labelledby="teacher-card-preview-tonight-actions"
-          >
-            <h5 id="teacher-card-preview-tonight-actions" className="teacher-card-preview__section-title">
-              {t('dashboard.teacher.cardPreview.tonightActionUptakeTitle')}
-            </h5>
-            <p className="teacher-card-preview__subsection-lede">{t('dashboard.teacher.cardPreview.tonightActionUptakeLede')}</p>
             <div className="teacher-card-preview__stats" role="list">
+              <div className="teacher-card-preview__stat" role="listitem">
+                <div className="teacher-card-preview__stat-value teacher-card-preview__stat-value--need-help">
+                  {needHelpCount}
+                </div>
+                <div className="teacher-card-preview__stat-label">
+                  {t('dashboard.teacher.cardPreview.parentNeedHelpStatLabel')}
+                </div>
+              </div>
               <div className="teacher-card-preview__stat" role="listitem">
                 <div className="teacher-card-preview__stat-value">{quizFamilyCount}</div>
                 <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.tonightActionUptakeQuiz')}</div>

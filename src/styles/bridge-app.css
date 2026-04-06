@@ -1134,21 +1134,10 @@ body {
   min-width: 0;
 }
 
-.teacher-card-preview__tonight-actions {
-  margin-top: 1rem;
-}
-
-.teacher-card-preview__feedback-grid {
-  display: grid;
+.teacher-card-preview__feedback-layout {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 640px) {
-  .teacher-card-preview__feedback-grid {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
 }
 
 .teacher-card-preview__feedback-panel {
@@ -1166,14 +1155,6 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
-}
-
-.teacher-card-preview__feedback-stat {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
 }
 
 .teacher-card-preview__feedback-panel-lede {
@@ -1218,6 +1199,10 @@ html.theme-dark .teacher-card-preview__module {
   color: var(--text);
   line-height: 1.2;
   color: var(--link-blue);
+}
+
+.teacher-card-preview__stat-value--need-help {
+  color: var(--danger);
 }
 
 .teacher-card-preview__stat-label {
