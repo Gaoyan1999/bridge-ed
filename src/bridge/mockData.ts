@@ -345,15 +345,40 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
   t2: [{ who: 'You', type: 'in', text: 'Draft not sent yet. Open Broadcast to continue editing.' }],
 };
 
-export const REPORT_DRAFT_TITLE = 'Week 14 — class progress snapshot';
+/** Class report modal — simulated “Math 9 unit test (quadratics)” dataset. */
+export const REPORT_DEMO_EXAM_LABEL =
+  'Math 9 — Unit test: Quadratic functions (Apr 4, 2026) · 28 students · 45 min';
+
+export const REPORT_DRAFT_TITLE = 'Math 9 — Unit test: Quadratic functions (class report)';
+
+export const REPORT_DRAFT_SUMMARY =
+  'Mean score sits in the mid band; students who did well handled vertex form and the discriminant. The most common slip was sign errors when moving terms across the equals sign—worth one short review before the next quiz.';
+
 export const REPORT_DRAFT_BODY =
-  'Hello everyone,\n\n' +
-  'Here’s a quick snapshot of our week in Algebra 9:\n' +
-  '• We wrapped quadratic equations with emphasis on factoring.\n' +
-  '• Most of the class is on track; a few students should redo the practice set on factoring signs.\n' +
-  '• Next week: short quiz on Tuesday — review examples 1–3 from the textbook.\n\n' +
-  'Reach out if you’d like a short check-in.\n\n' +
+  'Hello families,\n\n' +
+  'Here’s a concise read-out from this week’s quadratic functions unit test (paper + structured working).\n\n' +
+  'What went well\n' +
+  '• Graphing parabolas from vertex form and reading turning points.\n' +
+  '• Most students showed clear working for factorisation when a = 1.\n\n' +
+  'Focus for revision\n' +
+  '• Double-check signs when you add/subtract both sides (small error → wrong roots).\n' +
+  '• “Completing the square” — review Example 3 in the learning card pack.\n\n' +
+  'Next step\n' +
+  '• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.\n\n' +
   '— Ms. Lee';
+
+/** Demo analytics shown in the class report modal (layout preview until gradebook is wired). */
+export const REPORT_DEMO_GRADE_COUNTS = { hd: 5, d: 11, c: 9, p: 3 } as const;
+
+export const REPORT_DEMO_LEARNING_CARD_OPENED = 22;
+
+export const REPORT_DEMO_CLASS_SIZE = 28;
+
+export const REPORT_DEMO_TOP_LEARNERS = [
+  { name: 'Alex Wang', cardsOpened: 14 },
+  { name: 'Betty Li', cardsOpened: 12 },
+  { name: 'Carol Zhang', cardsOpened: 11 },
+] as const;
 
 export const PARENT_REPORT = [
   { label: 'Check-ins this week', value: '5/7 days', note: '+1 vs last week' },

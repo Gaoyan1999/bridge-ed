@@ -23,7 +23,7 @@ const REASON_TAG_IDS = ['exam_results', 'teacher', 'classmates', 'knowledge', 'e
 
 export function MoodPanel({ active }: { active: boolean }) {
   const { t } = useTranslation();
-  const { role, currentUser, setModule, bumpStudentMoods } = useBridge();
+  const { role, currentUser, bumpStudentMoods } = useBridge();
   const hints = panelHintsForRole(t, role);
   const [moodLevel, setMoodLevel] = useState(2);
   const [selectedTags, setSelectedTags] = useState<Set<string>>(() => new Set());
