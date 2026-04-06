@@ -4,6 +4,7 @@ import { ImagePlus } from 'lucide-react';
 import { useBridge } from '@/bridge/BridgeContext';
 import { panelHintsForRole } from '@/bridge/panelHints';
 import { ChatLearningCardMessage } from '@/bridge/components/ChatLearningCardMessage';
+import { ChatTeacherReportMessage } from '@/bridge/components/ChatTeacherReportMessage';
 import { MessageAttachmentGrid } from '@/bridge/components/MessageAttachmentGrid';
 import { Button } from '@/bridge/components/ui/Button';
 import { Composer } from '@/bridge/components/ui/Composer';
@@ -145,11 +146,12 @@ export function ChatPanel({ active }: { active: boolean }) {
             ) : (
               msgs.map((m, idx) => (
                 <div
-                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}`}
+                  key={`${idx}-${m.who}-${m.learningCard?.id ?? ''}-${m.teacherReport?.title ?? ''}`}
                   className={cx(
                     'msg',
                     m.type === 'out' ? 'msg--out' : 'msg--in',
                     m.learningCard && 'msg--learning-card',
+                    m.teacherReport && 'msg--teacher-report',
                   )}
                 >
                   <div className="msg__who">
@@ -158,6 +160,8 @@ export function ChatPanel({ active }: { active: boolean }) {
                   <MessageAttachmentGrid attachments={m.attachments} />
                   {m.learningCard ? (
                     <ChatLearningCardMessage card={m.learningCard} />
+                  ) : m.teacherReport ? (
+                    <ChatTeacherReportMessage report={m.teacherReport} />
                   ) : m.text?.trim() ? (
                     <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
                   ) : null}

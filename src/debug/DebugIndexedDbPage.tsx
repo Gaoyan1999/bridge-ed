@@ -26,7 +26,7 @@ export function DebugIndexedDbPage() {
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
       downloadJson(`bridge-ed-indexeddb-${stamp}.json`, snapshot);
       setStatus(
-        `Exported ${snapshot.learningCards.length} learning card(s), ${snapshot.studentMoods.length} mood row(s), ${snapshot.users.length} user(s).`,
+        `Exported ${snapshot.learningCards.length} learning card(s), ${snapshot.studentMoods.length} mood row(s), ${snapshot.users.length} user(s), ${snapshot.reports.length} report(s).`,
       );
     } catch (e) {
       console.error(e);

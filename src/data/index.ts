@@ -1,5 +1,6 @@
 export * from './entity';
 export * from './learning-card-mappers';
+export * from './report-mappers';
 export * from './student-mood-mappers';
 export * from './config';
 export * from './learning-card-summary';

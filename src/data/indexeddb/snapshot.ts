@@ -3,6 +3,7 @@ import {
   LEARNING_CARD_SCHEMA_VERSION,
   type LearningCardBackend,
 } from '../entity/learning-card-backend';
+import { REPORT_SCHEMA_VERSION, type ReportBackend } from '../entity/report-backend';
 import {
   STUDENT_MOOD_KINDS,
   STUDENT_MOOD_SCHEMA_VERSION,
@@ -10,9 +11,10 @@ import {
 } from '../entity/student-mood-backend';
 import type { UserBackend, UserRole } from '../entity/user-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
+import { normalizeReportBackend } from '../report-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
-export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 1 as const;
+export const BRIDGE_INDEXEDDB_SNAPSHOT_VERSION = 2 as const;
 
 export type BridgeIndexedDbSnapshot = {
   snapshotVersion: typeof BRIDGE_INDEXEDDB_SNAPSHOT_VERSION;
@@ -20,6 +22,7 @@ export type BridgeIndexedDbSnapshot = {
   learningCards: LearningCardBackend[];
   studentMoods: StudentMoodBackend[];
   users: UserBackend[];
+  reports: ReportBackend[];
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -97,16 +100,36 @@ function isUserRow(v: unknown): v is UserBackend {
   return true;
 }
 
+function isReportRow(v: unknown): v is ReportBackend {
+  if (!isRecord(v)) return false;
+  return (
+    typeof v.id === 'string' &&
+    v.schemaVersion === REPORT_SCHEMA_VERSION &&
+    typeof v.createdAt === 'string' &&
+    typeof v.updatedAt === 'string' &&
+    typeof v.authorUserId === 'string' &&
+    typeof v.sentAt === 'string' &&
+    typeof v.title === 'string' &&
+    typeof v.summary === 'string' &&
+    typeof v.body === 'string' &&
+    isRecord(v.audience) &&
+    typeof v.audience.toStudents === 'boolean' &&
+    typeof v.audience.toParents === 'boolean'
+  );
+}
+
 export async function exportIndexedDbSnapshot(): Promise<BridgeIndexedDbSnapshot> {
   const learningCards = await bridgeDb.learningCards.toArray();
   const studentMoods = await bridgeDb.studentMoods.toArray();
   const users = await bridgeDb.users.toArray();
+  const reports = await bridgeDb.reports.toArray();
   return {
     snapshotVersion: BRIDGE_INDEXEDDB_SNAPSHOT_VERSION,
     exportedAt: new Date().toISOString(),
     learningCards,
     studentMoods,
     users,
+    reports,
   };
 }
 
@@ -121,8 +144,8 @@ async function clearAllBridgeDbStores(): Promise<void> {
 }
 
 /**
- * Clears every object store in `bridge-ed`, then bulk-puts learning cards, student moods, and users.
- * `studentMoods` / `users` may be empty arrays; omit only when importing legacy JSON (treated as `[]`).
+ * Clears every object store in `bridge-ed`, then bulk-puts learning cards, student moods, users, and reports.
+ * `studentMoods` / `users` / `reports` may be empty arrays; omit only when importing legacy JSON (treated as `[]`).
  */
 export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise<void> {
   if (!isRecord(data)) {
@@ -158,6 +181,16 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
     users.push(row);
   }
 
+  const reportsRaw = Array.isArray(data.reports) ? data.reports : [];
+  const reports: ReportBackend[] = [];
+  for (let i = 0; i < reportsRaw.length; i++) {
+    const row = reportsRaw[i];
+    if (!isReportRow(row)) {
+      throw new Error(`Invalid reports[${i}]: expected a full ReportBackend record.`);
+    }
+    reports.push(normalizeReportBackend(row));
+  }
+
   await clearAllBridgeDbStores();
   if (learningCards.length > 0) {
     await bridgeDb.learningCards.bulkPut(learningCards);
@@ -167,5 +200,8 @@ export async function importIndexedDbSnapshotFullReplace(data: unknown): Promise
   }
   if (users.length > 0) {
     await bridgeDb.users.bulkPut(users);
+  }
+  if (reports.length > 0) {
+    await bridgeDb.reports.bulkPut(reports);
   }
 }
