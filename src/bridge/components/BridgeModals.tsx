@@ -1,8 +1,7 @@
-import { useEffect, useId, useState } from 'react';
-import { Checkbox } from 'react-aria-components';
+import { useEffect, useState } from 'react';
 import { useBridge } from '@/bridge/BridgeContext';
-import { REPORT_DRAFT_BODY, REPORT_DRAFT_TITLE } from '@/bridge/mockData';
 import { LearningCardModal } from '@/bridge/components/LearningCardModal';
+import { ReportModal } from '@/bridge/components/ReportModal';
 import { TeacherCardPreviewTodoModal } from '@/bridge/components/TeacherCardPreviewTodoModal';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldSelect } from '@/bridge/components/ui/FieldSelect';
@@ -145,116 +144,6 @@ function BroadcastModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ReportModal({
-  onClose,
-  pushTeacherReport,
-}: {
-  onClose: () => void;
-  pushTeacherReport: (title: string, body: string, toStudents: boolean, toParents: boolean) => void;
-}) {
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [toStudents, setToStudents] = useState(true);
-  const [toParents, setToParents] = useState(true);
-  const [success, setSuccess] = useState(false);
-  const [audienceHint, setAudienceHint] = useState(false);
-  const audienceHintId = useId();
-
-  return (
-    <>
-      <div className="modal__header">
-        <h3 id="modal-report-title" className="modal__title">
-          Create &amp; push report
-        </h3>
-        <p className="modal__lede">
-          Recipients get a copy in <strong>Messages</strong>.
-        </p>
-      </div>
-      {!success ? (
-        <form
-          className="book-form"
-          id="form-report"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!toStudents && !toParents) {
-              setAudienceHint(true);
-              return;
-            }
-            setAudienceHint(false);
-            const t = title.trim() || 'Untitled report';
-            const b = body.trim() || '';
-            pushTeacherReport(t, b, toStudents, toParents);
-            setSuccess(true);
-          }}
-        >
-          <div className="modal__scroll">
-            <FieldTextInput
-              id="report-title"
-              label="Report title"
-              value={title}
-              onChange={setTitle}
-              isRequired
-              placeholder="e.g. Week 14 — class progress"
-            />
-            <FieldTextArea
-              id="report-body"
-              label="Report body"
-              value={body}
-              onChange={setBody}
-              rows={7}
-              isRequired
-              placeholder="Highlights, reminders, and optional next steps…"
-            />
-            <fieldset className="field field--audience">
-              <legend className="field__label">Push to</legend>
-              <div className="audience-chips">
-                <Checkbox isSelected={toStudents} onChange={setToStudents} className="audience-chip audience-chip--rac">
-                  <span>👨‍🎓 Students</span>
-                </Checkbox>
-                <Checkbox isSelected={toParents} onChange={setToParents} className="audience-chip audience-chip--rac">
-                  <span>👪 Parents</span>
-                </Checkbox>
-              </div>
-              <p className="field__hint" id={audienceHintId} role="alert" hidden={!audienceHint}>
-                Select at least one audience.
-              </p>
-            </fieldset>
-            <div className="report-actions">
-              <Button
-                variant="text"
-                type="button"
-                id="btn-report-draft"
-                onClick={() => {
-                  setTitle(REPORT_DRAFT_TITLE);
-                  setBody(REPORT_DRAFT_BODY);
-                }}
-              >
-                Generate draft (demo)
-              </Button>
-            </div>
-          </div>
-          <div className="modal__footer">
-            <div className="modal__actions">
-              <Button variant="text" type="button" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button variant="primary" pill type="submit">
-                Push report
-              </Button>
-            </div>
-          </div>
-        </form>
-      ) : (
-        <div className="modal__scroll">
-          <p className="form-success" id="report-success" role="status" hidden={!success}>
-            Report pushed. Students and/or parents will see it under Chat.
-          </p>
-        </div>
-      )}
-    </>
-  );
-}
-
 export function BridgeModals() {
   const { modal, closeModal, pushTeacherReport, bumpLearningCards } = useBridge();
 
@@ -340,7 +229,7 @@ export function BridgeModals() {
     return (
       <div className="modal" id="modal-report" role="dialog" aria-modal="true" aria-labelledby="modal-report-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
-        <div className="modal__box modal__box--rounded modal__box--wide">
+        <div className="modal__box modal__box--rounded modal__box--report">
           <ReportModal onClose={onBackdropClose} pushTeacherReport={pushTeacherReport} />
         </div>
       </div>

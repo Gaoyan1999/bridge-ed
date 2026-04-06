@@ -3,16 +3,13 @@ import {
   BookOpen,
   ChevronDown,
   ChevronLeft,
-  ClipboardList,
   GraduationCap,
   LayoutDashboard,
   MessageSquare,
-  Paperclip,
   School,
   Smile,
   Sparkles,
   Users,
-  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -66,8 +63,7 @@ export function Sidebar({
   setRoleDropdownOpen,
 }: SidebarChromeProps) {
   const { t, i18n } = useTranslation();
-  const { role, setRole, setCurrentUserId, users, currentUser, currentUserId, module, setModule, showToolDemo } =
-    useBridge();
+  const { role, setRole, setCurrentUserId, users, currentUser, currentUserId, module, setModule } = useBridge();
 
   const ddRef = useRef<HTMLDivElement>(null);
   const rawLng = (i18n.resolvedLanguage ?? i18n.language ?? 'en').split('-')[0]?.toLowerCase() ?? 'en';
