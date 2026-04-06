@@ -5,6 +5,9 @@
 !.env.example
 !backend/.env.example
 node_modules/
+__pycache__/
+*.py[cod]
+backend/data/
 
 
 # Logs

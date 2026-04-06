@@ -117,6 +117,20 @@ export type KnowledgeTonightCommandResult = {
   reply: string;
 };
 
+export type ChatRespondHistoryMessage = {
+  who: string;
+  type: 'in' | 'out';
+  text: string;
+};
+
+export type ChatRespondInput = {
+  role: 'parent' | 'student' | 'teacher';
+  threadId: string;
+  threadTitle?: string;
+  message: string;
+  history?: ChatRespondHistoryMessage[];
+};
+
 /** Mock replies — used when `VITE_USE_LLM` is off or as fallback. */
 const MOCK_KNOWLEDGE_QUIZ_REPLY =
   '**Quick check (Demo)**\n\n' +
@@ -163,6 +177,35 @@ async function mockExplainTerminologyToParents(
  * Same idea as {@link getDataLayer} — one place for LLM-facing API calls.
  */
 export class LlmApi {
+  private async callChatRespond(input: ChatRespondInput): Promise<KnowledgeTonightCommandResult> {
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/chat/respond`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        role: input.role,
+        threadId: input.threadId,
+        threadTitle: input.threadTitle ?? '',
+        message: input.message,
+        history: input.history ?? [],
+      }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to get chat response.');
+    }
+    const data = (await res.json()) as { reply?: string };
+    return { reply: data.reply ?? '' };
+  }
+
+  async knowledgeChatRespond(input: ChatRespondInput): Promise<KnowledgeTonightCommandResult> {
+    if (!getUseLlm()) {
+      await new Promise((r) => setTimeout(r, 320));
+      return { reply: 'I got your message. Tell me a bit more so I can help step by step.' };
+    }
+    return this.callChatRespond(input);
+  }
+
   /**
    * Student Knowledge cover image (hero).
    * Mock only — replace with `POST /learning-cards/child-knowledge/hero` (or similar) when the backend exists.
@@ -213,17 +256,13 @@ export class LlmApi {
       await new Promise((r) => setTimeout(r, 320));
       return { reply: MOCK_KNOWLEDGE_QUIZ_REPLY };
     }
-    const base = getApiBaseUrl();
-    const res = await fetch(`${base}/learning-cards/knowledge-tonight/quiz`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    return this.callChatRespond({
+      role: 'student',
+      threadId: 'knowledge-tonight-quiz',
+      threadTitle: input.cardTitle ?? '',
+      message: '/quiz',
+      history: [],
     });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Failed to run Knowledge quiz.');
-    }
-    return res.json() as Promise<KnowledgeTonightCommandResult>;
   }
 
   /**
@@ -235,17 +274,13 @@ export class LlmApi {
       await new Promise((r) => setTimeout(r, 320));
       return { reply: MOCK_KNOWLEDGE_PRACTICE_REPLY };
     }
-    const base = getApiBaseUrl();
-    const res = await fetch(`${base}/learning-cards/knowledge-tonight/practice`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    return this.callChatRespond({
+      role: 'student',
+      threadId: 'knowledge-tonight-practice',
+      threadTitle: input.cardTitle ?? '',
+      message: '/practice',
+      history: [],
     });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Failed to run Knowledge practice.');
-    }
-    return res.json() as Promise<KnowledgeTonightCommandResult>;
   }
 
   /**
@@ -257,16 +292,12 @@ export class LlmApi {
       await new Promise((r) => setTimeout(r, 320));
       return { reply: MOCK_KNOWLEDGE_TEACH_BACK_REPLY };
     }
-    const base = getApiBaseUrl();
-    const res = await fetch(`${base}/learning-cards/knowledge-tonight/teach-back`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cardTitle: input.cardTitle ?? '' }),
+    return this.callChatRespond({
+      role: 'student',
+      threadId: 'knowledge-tonight-teach-back',
+      threadTitle: input.cardTitle ?? '',
+      message: '/teach-back',
+      history: [],
     });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || 'Failed to run Knowledge teach-back.');
-    }
-    return res.json() as Promise<KnowledgeTonightCommandResult>;
   }
 }

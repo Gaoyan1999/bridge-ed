@@ -53,10 +53,7 @@ def learning_cards_create(input_data: LearningCardCreate) -> LearningCard:
 
 @app.put("/learning-cards/{card_id}", response_model=LearningCard)
 def learning_cards_update(card_id: str, input_data: LearningCardCreate) -> LearningCard:
-    card = update_card(card_id, input_data)
-    if card is None:
-        raise HTTPException(status_code=404, detail="Learning card not found.")
-    return card
+    return update_card(card_id, input_data)
 
 
 @app.delete("/learning-cards/{card_id}", status_code=204)

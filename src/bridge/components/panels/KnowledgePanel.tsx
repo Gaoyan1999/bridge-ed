@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   LearningCardBackend,
   LearningCardStudentFeedback,
@@ -53,7 +53,7 @@ import {
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
 
 /**
- * Subject line from `learningCardBackendToItem` is often `G9 · Math` — show subject-focused text (drop grade when present).
+ * Subject line from `learningCardBackendToItem` is often `G9 路 Math` 鈥?show subject-focused text (drop grade when present).
  */
 function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject'>): {
   key: string;
@@ -64,7 +64,7 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject'>): {
   const line = card.subject.trim();
   if (line) {
     const parts = line
-      .split(' · ')
+      .split(' 路 ')
       .map((s) => s.trim())
       .filter(Boolean);
     if (parts.length <= 1) {
@@ -72,7 +72,7 @@ function knowledgeLabelsFromCard(card: Pick<LearningCardItem, 'subject'>): {
     } else {
       const [first, ...rest] = parts;
       const gradeLike = Boolean(first && /^G\d+/i.test(first));
-      const subjectText = gradeLike && rest.length ? rest.join(' · ') : line;
+      const subjectText = gradeLike && rest.length ? rest.join(' 路 ') : line;
       out.push({ key: 'subject', kind: 'subject', text: subjectText });
     }
   }
@@ -465,7 +465,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   }, [role, parentUserId, threadId, bumpLearningCards, t]);
 
   /**
-   * Parent chat → children DOING + chat flag. Optional `tonightPreset` when parent ran a suggested action
+   * Parent chat 鈫?children DOING + chat flag. Optional `tonightPreset` when parent ran a suggested action
    * (sets the matching `action*` on each relevant child).
    */
   const persistParentEngagementToChildren = useCallback(
@@ -525,6 +525,39 @@ export function KnowledgePanel({ active }: { active: boolean }) {
 
   const send = () => {
     const v = input.trim();
+    const apiMessage = v || (pending.length > 0 ? '[Image attachment]' : '');
+    if (!apiMessage && !threadId) return;
+    const history = msgs.slice(-12).map((m) => ({
+      who: m.who,
+      type: m.type,
+      text: m.text,
+    }));
+    const roleForApi = role === 'teacher' ? 'parent' : role;
+    const doReply = async () => {
+      if (!threadId || !apiMessage) return;
+      try {
+        const api = getLlmApi();
+        const result = await api.knowledgeChatRespond({
+          role: roleForApi,
+          threadId,
+          threadTitle: currentCard?.title ?? '',
+          message: apiMessage,
+          history,
+        });
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: result.reply,
+        });
+      } catch (e) {
+        appendKnowledgeMessage(threadId, {
+          who: 'BridgeEd AI',
+          type: 'in',
+          text: e instanceof Error ? e.message : 'Chat response failed.',
+        });
+      }
+    };
+
     const attachments =
       pending.length > 0
         ? pending.map((p) => ({ kind: 'image' as const, url: p.dataUrl, name: p.name }))
@@ -547,6 +580,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         ...(fb?.status === 'not_started' ? { status: 'learning' as const } : {}),
       });
     }
+    void doReply();
     if (role === 'parent') {
       void persistParentEngagementToChildren();
     }
@@ -572,13 +606,20 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       }
       const api = getLlmApi();
       const title = currentCard?.title;
+      const history = msgs.slice(-12).map((m) => ({
+        who: m.who,
+        type: m.type,
+        text: m.text,
+      }));
+      const roleForApi = role === 'teacher' ? 'parent' : role;
       try {
-        const result =
-          preset === 'quiz'
-            ? await api.knowledgeQuiz({ cardTitle: title })
-            : preset === 'parent_led_practice'
-              ? await api.knowledgePractice({ cardTitle: title })
-              : await api.knowledgeTeachBack({ cardTitle: title });
+        const result = await api.knowledgeChatRespond({
+          role: roleForApi,
+          threadId,
+          threadTitle: title ?? '',
+          message: cmd,
+          history,
+        });
         appendKnowledgeMessage(threadId, {
           who: 'BridgeEd AI',
           type: 'in',
@@ -807,7 +848,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                             aria-label={t('common.removeAttachment')}
                             onClick={() => remove(p.id)}
                           >
-                            ×
+                            脳
                           </button>
                         </div>
                       ))}

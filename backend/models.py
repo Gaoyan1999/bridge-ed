@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,9 +14,33 @@ class TranslatedSummaries(BaseModel):
 
 
 class LearningCardCreate(BaseModel):
-    title: str = Field(min_length=1)
-    teacherSummary: str = Field(min_length=1)
-    parentActions: list[str] = Field(min_length=1)
+    model_config = ConfigDict(extra="allow")
+
+    id: str | None = None
+    schemaVersion: int = 3
+    createdAt: str | None = None
+    updatedAt: str | None = None
+
+    authorUserId: str = ""
+    classId: str | None = None
+    classLessonTitle: str = ""
+    grade: str = ""
+    subject: str = ""
+    topic: str = ""
+    teacherNotes: str = ""
+    parentSummary: str = ""
+    translatedSummaries: TranslatedSummaries | None = None
+    childKnowledge: dict[str, Any] | None = None
+    tonightActions: list[dict[str, Any]] = Field(default_factory=list)
+    audience: dict[str, Any] = Field(default_factory=dict)
+    sentAt: str | None = None
+    threadId: str = ""
+    status: dict[str, Any] = Field(default_factory=dict)
+
+    # Legacy fields kept for backward compatibility with early payloads.
+    title: str | None = None
+    teacherSummary: str | None = None
+    parentActions: list[str] | None = None
 
 
 class LearningCard(LearningCardCreate):
