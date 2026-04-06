@@ -71,7 +71,7 @@
     },
     "student": {
       "chat": "班级通知与老师发来的消息。",
-      "knowledge": "选择班级学习卡，就该主题与 BridgeEd AI 对话——练习思路与简明讲解。",
+      "knowledge": "选择班级学习卡，就该主题与 BridgeEd AI 对话——练习思路、简明讲解；家长从测验生成练习卷后，可在本卡内完成。",
       "mood": "选择心情、标记影响因素并提交——家长可在仪表盘查看本周摘要。"
     },
     "teacher": {
@@ -87,9 +87,30 @@
     "messages": "消息",
     "mood": "心情"
   },
+  "quiz": {
+    "student": {
+      "loading": "加载练习卷…",
+      "empty": "还没有练习卷。家长在知识页从测验生成练习后，会显示在这里。",
+      "listAria": "你的练习卷列表",
+      "back": "返回列表",
+      "questionAria": "第 {{n}} 题",
+      "submit": "保存答案",
+      "saving": "保存中…"
+    }
+  },
   "knowledge": {
     "emptyStudent": "还没有学习卡。老师发送到班级后会显示在这里。",
     "emptyParent": "还没有学习卡。请在仪表盘查看老师分享的内容。",
+    "studentQuizSectionAria": "本张学习卡的练习卷",
+    "studentQuizKicker": "练习卷",
+    "studentQuizEmpty": "还没有练习卷。家长在知识页从测验生成后会显示在这里。",
+    "studentQuizRowTitle": "练习卷 · {{date}}",
+    "studentQuizOpen": "去做题",
+    "studentQuizReview": "查看/修改",
+    "studentQuizModalTitle": "练习卷",
+    "studentQuizTake": "去做测验",
+    "studentQuizRequestEval": "AI 评估",
+    "evalQuizFailed": "无法获取 AI 对你练习卷的反馈。",
     "selectCard": "选择一张卡片",
     "composerPlaceholder": "询问本卡主题，或粘贴作业问题…",
     "demoThread": "从仪表盘打开此卡以开始 AI 对话。",
@@ -129,12 +150,20 @@
     "challengeFeedbackPlaceholder": "例如：太长 · 想换主题 · 看不懂从哪里开始…",
     "challengeFeedbackSubmit": "发送并完成",
     "challengeFeedbackRequired": "请写一点点，我们才知道怎么帮你。",
+    "quizWorksheetOfferPrompt": "要根据刚才的题目给孩子出一份练习卷吗？",
+    "quizWorksheetOfferYesAria": "好的，生成练习卷",
+    "quizWorksheetOfferNoAria": "不用",
+    "quizWorksheetOfferRegionAria": "测验后的练习卷询问",
+    "quizWorksheetOfferTodoAlert": "根据本次测验生成练习卷的功能将在此处接入。",
+    "quizWorksheetGenerating": "正在生成试卷…",
+    "quizWorksheetDone": "已经根据题目给孩子生成练习卷。",
+    "quizWorksheetGenerateError": "生成试卷失败，请稍后再试。",
     "ariaSuggestedTasks": "今晚建议任务",
     "ariaSubjectStatus": "科目与状态",
     "ariaInboxLabels": "科目与进度状态",
     "inboxListAria": "学习卡列表",
     "taskShort": {
-      "quiz": "测验",
+      "quiz": "出测验",
       "parent_led_practice": "实践",
       "explain_to_parent": "讲给家长听"
     },

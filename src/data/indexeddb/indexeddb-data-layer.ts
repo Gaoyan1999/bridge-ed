@@ -4,6 +4,7 @@ import type {
   DataLayer,
   LearningCardsRepository,
   ParentBookingsRepository,
+  QuizzesRepository,
   ReportsRepository,
   StudentMoodsRepository,
   TeacherTodoListsRepository,
@@ -18,8 +19,10 @@ import { normalizeReportBackend } from '../report-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
 import type { ParentBookingBackend } from '../entity/parent-booking-backend';
+import type { QuizBackend } from '../entity/quiz-backend';
 import type { UserBackend } from '../entity/user-backend';
 import { normalizeParentBookingBackend } from '../parent-booking-mappers';
+import { normalizeQuizBackend } from '../quiz-mappers';
 import { normalizeTeacherTodoListBackend } from '../teacher-todo-list-mappers';
 import { normalizeStudentMoodBackend } from '../student-mood-mappers';
 
@@ -266,6 +269,71 @@ class IndexedDbTeacherTodoListsRepo implements TeacherTodoListsRepository {
   }
 }
 
+function sortQuizByCreatedAtDesc(a: QuizBackend, b: QuizBackend): number {
+  const ta = Date.parse(a.createdAt);
+  const tb = Date.parse(b.createdAt);
+  const na = Number.isFinite(ta) ? ta : 0;
+  const nb = Number.isFinite(tb) ? tb : 0;
+  return nb - na;
+}
+
+class IndexedDbQuizzesRepo implements QuizzesRepository {
+  async listForParent(parentId: string): Promise<QuizBackend[]> {
+    const pid = parentId.trim();
+    if (!pid) return [];
+    const rows = await bridgeDb.quizzes.toArray();
+    return rows
+      .filter((r) => r.parentId === pid)
+      .map((r) => normalizeQuizBackend(r))
+      .sort(sortQuizByCreatedAtDesc);
+  }
+
+  async listForParentAndLearningCard(parentId: string, learningCardId: string): Promise<QuizBackend[]> {
+    const pid = parentId.trim();
+    const cid = learningCardId.trim();
+    if (!pid || !cid) return [];
+    const rows = await bridgeDb.quizzes.toArray();
+    return rows
+      .filter((r) => r.parentId === pid && String(r.learningCardId ?? '').trim() === cid)
+      .map((r) => normalizeQuizBackend(r))
+      .sort(sortQuizByCreatedAtDesc);
+  }
+
+  async listForStudent(studentId: string): Promise<QuizBackend[]> {
+    const sid = studentId.trim();
+    if (!sid) return [];
+    const rows = await bridgeDb.quizzes.toArray();
+    return rows
+      .filter((r) => r.studentId === sid)
+      .map((r) => normalizeQuizBackend(r))
+      .sort(sortQuizByCreatedAtDesc);
+  }
+
+  async listForStudentAndLearningCard(studentId: string, learningCardId: string): Promise<QuizBackend[]> {
+    const sid = studentId.trim();
+    const cid = learningCardId.trim();
+    if (!sid || !cid) return [];
+    const rows = await bridgeDb.quizzes.toArray();
+    return rows
+      .filter((r) => r.studentId === sid && String(r.learningCardId ?? '').trim() === cid)
+      .map((r) => normalizeQuizBackend(r))
+      .sort(sortQuizByCreatedAtDesc);
+  }
+
+  async get(id: string): Promise<QuizBackend | undefined> {
+    const raw = await bridgeDb.quizzes.get(id);
+    return raw ? normalizeQuizBackend(raw) : undefined;
+  }
+
+  async put(quiz: QuizBackend): Promise<void> {
+    await bridgeDb.quizzes.put(normalizeQuizBackend(quiz));
+  }
+
+  async delete(id: string): Promise<void> {
+    await bridgeDb.quizzes.delete(id);
+  }
+}
+
 export class IndexedDbDataLayer implements DataLayer {
   readonly mode = 'indexeddb' as const;
   readonly learningCards = new IndexedDbLearningCardsRepo();
@@ -275,4 +343,5 @@ export class IndexedDbDataLayer implements DataLayer {
   readonly broadcasts = new IndexedDbBroadcastsRepo();
   readonly teacherTodoLists = new IndexedDbTeacherTodoListsRepo();
   readonly parentBookings = new IndexedDbParentBookingsRepo();
+  readonly quizzes = new IndexedDbQuizzesRepo();
 }

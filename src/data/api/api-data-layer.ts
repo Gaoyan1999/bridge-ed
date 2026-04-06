@@ -12,6 +12,7 @@ import type {
   DataLayer,
   LearningCardsRepository,
   ParentBookingsRepository,
+  QuizzesRepository,
   ReportsRepository,
   StudentMoodsRepository,
   TeacherTodoListsRepository,
@@ -25,7 +26,9 @@ import type { ReportBackend } from '../entity/report-backend';
 import { normalizeLearningCardBackend } from '../learning-card-mappers';
 import type { StudentMoodBackend } from '../entity/student-mood-backend';
 import type { TeacherTodoListBackend } from '../entity/teacher-todo-list-backend';
+import type { QuizBackend } from '../entity/quiz-backend';
 import type { UserBackend } from '../entity/user-backend';
+import { normalizeQuizBackend } from '../quiz-mappers';
 
 class ApiLearningCardsRepo implements LearningCardsRepository {
   async listByUserId(userId: string): Promise<LearningCardBackend[]> {
@@ -207,6 +210,61 @@ class ApiParentBookingsRepo implements ParentBookingsRepository {
   }
 }
 
+/** In-memory until `/quizzes` exists on the API. */
+class ApiQuizzesRepo implements QuizzesRepository {
+  private rows: QuizBackend[] = [];
+
+  async listForParent(parentId: string): Promise<QuizBackend[]> {
+    const pid = parentId.trim();
+    if (!pid) return [];
+    return this.rows.filter((r) => r.parentId === pid).map((r) => normalizeQuizBackend(r));
+  }
+
+  async listForParentAndLearningCard(parentId: string, learningCardId: string): Promise<QuizBackend[]> {
+    const pid = parentId.trim();
+    const cid = learningCardId.trim();
+    if (!pid || !cid) return [];
+    return this.rows
+      .filter((r) => r.parentId === pid && String(r.learningCardId ?? '').trim() === cid)
+      .map((r) => normalizeQuizBackend(r));
+  }
+
+  async listForStudent(studentId: string): Promise<QuizBackend[]> {
+    const sid = studentId.trim();
+    if (!sid) return [];
+    const ta = (a: QuizBackend, b: QuizBackend) =>
+      Date.parse(b.createdAt) - Date.parse(a.createdAt);
+    return this.rows.filter((r) => r.studentId === sid).map((r) => normalizeQuizBackend(r)).sort(ta);
+  }
+
+  async listForStudentAndLearningCard(studentId: string, learningCardId: string): Promise<QuizBackend[]> {
+    const sid = studentId.trim();
+    const cid = learningCardId.trim();
+    if (!sid || !cid) return [];
+    const ta = (a: QuizBackend, b: QuizBackend) =>
+      Date.parse(b.createdAt) - Date.parse(a.createdAt);
+    return this.rows
+      .filter((r) => r.studentId === sid && String(r.learningCardId ?? '').trim() === cid)
+      .map((r) => normalizeQuizBackend(r))
+      .sort(ta);
+  }
+
+  async get(id: string): Promise<QuizBackend | undefined> {
+    const raw = this.rows.find((r) => r.id === id);
+    return raw ? normalizeQuizBackend(raw) : undefined;
+  }
+
+  async put(quiz: QuizBackend): Promise<void> {
+    const n = normalizeQuizBackend(quiz);
+    this.rows = this.rows.filter((r) => r.id !== n.id);
+    this.rows.push(n);
+  }
+
+  async delete(id: string): Promise<void> {
+    this.rows = this.rows.filter((r) => r.id !== id);
+  }
+}
+
 export class ApiDataLayer implements DataLayer {
   readonly mode = 'api' as const;
   readonly learningCards = new ApiLearningCardsRepo();
@@ -216,4 +274,5 @@ export class ApiDataLayer implements DataLayer {
   readonly broadcasts = new ApiBroadcastsRepo();
   readonly teacherTodoLists = new ApiTeacherTodoListsRepo();
   readonly parentBookings = new ApiParentBookingsRepo();
+  readonly quizzes = new ApiQuizzesRepo();
 }

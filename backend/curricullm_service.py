@@ -20,6 +20,14 @@ from .models import (
     TranslatedSummaries,
 )
 
+# Knowledge slash command: `/make-quiz` (preferred). Legacy `/quiz` still matched for old threads.
+_MATCH_MAKE_QUIZ = re.compile(r"^/?(?:make-quiz|quiz)(\b|$)", re.IGNORECASE)
+
+
+def _is_make_quiz_message(text: str) -> bool:
+    return bool(_MATCH_MAKE_QUIZ.match((text or "").strip()))
+
+
 MOCK_CHILD_HERO_IMAGES: tuple[tuple[str, str], ...] = (
     (
         "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80",
@@ -678,13 +686,13 @@ def reply_language_name(ui_lang: str) -> str:
 def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
     ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
     message = input_data.message.strip().lower()
-    is_quiz = bool(re.match(r"^/?quiz(\b|$)", message))
+    is_quiz = _is_make_quiz_message(message)
     is_practice = bool(re.match(r"^/?practice(\b|$)", message))
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", message))
     prior_quiz_count = sum(
         1
         for m in input_data.history
-        if m.type == "out" and bool(re.match(r"^/?quiz(\b|$)", m.text.strip().lower()))
+        if m.type == "out" and _is_make_quiz_message(m.text)
     )
     quiz_round = prior_quiz_count + 1 if is_quiz else 0
     if is_quiz:
@@ -929,13 +937,13 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
             )
 
     message = input_data.message.strip().lower()
-    is_quiz = bool(re.match(r"^/?quiz(\b|$)", message))
+    is_quiz = _is_make_quiz_message(message)
     is_practice = bool(re.match(r"^/?practice(\b|$)", message))
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", message))
     prior_quiz_count = sum(
         1
         for m in input_data.history
-        if m.type == "out" and bool(re.match(r"^/?quiz(\b|$)", m.text.strip().lower()))
+        if m.type == "out" and _is_make_quiz_message(m.text)
     )
     quiz_round = prior_quiz_count + 1 if is_quiz else 0
     prior_teach_back_count = sum(
@@ -949,7 +957,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
         quiz_heading = "## Quick Quiz" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Quiz rapide")
         answer_heading = "## Answer Key" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Corrige")
         quiz_instructions = [
-            "The user requested /quiz.",
+            "The user requested /make-quiz.",
             "Generate a quiz list directly related to the provided card context/topic.",
             "Return markdown only using this structure:",
             quiz_heading,
@@ -1092,7 +1100,7 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
     auth_header = get_env("CURRICULLM_AUTH_HEADER", "Authorization")
     auth_scheme = get_env("CURRICULLM_AUTH_SCHEME", "Bearer")
 
-    is_quiz = bool(re.match(r"^/?quiz(\b|$)", input_data.message.strip().lower()))
+    is_quiz = _is_make_quiz_message(input_data.message)
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", input_data.message.strip().lower()))
     temperature = 0.7 if is_quiz else (0.65 if is_teach_back else 0.4)
 
@@ -1134,7 +1142,7 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
         raise RuntimeError("CurricuLLM chat response did not contain usable content.")
 
     reply = content.strip()
-    if bool(re.match(r"^/?quiz(\b|$)", input_data.message.strip().lower())):
+    if _is_make_quiz_message(input_data.message):
         reply = normalize_quiz_markdown(reply, normalize_ui_lang(getattr(input_data, "uiLang", "en")))
 
     return ChatRespondResponse(reply=reply, source="curricullm")
@@ -1171,7 +1179,7 @@ def stream_respond_with_curricullm(input_data: ChatRespondRequest) -> Iterator[s
     auth_header = get_env("CURRICULLM_AUTH_HEADER", "Authorization")
     auth_scheme = get_env("CURRICULLM_AUTH_SCHEME", "Bearer")
 
-    is_quiz = bool(re.match(r"^/?quiz(\b|$)", input_data.message.strip().lower()))
+    is_quiz = _is_make_quiz_message(input_data.message)
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", input_data.message.strip().lower()))
     temperature = 0.7 if is_quiz else (0.65 if is_teach_back else 0.4)
 
@@ -1256,11 +1264,11 @@ def stream_respond_in_chat(input_data: ChatRespondRequest) -> Iterator[str]:
 
 def respond_knowledge_tonight(command: str, card_title: str) -> KnowledgeTonightCommandResponse:
     prompt_map = {
-        "quiz": "/quiz",
+        "quiz": "/make-quiz",
         "practice": "/practice",
         "teach-back": "/teach-back",
     }
-    cmd = prompt_map.get(command, "/quiz")
+    cmd = prompt_map.get(command, "/make-quiz")
     result = respond_in_chat(
         ChatRespondRequest(
             role="student",

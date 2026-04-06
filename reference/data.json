@@ -1,12 +1,12 @@
 {
-  "snapshotVersion": 3,
-  "exportedAt": "2026-04-06T14:45:10.362Z",
+  "snapshotVersion": 4,
+  "exportedAt": "2026-04-06T16:38:45.219Z",
   "learningCards": [
     {
       "id": "card-2f4aca11-04bc-46ea-8621-3c82be9a9bf0",
       "schemaVersion": 4,
       "createdAt": "2026-04-06T12:16:10.825Z",
-      "updatedAt": "2026-04-06T12:47:33.920Z",
+      "updatedAt": "2026-04-06T16:02:11.034Z",
       "authorUserId": "teacher-2",
       "classId": null,
       "classLessonTitle": "Week 14 — Factoring review",
@@ -55,7 +55,7 @@
         {
           "studentId": "student-2",
           "watchedVideo": true,
-          "chatedWithAI": false,
+          "chatedWithAI": true,
           "status": "learning",
           "actionTeachBack": true
         },
@@ -81,7 +81,7 @@
       "id": "card-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
       "schemaVersion": 4,
       "createdAt": "2026-04-02T09:00:00.000Z",
-      "updatedAt": "2026-04-02T15:30:00.000Z",
+      "updatedAt": "2026-04-06T16:38:31.665Z",
       "authorUserId": "teacher-2",
       "classId": "class-au-g8-01",
       "classLessonTitle": "Week 1 — Numeracy Essentials: 3-Digit Operations Refresher",
@@ -131,12 +131,25 @@
           "chatedWithAI": false,
           "status": "finished",
           "finishedType": "pretty_easy"
+        },
+        {
+          "studentId": "student-1",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning"
+        },
+        {
+          "studentId": "student-2",
+          "watchedVideo": false,
+          "chatedWithAI": true,
+          "status": "learning"
         }
       ],
       "parentFeedbacks": [
         {
           "parentId": "parent-au-01",
-          "doNotUnderstand": false
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
         }
       ]
     },
@@ -208,7 +221,7 @@
       "id": "card-art-g5-au-2026-04-06",
       "schemaVersion": 4,
       "createdAt": "2026-04-06T09:00:00.000Z",
-      "updatedAt": "2026-04-06T12:31:22.562Z",
+      "updatedAt": "2026-04-06T16:26:22.668Z",
       "authorUserId": "teacher-1",
       "classId": "AU-QLD-G5-ART",
       "classLessonTitle": "Week 1 — The Magic of Color: The Color Wheel",
@@ -264,16 +277,18 @@
           "watchedVideo": false,
           "chatedWithAI": true,
           "status": "learning",
-          "actionPractice": true,
-          "actionQuiz": true
+          "actionQuiz": false,
+          "actionPractice": false,
+          "actionTeachBack": false
         },
         {
           "studentId": "student-2",
           "watchedVideo": false,
           "chatedWithAI": true,
           "status": "learning",
-          "actionPractice": true,
-          "actionQuiz": true
+          "actionQuiz": false,
+          "actionPractice": false,
+          "actionTeachBack": false
         }
       ],
       "parentFeedbacks": [
@@ -285,11 +300,7 @@
         {
           "parentId": "parent-1",
           "doNotUnderstand": false,
-          "tonightActionsDone": [
-            "quiz",
-            "parent_led_practice",
-            "explain_to_parent"
-          ]
+          "tonightActionsDone": []
         }
       ]
     },
@@ -297,7 +308,7 @@
       "id": "card-c0c035b8-4692-476f-9a31-9eac8cd8f5f6",
       "schemaVersion": 4,
       "createdAt": "2026-04-06T12:11:16.222Z",
-      "updatedAt": "2026-04-06T13:20:21.223Z",
+      "updatedAt": "2026-04-06T16:36:29.699Z",
       "authorUserId": "teacher-2",
       "classId": null,
       "classLessonTitle": "Week 14 — Factoring review",
@@ -353,8 +364,8 @@
         {
           "studentId": "student-1",
           "watchedVideo": false,
-          "chatedWithAI": false,
-          "status": "not_started",
+          "chatedWithAI": true,
+          "status": "learning",
           "actionQuiz": false,
           "actionPractice": false,
           "actionTeachBack": false
@@ -362,8 +373,8 @@
         {
           "studentId": "student-2",
           "watchedVideo": false,
-          "chatedWithAI": false,
-          "status": "not_started",
+          "chatedWithAI": true,
+          "status": "learning",
           "actionQuiz": false,
           "actionPractice": false,
           "actionTeachBack": false
@@ -436,7 +447,8 @@
       "parentFeedbacks": [
         {
           "parentId": "prn-9-A",
-          "doNotUnderstand": false
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
         }
       ]
     },
@@ -499,7 +511,8 @@
       "parentFeedbacks": [
         {
           "parentId": "prn-001",
-          "doNotUnderstand": false
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
         }
       ]
     },
@@ -562,7 +575,8 @@
       "parentFeedbacks": [
         {
           "parentId": "prn-7-01",
-          "doNotUnderstand": false
+          "doNotUnderstand": false,
+          "tonightActionsDone": []
         }
       ]
     }
@@ -736,7 +750,7 @@
       "sentAt": "2026-04-06T07:47:01.844Z",
       "title": "Math 9 — Unit test: Quadratic functions (class report)",
       "summary": "Mean score sits in the mid band; students who did well handled vertex form and the discriminant. The most common slip was sign errors when moving terms across the equals sign—worth one short review before the next quiz.",
-      "body": "Hello families,\n\nHere’s a concise read-out from this week’s quadratic functions unit test (paper + structured working).\n\nWhat went well\n• Graphing parabolas from vertex form and reading turning points.\n• Most students showed clear working for factorisation when a = 1.\n\nFocus for revision\n• Double-check signs when you add/subtract both sides (small error → wrong roots).\n• “Completing the square” — review Example 3 in the learning card pack.\n\nNext step\n• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.",
+      "body": "Hello families,\n\nHere’s a concise read-out from this week’s quadratic functions unit test (paper + structured working).\n\nWhat went well\n• Graphing parabolas from vertex form and reading turning points.\n• Most students showed clear working for factorisation when a = 1.\n\nFocus for revision\n• Double-check signs when you add/subtract both sides (small error → wrong roots).\n• “Completing the square” — review Example 3 in the learning card pack.\n\nNext step\n• Optional drop-in Thursday 3:30–4:00 PM for targeted questions.\n\n— Ms. Lee",
       "audience": {
         "toStudents": true,
         "toParents": true
@@ -745,7 +759,7 @@
         "student": "rep-1775461621844-s",
         "parent": "rep-1775461621844-p"
       }
-    }    
+    }
   ],
   "broadcasts": [
     {
@@ -765,6 +779,72 @@
         "student": "bc-1775463890635-s",
         "parent": "bc-1775463890635-p"
       }
-    }    
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "78863d38-46b2-4b3c-9e64-16f8c88cd220",
+      "learningCardId": "card-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
+      "parentId": "parent-1",
+      "studentId": "student-2",
+      "createdAt": "2026-04-06T16:38:34.926Z",
+      "questions": [
+        {
+          "question": "Based on the quiz discussion, what is the main idea of “I got your message. Tell me a bit more so I can help step by step.”?",
+          "options": [
+            "Option A",
+            "Option B",
+            "Option C",
+            "Option D"
+          ],
+          "correctAnswer": "Option B"
+        },
+        {
+          "question": "Which step should come first when reviewing?",
+          "options": [
+            "Plan",
+            "Guess",
+            "Skip",
+            "Ignore"
+          ],
+          "correctAnswer": "Plan"
+        }
+      ],
+      "status": "completed",
+      "sourceQuizText": "I got your message. Tell me a bit more so I can help step by step.",
+      "structuredPayloadJson": "{\"questions\":[{\"question\":\"Based on the quiz discussion, what is the main idea of “I got your message. Tell me a bit more so I can help step by step.”?\",\"options\":[\"Option A\",\"Option B\",\"Option C\",\"Option D\"],\"correctAnswer\":\"Option B\"},{\"question\":\"Which step should come first when reviewing?\",\"options\":[\"Plan\",\"Guess\",\"Skip\",\"Ignore\"],\"correctAnswer\":\"Plan\"}]}"
+    },
+    {
+      "id": "c05ec8f2-3aa1-45d7-806f-b02968d36150",
+      "learningCardId": "card-8a3b2c1d-4e5f-6g7h-8i9j-k0l1m2n3o4p5",
+      "parentId": "parent-1",
+      "studentId": "student-1",
+      "createdAt": "2026-04-06T16:38:34.926Z",
+      "questions": [
+        {
+          "question": "Based on the quiz discussion, what is the main idea of “I got your message. Tell me a bit more so I can help step by step.”?",
+          "options": [
+            "Option A",
+            "Option B",
+            "Option C",
+            "Option D"
+          ],
+          "correctAnswer": "Option B"
+        },
+        {
+          "question": "Which step should come first when reviewing?",
+          "options": [
+            "Plan",
+            "Guess",
+            "Skip",
+            "Ignore"
+          ],
+          "correctAnswer": "Plan"
+        }
+      ],
+      "status": "completed",
+      "sourceQuizText": "I got your message. Tell me a bit more so I can help step by step.",
+      "structuredPayloadJson": "{\"questions\":[{\"question\":\"Based on the quiz discussion, what is the main idea of “I got your message. Tell me a bit more so I can help step by step.”?\",\"options\":[\"Option A\",\"Option B\",\"Option C\",\"Option D\"],\"correctAnswer\":\"Option B\"},{\"question\":\"Which step should come first when reviewing?\",\"options\":[\"Plan\",\"Guess\",\"Skip\",\"Ignore\"],\"correctAnswer\":\"Plan\"}]}"
+    }
   ]
 }
