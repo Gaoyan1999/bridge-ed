@@ -3127,24 +3127,6 @@ html.theme-dark .learning-card-confirm__highlight {
   min-height: 0;
 }
 
-.inbox__section-label {
-  padding: 0.5rem 1rem 0.35rem;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  background: var(--page-bg);
-  border-bottom: 1px solid var(--border-light);
-}
-
-.inbox__section-divider {
-  height: 0;
-  margin: 0;
-  border: none;
-  border-top: 1px solid var(--border-light);
-}
-
 .inbox-item {
   display: block;
   width: 100%;
@@ -3806,6 +3788,52 @@ html.theme-dark .inbox-item__kind--broadcast {
 
 .msg--teacher-report {
   max-width: 100%;
+}
+
+.msg--broadcast {
+  max-width: 100%;
+}
+
+.msg__broadcast-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.msg__broadcast-meta .msg__who {
+  margin-bottom: 0;
+}
+
+.msg__time {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.msg__broadcast-card {
+  min-width: 0;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  color: #1a1a1e;
+}
+
+.msg__broadcast-title {
+  font-weight: 600;
+  font-size: 0.95em;
+  margin-bottom: 0.35rem;
+}
+
+.msg__broadcast-body {
+  white-space: pre-wrap;
+  font-size: inherit;
+  line-height: 1.45;
 }
 
 .teacher-report-msg {

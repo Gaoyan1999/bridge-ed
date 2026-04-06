@@ -303,10 +303,10 @@ export const PARENT_DASH_MOOD: { day: string; kind: StudentMoodKind }[] = [
 
 export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
   parent: [
-    { id: 'n1', title: 'Practice set: quadratics', date: '2026-04-01', kind: 'broadcast' },
+    { id: 'broadcast-feed-parent', title: '', date: '2026-04-01', kind: 'broadcast' },
     { id: 'n2', title: 'Ms. Lee: note on next week’s quiz', date: '2026-03-30', kind: 'dm' },
   ],
-  student: [{ id: 's1', title: 'Class: submit homework by Friday', date: '2026-04-02', kind: 'broadcast' }],
+  student: [{ id: 'broadcast-feed-student', title: '', date: '2026-04-02', kind: 'broadcast' }],
   teacher: [
     { id: 't1', title: 'Booking: Alex Wang’s parent', date: '2026-04-02', kind: 'booking' },
     { id: 't2', title: 'Draft: broadcast', date: '2026-04-01', kind: 'draft' },
@@ -314,11 +314,17 @@ export const INITIAL_INBOX: Record<Role, InboxItem[]> = {
 };
 
 export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
-  n1: [
+  'broadcast-feed-parent': [
     {
       who: 'School',
       type: 'in',
       text: 'This week’s factoring practice (PDF is in Materials). About 15 minutes a day is enough—you don’t need to finish it in one go.',
+      broadcastPost: {
+        title: 'Practice set: quadratics',
+        body:
+          'This week’s factoring practice (PDF is in Materials). About 15 minutes a day is enough—you don’t need to finish it in one go.',
+        sentAt: '2026-04-01T14:30:00.000Z',
+      },
     },
   ],
   n2: [
@@ -329,11 +335,16 @@ export const INITIAL_THREADS: Record<string, ThreadMessage[]> = {
     },
     { who: 'You', type: 'out', text: 'Thanks—we’ll focus on example 3 this weekend.' },
   ],
-  s1: [
+  'broadcast-feed-student': [
     {
       who: 'Homeroom',
       type: 'in',
       text: 'Submit math homework by Friday; format is in the class announcement.',
+      broadcastPost: {
+        title: 'Class: submit homework by Friday',
+        body: 'Submit math homework by Friday; format is in the class announcement.',
+        sentAt: '2026-04-02T09:15:00.000Z',
+      },
     },
   ],
   t1: [

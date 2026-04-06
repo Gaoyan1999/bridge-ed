@@ -11,6 +11,10 @@ import {
   type SetStateAction,
 } from 'react';
 import { INITIAL_INBOX, INITIAL_THREADS, MODULES } from '@/bridge/mockData';
+import {
+  BROADCAST_FEED_THREAD_ID_PARENT,
+  BROADCAST_FEED_THREAD_ID_STUDENT,
+} from '@/bridge/broadcast-inbox-ids';
 import { threadMessageFromBroadcastBackend, threadMessageFromTeacherBroadcastPayload } from '@/bridge/broadcast-thread';
 import {
   threadMessageFromReportBackend,
@@ -81,6 +85,7 @@ function cloneThreads(initial: Record<string, ThreadMessage[]>) {
       attachments: m.attachments?.map((a) => ({ ...a })),
       learningCard: m.learningCard ? { ...m.learningCard } : undefined,
       teacherReport: m.teacherReport ? { ...m.teacherReport } : undefined,
+      broadcastPost: m.broadcastPost ? { ...m.broadcastPost } : undefined,
     }));
   }
   return out;
@@ -256,47 +261,50 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       .broadcasts.listAll()
       .then((rows) => {
         if (cancelled || rows.length === 0) return;
+        const bySentAsc = (a: BroadcastBackend, b: BroadcastBackend) =>
+          a.sentAt.localeCompare(b.sentAt) || a.id.localeCompare(b.id);
+        const parentRows = rows.filter((r) => r.audience.toParents).sort(bySentAsc);
+        const studentRows = rows.filter((r) => r.audience.toStudents).sort(bySentAsc);
+
         setThreads((prev) => {
           const next = { ...prev };
-          for (const b of rows) {
-            const msg = threadMessageFromBroadcastBackend(b);
-            if (b.audience.toStudents) {
-              const tid = b.messageThreadIds?.student ?? `${b.id}-s`;
-              if (!next[tid]) next[tid] = [{ ...msg }];
-            }
-            if (b.audience.toParents) {
-              const tid = b.messageThreadIds?.parent ?? `${b.id}-p`;
-              if (!next[tid]) next[tid] = [{ ...msg }];
-            }
+          if (parentRows.length > 0) {
+            next[BROADCAST_FEED_THREAD_ID_PARENT] = parentRows.map((b) => ({ ...threadMessageFromBroadcastBackend(b) }));
+          }
+          if (studentRows.length > 0) {
+            next[BROADCAST_FEED_THREAD_ID_STUDENT] = studentRows.map((b) => ({
+              ...threadMessageFromBroadcastBackend(b),
+            }));
           }
           return next;
         });
         setInboxByRole((prev) => {
-          const parentSeen = new Set(prev.parent.map((i) => i.id));
-          const studentSeen = new Set(prev.student.map((i) => i.id));
           const parentAdds: InboxItem[] = [];
           const studentAdds: InboxItem[] = [];
-          for (const b of rows) {
-            const dateStr = b.sentAt.slice(0, 10);
-            if (b.audience.toParents) {
-              const pid = b.messageThreadIds?.parent ?? `${b.id}-p`;
-              if (!parentSeen.has(pid)) {
-                parentSeen.add(pid);
-                parentAdds.push({ id: pid, title: b.title, date: dateStr, kind: 'broadcast' });
-              }
-            }
-            if (b.audience.toStudents) {
-              const sid = b.messageThreadIds?.student ?? `${b.id}-s`;
-              if (!studentSeen.has(sid)) {
-                studentSeen.add(sid);
-                studentAdds.push({ id: sid, title: b.title, date: dateStr, kind: 'broadcast' });
-              }
-            }
+          if (parentRows.length > 0) {
+            const latest = parentRows[parentRows.length - 1]!.sentAt.slice(0, 10);
+            parentAdds.push({
+              id: BROADCAST_FEED_THREAD_ID_PARENT,
+              title: '',
+              date: latest,
+              kind: 'broadcast',
+            });
           }
+          if (studentRows.length > 0) {
+            const latest = studentRows[studentRows.length - 1]!.sentAt.slice(0, 10);
+            studentAdds.push({
+              id: BROADCAST_FEED_THREAD_ID_STUDENT,
+              title: '',
+              date: latest,
+              kind: 'broadcast',
+            });
+          }
+          const parentNoBroadcast = prev.parent.filter((i) => i.kind !== 'broadcast');
+          const studentNoBroadcast = prev.student.filter((i) => i.kind !== 'broadcast');
           return {
             ...prev,
-            parent: dedupeInboxByIdKeepFirst([...parentAdds, ...prev.parent]),
-            student: dedupeInboxByIdKeepFirst([...studentAdds, ...prev.student]),
+            parent: dedupeInboxByIdKeepFirst([...parentAdds, ...parentNoBroadcast]),
+            student: dedupeInboxByIdKeepFirst([...studentAdds, ...studentNoBroadcast]),
           };
         });
       })
@@ -486,8 +494,8 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       body,
       audience: { toStudents, toParents },
       messageThreadIds: {
-        ...(toStudents ? { student: `${baseId}-s` } : {}),
-        ...(toParents ? { parent: `${baseId}-p` } : {}),
+        ...(toStudents ? { student: BROADCAST_FEED_THREAD_ID_STUDENT } : {}),
+        ...(toParents ? { parent: BROADCAST_FEED_THREAD_ID_PARENT } : {}),
       },
     };
     void getDataLayer()
@@ -498,33 +506,35 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
 
     setThreads((prev) => {
       const next = { ...prev };
-      if (toStudents) {
-        const sid = `${baseId}-s`;
-        next[sid] = [{ ...threadLine }];
-      }
       if (toParents) {
-        const pid = `${baseId}-p`;
-        next[pid] = [{ ...threadLine }];
+        const pid = BROADCAST_FEED_THREAD_ID_PARENT;
+        const existing = next[pid] ?? [];
+        next[pid] = [...existing, { ...threadLine }];
+      }
+      if (toStudents) {
+        const sid = BROADCAST_FEED_THREAD_ID_STUDENT;
+        const existing = next[sid] ?? [];
+        next[sid] = [...existing, { ...threadLine }];
       }
       return next;
     });
 
     setInboxByRole((prev) => {
       const next = { ...prev, parent: [...prev.parent], student: [...prev.student], teacher: [...prev.teacher] };
-      if (toStudents) {
-        const sid = `${baseId}-s`;
-        next.student.unshift({
-          id: sid,
-          title,
+      if (toParents) {
+        next.parent = next.parent.filter((i) => i.kind !== 'broadcast');
+        next.parent.unshift({
+          id: BROADCAST_FEED_THREAD_ID_PARENT,
+          title: '',
           date: dateStr,
           kind: 'broadcast',
         });
       }
-      if (toParents) {
-        const pid = `${baseId}-p`;
-        next.parent.unshift({
-          id: pid,
-          title,
+      if (toStudents) {
+        next.student = next.student.filter((i) => i.kind !== 'broadcast');
+        next.student.unshift({
+          id: BROADCAST_FEED_THREAD_ID_STUDENT,
+          title: '',
           date: dateStr,
           kind: 'broadcast',
         });
