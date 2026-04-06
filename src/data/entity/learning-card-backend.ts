@@ -105,11 +105,18 @@ export type LearningCardStudentFeedback = {
   /** Set when `status === 'finished'` (how it felt / self-report). */
   finishedType?: LearningCardStudentFinishedType;
   feeling?: string;
-  /** Student used the teacher-suggested Quiz action in Knowledge. */
+  /**
+   * Quiz uptake: **student** sets this when they run the Quiz flow from the composer; **parent** sets it on
+   * linked children when they mark the Quiz todo done in Tonight's actions.
+   */
   actionQuiz?: boolean;
-  /** Student used the teacher-suggested Practice action in Knowledge. */
+  /**
+   * Hands-on uptake: **student** from composer; **parent** when they mark the hands-on todo done (synced to children).
+   */
   actionPractice?: boolean;
-  /** Student used the teacher-suggested Teach-back action in Knowledge. */
+  /**
+   * Teach-back uptake: **student** from composer; **parent** when they mark the teach-back todo done (synced to children).
+   */
   actionTeachBack?: boolean;
 };
 

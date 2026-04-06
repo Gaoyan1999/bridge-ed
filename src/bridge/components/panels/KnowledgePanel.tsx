@@ -25,6 +25,7 @@ import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import type { TFunction } from 'i18next';
 import {
   LEARNING_CARD_TONIGHT_PRESET_LABELS,
+  isParentFacingTonightPreset,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
 } from '@/bridge/types';
@@ -46,6 +47,7 @@ import {
   getStudentFeedbackForUser,
   learningCardBackendToItem,
   relevantChildStudentIdsForParent,
+  studentActionClearPatchForTonightPreset,
   studentActionPatchForTonightPreset,
   upsertParentFeedbackOnCard,
   upsertStudentFeedbackOnCard,
@@ -481,47 +483,52 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       if (!b) return;
       const fb = getParentFeedbackForUser(b, parentUserId);
       const cur = new Set(fb.tonightActionsDone ?? []);
-      if (cur.has(preset)) cur.delete(preset);
-      else cur.add(preset);
-      const updated = upsertParentFeedbackOnCard(b, {
+      const markingDone = !cur.has(preset);
+      if (markingDone) cur.add(preset);
+      else cur.delete(preset);
+      let updated = upsertParentFeedbackOnCard(b, {
         parentId: parentUserId,
         tonightActionsDone: Array.from(cur),
       });
-      await getDataLayer().learningCards.put(updated);
-      setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-      bumpLearningCards();
-    },
-    [role, parentUserId, threadId, bumpLearningCards],
-  );
-
-  /**
-   * Parent chat 鈫?children DOING + chat flag. Optional `tonightPreset` when parent ran a suggested action
-   * (sets the matching `action*` on each relevant child).
-   */
-  const persistParentEngagementToChildren = useCallback(
-    async (tonightPreset?: LearningCardTonightActionPreset) => {
-      if (role !== 'parent' || !threadId || parentChildrenIds.length === 0) return;
-      const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
-      if (!b) return;
-      const ids = relevantChildStudentIdsForParent(b, parentChildrenIds);
-      if (ids.length === 0) return;
-      const actionPatch = tonightPreset ? studentActionPatchForTonightPreset(tonightPreset) : {};
-      let updated = b;
-      for (const sid of ids) {
-        const fb = getStudentFeedbackForUser(updated, sid);
-        updated = upsertStudentFeedbackOnCard(updated, {
-          studentId: sid,
-          chatedWithAI: true,
-          ...(fb.status === 'not_started' ? { status: 'learning' as const } : {}),
-          ...actionPatch,
-        });
+      const ids = relevantChildStudentIdsForParent(updated, parentChildrenIds);
+      if (ids.length > 0) {
+        const actionPatch = markingDone
+          ? studentActionPatchForTonightPreset(preset)
+          : studentActionClearPatchForTonightPreset(preset);
+        for (const sid of ids) {
+          updated = upsertStudentFeedbackOnCard(updated, {
+            studentId: sid,
+            ...actionPatch,
+          });
+        }
       }
       await getDataLayer().learningCards.put(updated);
       setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
       bumpLearningCards();
     },
-    [role, threadId, parentChildrenIds, bumpLearningCards],
+    [role, parentUserId, threadId, bumpLearningCards, parentChildrenIds],
   );
+
+  /** Parent chat → linked children: `chatedWithAI` + optional `learning` status (`action*` flags follow Tonight's todo toggles). */
+  const persistParentEngagementToChildren = useCallback(async () => {
+    if (role !== 'parent' || !threadId || parentChildrenIds.length === 0) return;
+    const b = cardBackendsRef.current.find((c) => c.threadId === threadId);
+    if (!b) return;
+    const ids = relevantChildStudentIdsForParent(b, parentChildrenIds);
+    if (ids.length === 0) return;
+    let updated = b;
+    for (const sid of ids) {
+      const sfb = getStudentFeedbackForUser(updated, sid);
+      updated = upsertStudentFeedbackOnCard(updated, {
+        studentId: sid,
+        chatedWithAI: true,
+        ...(sfb.status === 'not_started' ? { status: 'learning' as const } : {}),
+      });
+    }
+    await getDataLayer().learningCards.put(updated);
+    setCardBackends((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    bumpLearningCards();
+  }, [role, threadId, parentChildrenIds, bumpLearningCards]);
 
   const finishCardEasy = useCallback(() => {
     void persistStudentPatch({ status: 'finished', finishedType: 'pretty_easy', feeling: undefined });
@@ -535,11 +542,15 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     void persistStudentPatch({ status: 'learning', finishedType: undefined, feeling: undefined });
   }, [persistStudentPatch]);
 
-  /** Teacher-included presets only. Parents see quiz, hands-on, and teach-back when selected (teach-back is confirmed on the parent side). */
+  /** Teacher-included presets. Parent summary todo list includes teach-back when selected; composer pills omit it. */
   const includedSteps = useMemo(
     () => currentCard?.tonightActions.filter((a) => a.include) ?? [],
     [currentCard],
   );
+  const composerTonightSteps = useMemo(() => {
+    if (role !== 'parent') return includedSteps;
+    return includedSteps.filter((a) => isParentFacingTonightPreset(a.preset));
+  }, [role, includedSteps]);
   const msgs = threadId ? knowledgeThreads[threadId] ?? [] : [];
   const buildCardContext = useCallback(
     (historyRows: Array<{ who: string; type: 'in' | 'out'; text: string }>) => {
@@ -666,7 +677,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         });
       }
       if (role === 'parent') {
-        void persistParentEngagementToChildren(preset);
+        void persistParentEngagementToChildren();
       }
       const api = getLlmApi();
       const title = currentCard?.title;
@@ -987,13 +998,13 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                       >
                         <ImagePlus strokeWidth={2} size={20} aria-hidden />
                       </Button>
-                      {includedSteps.length > 0 ? (
+                      {composerTonightSteps.length > 0 ? (
                         <div
                           className="knowledge-tonight-actions knowledge-tonight-actions--composer"
                           role="group"
                           aria-label={t('knowledge.ariaSuggestedTasks')}
                         >
-                          {includedSteps.map((action) => (
+                          {composerTonightSteps.map((action) => (
                             <Button
                               key={action.preset}
                               type="button"

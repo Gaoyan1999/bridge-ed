@@ -286,13 +286,22 @@ function mergeStudentActionFlags(
   if (typeof r.actionTeachBack === 'boolean') out.actionTeachBack = r.actionTeachBack;
 }
 
-/** Sets the matching `action*` flag when a student (or parent on behalf of children) runs a tonight preset. */
+/** Sets the matching `action*` flag when a student runs a tonight preset from the composer. */
 export function studentActionPatchForTonightPreset(
   preset: LearningCardTonightActionPreset,
 ): Partial<Pick<LearningCardStudentFeedback, 'actionQuiz' | 'actionPractice' | 'actionTeachBack'>> {
   if (preset === 'quiz') return { actionQuiz: true };
   if (preset === 'parent_led_practice') return { actionPractice: true };
   return { actionTeachBack: true };
+}
+
+/** Clears one `action*` flag when a parent unmarks that item in Tonight's actions. */
+export function studentActionClearPatchForTonightPreset(
+  preset: LearningCardTonightActionPreset,
+): Partial<Pick<LearningCardStudentFeedback, 'actionQuiz' | 'actionPractice' | 'actionTeachBack'>> {
+  if (preset === 'quiz') return { actionQuiz: false };
+  if (preset === 'parent_led_practice') return { actionPractice: false };
+  return { actionTeachBack: false };
 }
 
 /**
