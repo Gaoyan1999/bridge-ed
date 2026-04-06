@@ -1044,10 +1044,13 @@ body {
 
 .report-grades-pie__legend-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto auto auto;
   align-items: center;
   gap: 0.45rem 0.5rem;
   font-size: 0.8125rem;
+  justify-content: start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .report-grades-pie__swatch {
@@ -1165,24 +1168,27 @@ body {
   justify-content: center;
 }
 
-@media (min-width: 480px) {
-  .teacher-card-preview__progress-dashboard {
-    justify-content: flex-start;
-  }
-}
-
-/* Learning progress module: keep doughnut left, legend on the right (no wrap under chart). */
+/* Learning progress module: doughnut + legend as one centered group (no wrap under chart). */
 .teacher-card-preview__progress-dashboard .student-status-pie {
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   width: 100%;
   max-width: 100%;
 }
 
 .teacher-card-preview__progress-dashboard .student-status-pie__legend {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
+}
+
+/* Feedback module pie: same centering as progress dashboard */
+.teacher-card-preview__feedback-panel--students .student-finished-pie {
+  justify-content: center;
+}
+
+.teacher-card-preview__feedback-panel--students .student-finished-pie__legend {
+  flex: 0 1 auto;
 }
 
 .teacher-card-preview__feedback-layout {
@@ -1350,10 +1356,13 @@ html.theme-dark .teacher-card-preview__module {
 
 .student-status-pie__legend-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto auto auto;
   align-items: center;
   gap: 0.45rem 0.5rem;
   font-size: 0.8125rem;
+  justify-content: start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .student-status-pie__swatch {
@@ -1390,7 +1399,7 @@ html.theme-dark .teacher-card-preview__module {
   color: var(--text-muted);
 }
 
-/* Finished students — self-report (matches Knowledge finish menu colors) */
+/* Finished students — self-report (blue/green match student-status doughnut doing/done) */
 .student-finished-pie {
   display: flex;
   flex-wrap: wrap;
@@ -1423,10 +1432,13 @@ html.theme-dark .teacher-card-preview__module {
 
 .student-finished-pie__legend-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto auto auto;
   align-items: center;
   gap: 0.45rem 0.5rem;
   font-size: 0.8125rem;
+  justify-content: start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .student-finished-pie__swatch {
@@ -1437,13 +1449,13 @@ html.theme-dark .teacher-card-preview__module {
 }
 
 .student-finished-pie__legend-item--pretty-easy .student-finished-pie__swatch {
-  background: rgba(21, 128, 61, 0.22);
-  border: 1px solid rgba(21, 128, 61, 0.55);
+  background: var(--knowledge-student-status-done-bg);
+  border: 1px solid var(--knowledge-student-status-done-border);
 }
 
 .student-finished-pie__legend-item--think-get-it .student-finished-pie__swatch {
-  background: rgba(11, 87, 208, 0.18);
-  border: 1px solid rgba(11, 87, 208, 0.42);
+  background: var(--knowledge-student-status-doing-bg);
+  border: 1px solid var(--knowledge-student-status-doing-border);
 }
 
 .student-finished-pie__legend-item--challenge .student-finished-pie__swatch {

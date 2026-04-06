@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMockTeacherCardEngagement } from '@/bridge/mockData';
-import type { LearningCardItem } from '@/bridge/types';
+import type { LearningCardItem, LearningCardTonightActionPreset } from '@/bridge/types';
 import { StudentFinishedFeedbackPieChart, type StudentFinishedFeedbackCounts } from '@/bridge/components/StudentFinishedFeedbackPieChart';
 import { StudentStatusPieChart } from '@/bridge/components/StudentStatusPieChart';
 import { Button } from '@/bridge/components/ui/Button';
@@ -54,6 +54,15 @@ export function TeacherCardPreviewTodoModal({
       }) satisfies Record<LearningCardStudentFinishedType, string>,
     [t],
   );
+
+  /** Teacher-selected “Tonight’s actions” on this card — mock uptake rows follow the same set. */
+  const includedTonightPresets = useMemo(() => {
+    const set = new Set<LearningCardTonightActionPreset>();
+    for (const row of card.tonightActions) {
+      if (row.include) set.add(row.preset);
+    }
+    return set;
+  }, [card.tonightActions]);
 
   const { quizFamilyCount, practiceFamilyCount, teachBackFamilyCount } = engagement.tonightActionUptake;
 
@@ -139,22 +148,28 @@ export function TeacherCardPreviewTodoModal({
                   {t('dashboard.teacher.cardPreview.parentNeedHelpStatLabel')}
                 </div>
               </div>
-              <div className="teacher-card-preview__stat" role="listitem">
-                <div className="teacher-card-preview__stat-value">{quizFamilyCount}</div>
-                <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.tonightActionUptakeQuiz')}</div>
-              </div>
-              <div className="teacher-card-preview__stat" role="listitem">
-                <div className="teacher-card-preview__stat-value">{practiceFamilyCount}</div>
-                <div className="teacher-card-preview__stat-label">
-                  {t('dashboard.teacher.cardPreview.tonightActionUptakePractice')}
+              {includedTonightPresets.has('quiz') ? (
+                <div className="teacher-card-preview__stat" role="listitem">
+                  <div className="teacher-card-preview__stat-value">{quizFamilyCount}</div>
+                  <div className="teacher-card-preview__stat-label">{t('dashboard.teacher.cardPreview.tonightActionUptakeQuiz')}</div>
                 </div>
-              </div>
-              <div className="teacher-card-preview__stat" role="listitem">
-                <div className="teacher-card-preview__stat-value">{teachBackFamilyCount}</div>
-                <div className="teacher-card-preview__stat-label">
-                  {t('dashboard.teacher.cardPreview.tonightActionUptakeTeachBack')}
+              ) : null}
+              {includedTonightPresets.has('parent_led_practice') ? (
+                <div className="teacher-card-preview__stat" role="listitem">
+                  <div className="teacher-card-preview__stat-value">{practiceFamilyCount}</div>
+                  <div className="teacher-card-preview__stat-label">
+                    {t('dashboard.teacher.cardPreview.tonightActionUptakePractice')}
+                  </div>
                 </div>
-              </div>
+              ) : null}
+              {includedTonightPresets.has('explain_to_parent') ? (
+                <div className="teacher-card-preview__stat" role="listitem">
+                  <div className="teacher-card-preview__stat-value">{teachBackFamilyCount}</div>
+                  <div className="teacher-card-preview__stat-label">
+                    {t('dashboard.teacher.cardPreview.tonightActionUptakeTeachBack')}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>

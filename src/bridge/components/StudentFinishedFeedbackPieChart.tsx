@@ -19,16 +19,19 @@ type Props = {
   chartAriaLabel: string;
 };
 
-/** Aligns with Knowledge finish menu: easy (green), think (blue), challenge (red). */
+/**
+ * Blue/green match `StudentStatusPieChart` doing/done (Knowledge progress doughnut).
+ * Red stays the finish-menu “challenge” accent.
+ */
 const TYPE_BG: Record<LearningCardStudentFinishedType, string> = {
-  pretty_easy: 'rgba(21, 128, 61, 0.22)',
-  think_get_it: 'rgba(11, 87, 208, 0.18)',
+  pretty_easy: 'rgba(220, 252, 231, 0.95)',
+  think_get_it: 'rgba(11, 87, 208, 0.1)',
   challenge: 'rgba(185, 28, 28, 0.2)',
 };
 
 const TYPE_BORDER: Record<LearningCardStudentFinishedType, string> = {
-  pretty_easy: 'rgba(21, 128, 61, 0.55)',
-  think_get_it: 'rgba(11, 87, 208, 0.42)',
+  pretty_easy: 'rgba(22, 163, 74, 0.38)',
+  think_get_it: 'rgba(11, 87, 208, 0.32)',
   challenge: 'rgba(185, 28, 28, 0.5)',
 };
 
