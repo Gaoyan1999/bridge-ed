@@ -1418,7 +1418,6 @@ html.theme-dark #form-learning-card-review .learning-card-review-tabs__panel--pa
 #form-learning-card-review .learning-card-ai-hint__icon-wrap {
   width: 1.45rem;
   height: 1.45rem;
-  margin-top: 0.04rem;
 }
 
 #form-learning-card-review .learning-card-ai-hint__text {
@@ -1537,7 +1536,7 @@ html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learni
 
 .learning-card-ai-hint {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 0.35rem;
   margin-bottom: 0.65rem;
@@ -1555,7 +1554,6 @@ html.theme-dark #form-learning-card-review .field--actions-pick--grouped .learni
 
 .learning-card-ai-hint__icon-wrap {
   flex-shrink: 0;
-  margin-top: 0.08rem;
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
