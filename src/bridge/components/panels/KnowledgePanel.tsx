@@ -624,6 +624,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
   }, [active, threadId, cards, seedKnowledgeThreadIfEmpty]);
 
   const send = () => {
+    if (tonightActionBusy || (threadId != null && streamingThreadId === threadId)) return;
     const v = input.trim();
     const apiMessage = v || (pending.length > 0 ? '[Image attachment]' : '');
     if (!apiMessage && !threadId) return;
@@ -1060,6 +1061,8 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                   onToggleTonightDone={(preset) => void persistParentTonightDone(preset)}
                   tonightKicker={t('learningCard.wizard.tonightActions')}
                   bridgedAiLabel={t('common.bridgedAi')}
+                  expandLabel={t('knowledge.parentPreviewExpand')}
+                  collapseLabel={t('knowledge.parentPreviewCollapse')}
                 />
               ) : null}
 
@@ -1256,7 +1259,14 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                         </div>
                       ) : null}
                     </div>
-                    <Button variant="primary" pill className="btn--sm" id="knowledge-send" onClick={send}>
+                    <Button
+                      variant="primary"
+                      pill
+                      className="btn--sm"
+                      id="knowledge-send"
+                      disabled={tonightActionBusy || (threadId != null && streamingThreadId === threadId)}
+                      onClick={send}
+                    >
                       {t('common.send')}
                     </Button>
                   </>

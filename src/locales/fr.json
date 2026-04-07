@@ -159,6 +159,8 @@
     "quizWorksheetDone": "Une fiche d’exercices a été générée pour votre ou vos enfants.",
     "quizWorksheetGenerateError": "Impossible de générer la fiche. Réessayez.",
     "ariaSuggestedTasks": "Tâches suggérées pour ce soir",
+    "parentPreviewExpand": "Afficher le résumé et les actions de ce soir",
+    "parentPreviewCollapse": "Masquer le résumé et les actions de ce soir",
     "ariaSubjectStatus": "Matière et statut",
     "ariaInboxLabels": "Matière et votre suivi",
     "inboxListAria": "Fiches d’apprentissage",
@@ -215,7 +217,11 @@
     "bookingCardTitle": "Rendez-vous 1:1 confirmé",
     "bookingLabelTopic": "Sujet",
     "bookingLabelWith": "Avec",
-    "bookingLabelWhen": "Quand"
+    "bookingLabelWhen": "Quand",
+    "seeTranslation": "Voir la traduction",
+    "seeOriginal": "Voir l’original",
+    "translating": "Traduction…",
+    "translationFailed": "Impossible de traduire cette annonce pour le moment."
   },
   "mood": {
     "emotion": "Émotion",
