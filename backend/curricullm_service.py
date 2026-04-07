@@ -1420,6 +1420,11 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     quiz_heading, key_heading = quiz_headings(ui_lang)
     mc_tag, tf_tag, sa_tag = quiz_type_tags(ui_lang)
 
+    # Quiz content should render as plain text, not emphasis. Some model outputs
+    # wrap whole questions/options in markdown bold markers, which then causes
+    # large stretches of the quiz to appear bold after line normalization.
+    out = out.replace("**", "").replace("__", "")
+
     out = re.sub(r"(?im)^\s*(?:##\s*)?quick quiz\s*$", quiz_heading, out)
     out = re.sub(r"(?im)^\s*(?:##\s*)?answer key\s*$", key_heading, out)
     out = re.sub(r"(?im)^\s*(?:##\s*)?correct answers\s*$", key_heading, out)
@@ -1448,8 +1453,13 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     )
 
     # Force A/B/C/D options onto separate lines if model emitted them inline.
-    out = re.sub(r"\s+([A-D]\))", r"\n- \1", out)
+    out = re.sub(r"(?<!-)\s+([A-D]\))", r"\n- \1", out)
     out = re.sub(r"(?m)^\s*([A-D]\))", r"- \1", out)
+    out = re.sub(r"(?m)^\s*-\s*([A-D]\))", r"- \1", out)
+    # Some model outputs produce a standalone "-" line before each option.
+    # Remove those empty bullets while keeping the real A/B/C/D option rows.
+    out = re.sub(r"(?m)^\s*-\s*$\n(?=\s*-\s*[A-D]\))", "", out)
+    out = re.sub(r"\n\s*-\s*\n\s*-\s*([A-D]\))", r"\n- \1", out)
 
     # Add spacing between questions and answer-key items when they run together.
     out = re.sub(r"([^\n])\s+(\d+\.\s)", r"\1\n\n\2", out)
