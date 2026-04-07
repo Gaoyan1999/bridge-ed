@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
   ChevronDown,
@@ -17,6 +17,8 @@ import { useBridge } from '@/bridge/BridgeContext';
 import { ROLE_DISPLAY } from '@/bridge/mockData';
 import type { Module, Role } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
+import { resolveI18nLng } from '@/i18n';
+import { LanguageMenu } from '@/bridge/components/ui/LanguageMenu';
 
 const ROLE_ICONS: Record<Role, LucideIcon> = {
   teacher: School,
@@ -49,10 +51,43 @@ const NAV_MODULES: {
   { module: 'mood', href: '#mood', Icon: Smile, studentOnly: true },
 ];
 
-const UI_LANGS = ['en', 'zh', 'fr'] as const;
-type UiLang = (typeof UI_LANGS)[number];
+const SIDEBAR_LANG_CHOICE_KEY = 'bridgeSidebarLangChoice';
 
-const LANG_SHORT: Record<UiLang, string> = { en: 'EN', zh: '中', fr: 'FR' };
+/** Extra dropdown entries (UI still uses English until we add resources). */
+const EXTRA_LANG_OPTIONS: { code: string; label: string }[] = [
+  { code: 'es', label: 'Español' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'ja', label: '日本語' },
+  { code: 'pt', label: 'Português' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'ko', label: '한국어' },
+  { code: 'ar', label: 'العربية' },
+];
+
+const VALID_LANG_CODES = new Set<string>(['en', 'zh', 'fr', ...EXTRA_LANG_OPTIONS.map((o) => o.code)]);
+
+function readLangChoice(): string | null {
+  try {
+    const s = localStorage.getItem(SIDEBAR_LANG_CHOICE_KEY);
+    if (!s || !VALID_LANG_CODES.has(s)) return null;
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+function writeLangChoice(code: string) {
+  try {
+    localStorage.setItem(SIDEBAR_LANG_CHOICE_KEY, code);
+  } catch {
+    /* ignore */
+  }
+}
+
+function langShortcutLabel(code: string): string {
+  if (code === 'zh') return '中';
+  return code.slice(0, 2).toUpperCase();
+}
 
 export function Sidebar({
   sidebarCollapsed,
@@ -67,7 +102,27 @@ export function Sidebar({
 
   const ddRef = useRef<HTMLDivElement>(null);
   const rawLng = (i18n.resolvedLanguage ?? i18n.language ?? 'en').split('-')[0]?.toLowerCase() ?? 'en';
-  const activeUiLang: UiLang = rawLng === 'zh' || rawLng === 'fr' ? rawLng : 'en';
+  const implicitChoice = rawLng === 'zh' || rawLng === 'fr' ? rawLng : 'en';
+
+  const [langChoice, setLangChoice] = useState<string>(() => readLangChoice() ?? implicitChoice);
+
+  useEffect(() => {
+    if (readLangChoice() !== null) return;
+    setLangChoice(implicitChoice);
+  }, [implicitChoice]);
+
+  const langMenuOptions = useMemo(() => {
+    const core = (['en', 'zh', 'fr'] as const).map((code) => ({
+      code,
+      label: sidebarCollapsed ? langShortcutLabel(code) : t(`sidebar.languages.${code}`),
+    }));
+    const extra = EXTRA_LANG_OPTIONS.map(({ code, label }) => ({
+      code,
+      label: sidebarCollapsed ? langShortcutLabel(code) : label,
+    }));
+    return [...core, ...extra];
+  }, [sidebarCollapsed, t]);
+
   const meta = ROLE_DISPLAY[role];
   const RoleIcon = ROLE_ICONS[role];
   const viewLabel = currentUser?.name ?? meta.label;
@@ -346,37 +401,22 @@ export function Sidebar({
             </p>
             <div
               className={cx(
-                'flex min-w-0 gap-1',
+                'relative z-[45] min-w-0',
                 sidebarCollapsed ? 'justify-center px-0' : 'px-2',
               )}
-              aria-label={sidebarCollapsed ? t('sidebar.languageAria') : undefined}
             >
-              {UI_LANGS.map((code) => {
-                const active = activeUiLang === code;
-                const label = t(`sidebar.languages.${code}`);
-                return (
-                  <button
-                    key={code}
-                    type="button"
-                    className={cx(
-                      'flex min-h-[2rem] min-w-0 flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] border-none px-1.5 py-1.5 text-[0.7rem] font-semibold leading-tight text-[var(--text)] transition-colors',
-                      active
-                        ? 'bg-[var(--info-banner)] text-[var(--link-blue)]'
-                        : 'bg-[var(--pill-bg)] text-[var(--text-muted)] hover:bg-[#e8edf3] hover:text-[var(--text)]',
-                    )}
-                    aria-pressed={active}
-                    aria-label={label}
-                    title={label}
-                    onClick={() => void i18n.changeLanguage(code)}
-                  >
-                    {sidebarCollapsed ? (
-                      <span aria-hidden="true">{LANG_SHORT[code]}</span>
-                    ) : (
-                      <span className="truncate">{label}</span>
-                    )}
-                  </button>
-                );
-              })}
+              <LanguageMenu
+                options={langMenuOptions}
+                value={langChoice}
+                collapsed={sidebarCollapsed}
+                listAriaLabelledBy="language-label"
+                triggerAriaLabel={t('sidebar.languageAria')}
+                onChange={(code) => {
+                  setLangChoice(code);
+                  writeLangChoice(code);
+                  void i18n.changeLanguage(resolveI18nLng(code));
+                }}
+              />
             </div>
           </div>
 

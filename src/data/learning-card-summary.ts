@@ -1,5 +1,5 @@
 import type { LearningCardItem, LearningCardTranslatedSummaries } from '@/bridge/types';
-import i18n from '@/i18n';
+import i18n, { resolveI18nLng } from '@/i18n';
 
 /** Matches `LearningCardBackend.translatedSummaries` keys. */
 export type ParentSummaryUiLang = 'en' | 'zh' | 'fr';
@@ -8,10 +8,7 @@ export type ParentSummaryTranslated = LearningCardTranslatedSummaries;
 
 /** Map i18next language tag to a supported UI lang for learning-card summaries. */
 export function uiLangFromI18n(language: string | undefined): ParentSummaryUiLang {
-  const base = language?.split('-')[0]?.toLowerCase() ?? 'en';
-  if (base === 'zh') return 'zh';
-  if (base === 'fr') return 'fr';
-  return 'en';
+  return resolveI18nLng(language);
 }
 
 /**
