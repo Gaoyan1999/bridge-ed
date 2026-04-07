@@ -18,7 +18,7 @@ function normalizeWorksheetText(raw: string): string {
 function normalizeQuestionText(raw: string): string {
   let out = normalizeWorksheetText(raw);
   out = out.replace(
-    /^\[(multiple_choice|true_false|short_answer|选择题|判断题|简答题|qcm|vrai_faux|reponse_courte)\]\s*/i,
+    /^\[(multiple_choice|multiple choice|true_false|true false|short_answer|short answer|选择题|判断题|简答题|qcm|vrai_faux|vrai faux|reponse_courte|reponse courte)\]\s*/i,
     '',
   );
   let prev = '';
