@@ -8,7 +8,6 @@ import {
   MessageSquare,
   School,
   Smile,
-  Sparkles,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -19,6 +18,7 @@ import type { Module, Role } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
 import { resolveI18nLng } from '@/i18n';
 import { LanguageMenu } from '@/bridge/components/ui/LanguageMenu';
+import bridgeEdLogo from '@/BridgeEd_log.svg';
 
 const ROLE_ICONS: Record<Role, LucideIcon> = {
   teacher: School,
@@ -205,10 +205,14 @@ export function Sidebar({
               sidebarCollapsed && 'hidden',
             )}
           >
-            <span className="inline-flex items-center justify-center text-[var(--link-blue)]" aria-hidden="true">
-              <Sparkles className="block shrink-0" strokeWidth={2} size={20} />
-            </span>
-            <span className="text-[1.125rem] font-semibold tracking-tight text-[var(--text)]">BridgeEd</span>
+            <img
+              src={bridgeEdLogo}
+              alt="BridgeEd"
+              className="block h-10 w-10 object-contain"
+            />
+            {!sidebarCollapsed ? (
+              <span className="text-[1.125rem] font-semibold tracking-tight text-[var(--text)]">BridgeEd</span>
+            ) : null}
           </div>
           {sidebarCollapsed && <span className="sr-only">BridgeEd</span>}
           <button
