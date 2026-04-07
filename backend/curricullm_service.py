@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import re
@@ -11,17 +11,23 @@ from .config import get_bool_env, get_env
 from .models import (
     ChatRespondRequest,
     ChatRespondResponse,
+    EvalQuizRequest,
     KnowledgeTonightCommandResponse,
     LearningCardChildKnowledgeGenerateRequest,
     LearningCardChildKnowledgeHeroResponse,
     LearningCardChildKnowledgeResponse,
     LearningCardGenerateRequest,
     LearningCardGenerateResponse,
+    StructuredQuizGenerateResponse,
+    StructuredQuizQuestion,
+    TranslateTextRequest,
+    TranslateTextResponse,
     TranslatedSummaries,
 )
 
 # Knowledge slash command: `/make-quiz` (preferred). Legacy `/quiz` still matched for old threads.
 _MATCH_MAKE_QUIZ = re.compile(r"^/?(?:make-quiz|quiz)(\b|$)", re.IGNORECASE)
+_MISSING_REFERENCE_ANSWER = "[REFERENCE_ANSWER_MISSING]"
 
 
 def _is_make_quiz_message(text: str) -> bool:
@@ -68,8 +74,8 @@ def build_demo_draft(input_data: LearningCardGenerateRequest) -> LearningCardGen
         f"{f'Teacher note: {notes}.' if notes else 'Focus on understanding the process rather than finishing everything in one sitting.'}"
     )
     fr = (
-        f"Dans {class_title}, les 閼煎崹閻氱幗es ont travaill閼?sur {topic} en {subject} ({grade}). "
-        f"Les familles peuvent aider en v閼煎嵐ifiant la compr閼煎崣ension avec des mots simples et en gardant des s閼煎崋nces courtes. "
+        f"Dans {class_title}, les eleves ont travaille sur {topic} en {subject} ({grade}). "
+        f"Les familles peuvent aider en verifiant la comprehension avec des mots simples et en gardant des seances courtes. "
         f"{note_line}"
     )
 
@@ -683,6 +689,71 @@ def reply_language_name(ui_lang: str) -> str:
     return "English"
 
 
+def quiz_headings(ui_lang: str) -> tuple[str, str]:
+    if ui_lang == "zh":
+        return "## 快速测验", "## 答案解析"
+    if ui_lang == "fr":
+        return "## Quiz rapide", "## Corrige"
+    return "## Quick Quiz", "## Answer Key"
+
+
+_PRACTICE_HEADING_BY_LANG = {
+    "en": "## Hands-on Practice",
+    "zh": "## 动手练习",
+    "fr": "## Pratique manuelle",
+}
+
+_TEACH_BACK_HEADING_BY_LANG = {
+    "en": "## Teach-back (Feynman Method)",
+    "zh": "## 费曼讲解练习",
+    "fr": "## Teach-back (methode Feynman)",
+}
+
+_ROLE_COPY_BY_LANG = {
+    "en": {
+        "parent": "I can help turn this into a parent-friendly next step.",
+        "student": "I can help with a simple explanation and what to do next.",
+        "teacher": "I can help draft a clear, family-friendly response.",
+    },
+    "zh": {
+        "parent": "我可以把这段内容整理成家长易懂的下一步建议。",
+        "student": "我可以用简单的话解释，并给你下一步怎么做。",
+        "teacher": "我可以帮你写一段清晰、对家庭友好的回复。",
+    },
+    "fr": {
+        "parent": "Je peux transformer cela en prochaine etape claire pour les parents.",
+        "student": "Je peux l'expliquer simplement avec une prochaine action.",
+        "teacher": "Je peux rediger une reponse professionnelle et chaleureuse.",
+    },
+}
+
+_SUGGESTION_COPY_BY_LANG = {
+    "en": {
+        "title": "Suggested reply:",
+        "line1": "1. Acknowledge the question in plain language.",
+        "line2": "2. Give one clear next step for home.",
+        "line3": "3. Offer a short follow-up if the learner is still stuck.",
+        "asked_prefix": "You asked: ",
+        "thread_prefix": "Thread",
+    },
+    "zh": {
+        "title": "建议回复：",
+        "line1": "1. 先用简单语言复述对方的问题。",
+        "line2": "2. 给出一个在家就能执行的明确下一步。",
+        "line3": "3. 如果仍有困难，补一句简短跟进建议。",
+        "asked_prefix": "你提到：",
+        "thread_prefix": "话题",
+    },
+    "fr": {
+        "title": "Reponse suggeree :",
+        "line1": "1. Reformulez la question en langage simple.",
+        "line2": "2. Donnez une prochaine etape claire a la maison.",
+        "line3": "3. Ajoutez un court suivi si l eleve bloque encore.",
+        "asked_prefix": "Vous avez demande : ",
+        "thread_prefix": "Fil",
+    },
+}
+
 def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
     ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
     message = input_data.message.strip().lower()
@@ -699,52 +770,73 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
         topic = (input_data.cardContext.topic if input_data.cardContext else "").strip() or input_data.threadTitle or "this topic"
         subject = (input_data.cardContext.subject if input_data.cardContext else "").strip() or "the subject"
         grade = (input_data.cardContext.grade if input_data.cardContext else "").strip() or "the student"
-        heading = "## Quick Quiz" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Quiz rapide")
-        key_heading = "## Answer Key" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Corrige")
-        variant = quiz_round % 3
-        if variant == 1:
-            q1 = f"1. Which factorization is correct for (x^2 + 7x + 10) in {subject}?"
-            a1 = ("   - A) (x + 5)(x + 2)\n   - B) (x + 10)(x + 1)\n   - C) (x + 3)(x + 4)\n   - D) (x + 6)(x + 1)")
-            k = ["1. A - (x + 5)(x + 2) expands to x^2 + 7x + 10."]
-        elif variant == 2:
-            q1 = f"1. For {grade}, what is the first check before factoring (x^2 + 5x + 6)?"
-            a1 = ("   - A) Look for a common factor first\n   - B) Divide by x immediately\n   - C) Move all terms to the right\n   - D) Ignore the middle term")
-            k = ["1. A - Checking for a greatest common factor is the best first step."]
+        heading, key_heading = quiz_headings(ui_lang)
+        if ui_lang == "zh":
+            mc_tag, tf_tag, sa_tag = "[选择题]", "[判断题]", "[简答题]"
+            return ChatRespondResponse(
+                reply=(
+                    f"{heading}\n\n"
+                    f"1. {mc_tag} 下列哪个是多项式 (x^2 - 9) 的正确因式分解？\n"
+                    "   - A) (x - 3)(x + 3)\n"
+                    "   - B) (x + 3)(x + 3)\n"
+                    "   - C) (x - 9)(x + 1)\n"
+                    "   - D) (x - 1)(x + 9)\n\n"
+                    f"2. {mc_tag} 因式分解 (2x^2 + 6x) 的正确结果是？\n"
+                    "   - A) 2(x + 4)\n"
+                    "   - B) x(2x + 6)\n"
+                    "   - C) 2x(x + 3)\n"
+                    "   - D) 2x + 3\n\n"
+                    f"3. {mc_tag} 下列哪个步骤最适合先用于 {topic} 相关题目？\n"
+                    "   - A) 先读题并圈出关键信息\n"
+                    "   - B) 不读题直接猜答案\n"
+                    "   - C) 先抄同学答案\n"
+                    "   - D) 跳过所有步骤\n\n"
+                    f"4. {tf_tag} 在学习 {topic} 时，只背答案而不理解过程是有效方法。\n"
+                    "   - A) 正确\n"
+                    "   - B) 错误\n\n"
+                    f"5. {sa_tag} 请用一句话说明 {topic} 的核心概念，以及它和 {subject} 的关系。\n\n"
+                    f"{key_heading}\n\n"
+                    "1. A - 这是平方差公式 a^2 - b^2 = (a - b)(a + b) 的直接应用。\n"
+                    "2. C - 两项的最大公因式是 2x，提出后得到 2x(x + 3)。\n"
+                    "3. A - 先理解题意能提高后续解题准确率。\n"
+                    "4. B - 只背答案不能迁移，理解过程才有用。\n"
+                    f"5. short: 能准确描述 {topic} 的定义，并说明它如何帮助解题。"
+                ),
+                source="demo-fallback",
+            )
+
+        if ui_lang == "fr":
+            mc_tag, tf_tag, sa_tag = "[QCM]", "[Vrai_Faux]", "[Reponse_Courte]"
         else:
-            q1 = f"1. Which expression is a difference of squares related to {topic}?"
-            a1 = ("   - A) x^2 - 9\n   - B) x^2 + 9\n   - C) x^2 + 6x + 9\n   - D) x^2 + x")
-            k = ["1. A - x^2 - 9 matches a^2 - b^2."]
+            mc_tag, tf_tag, sa_tag = "[multiple_choice]", "[true_false]", "[short_answer]"
         return ChatRespondResponse(
             reply=(
                 f"{heading}\n"
-                f"\n{q1}\n"
-                f"{a1}\n\n"
-                f"2. For {grade}, what is a good first step when solving a {topic} question?\n"
+                f"\n1. {mc_tag} Which factorization is correct for (x^2 + 7x + 10) in {subject}?\n"
+                "   - A) (x + 5)(x + 2)\n"
+                "   - B) (x + 10)(x + 1)\n"
+                "   - C) (x + 3)(x + 4)\n"
+                "   - D) (x + 6)(x + 1)\n\n"
+                f"2. {mc_tag} For {grade}, what is a good first step when solving a {topic} question?\n"
                 "   - A) Skip reading and guess quickly.\n"
                 "   - B) Identify what the question is asking.\n"
                 "   - C) Write a long paragraph first.\n"
                 "   - D) Memorize without checking meaning.\n\n"
-                f"3. Which example is most connected to {topic}?\n"
+                f"3. {mc_tag} Which example is most connected to {topic}?\n"
                 "   - A) An example that uses the same key terms and process.\n"
                 "   - B) A random fact from another subject.\n"
                 "   - C) A story with no learning goal.\n"
                 "   - D) A topic with no overlap.\n\n"
-                f"4. If a student is stuck on {topic}, what is the best next move?\n"
-                "   - A) Stop immediately and do nothing.\n"
-                "   - B) Break the problem into smaller steps and try one step at a time.\n"
-                "   - C) Copy an answer without understanding.\n"
-                "   - D) Ignore teacher notes.\n\n"
-                f"5. What is the strongest sign that {topic} is understood?\n"
-                "   - A) The student can explain the idea in their own words.\n"
-                "   - B) The student can only repeat one sentence.\n"
-                "   - C) The student avoids all questions.\n"
-                "   - D) The student never checks mistakes.\n\n"
-                f"{key_heading}\n"
-                f"\n{k[0]}\n"
+                f"4. {tf_tag} If a student is stuck on {topic}, copying answers without understanding is a good next step.\n"
+                "   - A) True\n"
+                "   - B) False\n\n"
+                f"5. {sa_tag} In one short sentence, explain the key idea of {topic} in your own words.\n\n"
+                f"{key_heading}\n\n"
+                "1. A - (x + 5)(x + 2) expands to x^2 + 7x + 10.\n"
                 "2. B - Understanding the prompt first improves accuracy.\n"
                 "3. A - Closely related examples reinforce transfer.\n"
-                "4. B - Step-by-step decomposition reduces confusion.\n"
-                "5. A - Teach-back shows genuine understanding."
+                "4. B - Copying without understanding does not help learning.\n"
+                f"5. short: A clear one-sentence explanation of {topic} using correct key terms."
             ),
             source="demo-fallback",
         )
@@ -752,7 +844,7 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
         topic = (input_data.cardContext.topic if input_data.cardContext else "").strip() or input_data.threadTitle or "this topic"
         subject = (input_data.cardContext.subject if input_data.cardContext else "").strip() or "the subject"
         grade = (input_data.cardContext.grade if input_data.cardContext else "").strip() or "the student"
-        heading = "## Hands-on Practice" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Pratique manuelle")
+        heading = _PRACTICE_HEADING_BY_LANG.get(ui_lang, _PRACTICE_HEADING_BY_LANG["en"])
         return ChatRespondResponse(
             reply=(
                 f"{heading}\n\n"
@@ -789,40 +881,40 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
         if ui_lang == "zh":
             return ChatRespondResponse(
                 reply=(
-                    "## ??????\n\n"
-                    f"???{topic}?{subject}?{grade}?\n\n"
-                    "### ??\n"
-                    "???????????????????????????\n\n"
-                    "### ?????\n"
-                    "1. ?????????????????\n"
-                    "2. ????????????????\n"
-                    "3. ?????????????????\n\n"
-                    "### ????\n"
-                    "1. ??????????\n"
-                    "2. ????????????\n"
-                    "3. ?????????????\n\n"
-                    "### ????\n"
-                    "?????? 30 ????????????????????????"
+                    "## 费曼讲解练习\n\n"
+                    f"主题：{topic}（{subject}，{grade}）\n\n"
+                    "### 目标\n"
+                    "像小老师一样，用自己的话把知识点讲给家长听。\n\n"
+                    "### 3步讲解流程\n"
+                    "1. 用一句简单的话说清定义。\n"
+                    "2. 给出一个贴近日常或课堂的例子。\n"
+                    "3. 说一个常见错误，并说明如何避免。\n\n"
+                    "### 自我检测\n"
+                    "1. 哪一步我还讲不清楚？\n"
+                    "2. 不看笔记，我还能再讲一遍吗？\n"
+                    "3. 下一步我应该练哪一题？\n\n"
+                    "### 总结\n"
+                    "用30秒做一次总结：它是什么、怎么用、接下来练什么。"
                 ),
                 source="demo-fallback",
             )
         if ui_lang == "fr":
             return ChatRespondResponse(
                 reply=(
-                    "## Exercice Teach-back (m閼煎嵓hode Feynman)\n\n"
+                    "## Exercice Teach-back (methode Feynman)\n\n"
                     f"Sujet : {topic} ({subject}, {grade})\n\n"
                     "### Objectif\n"
                     "Explique la notion comme un mini-professeur, avec tes propres mots.\n\n"
-                    "### M閼煎嵓hode en 3 閼煎嵓apes\n"
-                    "1. Donne une d閼煎崝inition tr閻氱幐 simple en une phrase.\n"
+                    "### Methode en 3 etapes\n"
+                    "1. Donne une definition tres simple en une phrase.\n"
                     "2. Donne un exemple concret de la vie quotidienne.\n"
-                    "3. Donne une erreur fr閼煎嵍uente et comment l'閼煎嵕iter.\n\n"
-                    "### Auto-v閼煎嵐ification\n"
-                    "1. Quelle 閼煎嵓ape est encore floue ?\n"
-                    "2. Puis-je r閼煎崘xpliquer sans regarder le cours ?\n"
+                    "3. Donne une erreur frequente et comment l'eviter.\n\n"
+                    "### Auto-verification\n"
+                    "1. Quelle etape est encore floue ?\n"
+                    "2. Puis-je reexpliquer sans regarder le cours ?\n"
                     "3. Quelle question vais-je pratiquer ensuite ?\n\n"
-                    "### Cl娑斿澅ure\n"
-                    "Termine par un r閼煎嵒um閼?de 30 secondes : id閼煎崘, utilisation, prochain entra閸楃棴ement."
+                    "### Cloture\n"
+                    "Termine par un resume de 30 secondes : idee, utilisation, prochain entrainement."
                 ),
                 source="demo-fallback",
             )
@@ -846,58 +938,24 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
             source="demo-fallback",
         )
 
-    role_copy = {
-        "parent": "I can help turn this into a parent-friendly next step.",
-        "student": "I can help with a simple explanation and what to do next.",
-        "teacher": "I can help draft a clear, family-friendly response.",
-    }
-    if ui_lang == "zh":
-        role_copy = {
-            "parent": "?????????????????????",
-            "student": "????????????????????",
-            "teacher": "??????????????????",
-        }
-    elif ui_lang == "fr":
-        role_copy = {
-            "parent": "Je peux transformer cela en prochaine etape claire pour les parents.",
-            "student": "Je peux l'expliquer simplement avec une prochaine action.",
-            "teacher": "Je peux rediger une reponse professionnelle et chaleureuse.",
-        }
+    role_copy = _ROLE_COPY_BY_LANG.get(ui_lang, _ROLE_COPY_BY_LANG["en"])
+    suggestion = _SUGGESTION_COPY_BY_LANG.get(ui_lang, _SUGGESTION_COPY_BY_LANG["en"])
     lead = role_copy.get(input_data.role, role_copy.get("parent", "I can help with this message."))
-    thread_hint = f"Thread: {input_data.threadTitle}. " if input_data.threadTitle else ""
-    if ui_lang == "zh":
-        thread_hint = f"???{input_data.threadTitle}? " if input_data.threadTitle else ""
-    elif ui_lang == "fr":
-        thread_hint = f"Fil : {input_data.threadTitle}. " if input_data.threadTitle else ""
-    suggestion_title = "Suggested reply:" if ui_lang == "en" else ("?????" if ui_lang == "zh" else "Reponse suggeree :")
-    line1 = (
-        "1. Acknowledge the question in plain language."
-        if ui_lang == "en"
-        else ("1. ??????????????" if ui_lang == "zh" else "1. Reformulez la question en langage simple.")
-    )
-    line2 = (
-        "2. Give one clear next step for home."
-        if ui_lang == "en"
-        else ("2. ????????????????" if ui_lang == "zh" else "2. Donnez une prochaine etape claire a la maison.")
-    )
-    line3 = (
-        "3. Offer a short follow-up if the learner is still stuck."
-        if ui_lang == "en"
-        else ("3. ????????????????????" if ui_lang == "zh" else "3. Ajoutez un court suivi si l eleve bloque encore.")
-    )
-    asked_prefix = (
-        "You asked: "
-        if ui_lang == "en"
-        else ("????????" if ui_lang == "zh" else "Vous avez demande : ")
-    )
+    if input_data.threadTitle:
+        if ui_lang == "zh":
+            thread_hint = f"{suggestion['thread_prefix']}：{input_data.threadTitle}。 "
+        else:
+            thread_hint = f"{suggestion['thread_prefix']} : {input_data.threadTitle}. "
+    else:
+        thread_hint = ""
     return ChatRespondResponse(
         reply=(
             f"{lead} {thread_hint}"
-            f"{asked_prefix}{input_data.message.strip()}\n\n"
-            f"{suggestion_title}\n"
-            f"{line1}\n"
-            f"{line2}\n"
-            f"{line3}"
+            f"{suggestion['asked_prefix']}{input_data.message.strip()}\n\n"
+            f"{suggestion['title']}\n"
+            f"{suggestion['line1']}\n"
+            f"{suggestion['line2']}\n"
+            f"{suggestion['line3']}"
         ),
         source="demo-fallback",
     )
@@ -954,32 +1012,58 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
     teach_back_round = prior_teach_back_count + 1 if is_teach_back else 0
 
     if is_quiz:
-        quiz_heading = "## Quick Quiz" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Quiz rapide")
-        answer_heading = "## Answer Key" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Corrige")
+        quiz_heading, answer_heading = quiz_headings(ui_lang)
+        if ui_lang == "zh":
+            mc_tag, tf_tag, sa_tag = "[选择题]", "[判断题]", "[简答题]"
+        elif ui_lang == "fr":
+            mc_tag, tf_tag, sa_tag = "[QCM]", "[Vrai_Faux]", "[Reponse_Courte]"
+        else:
+            mc_tag, tf_tag, sa_tag = "[multiple_choice]", "[true_false]", "[short_answer]"
         quiz_instructions = [
             "The user requested /make-quiz.",
             "Generate a quiz list directly related to the provided card context/topic.",
             "Return markdown only using this structure:",
             quiz_heading,
             "",
-            "1. Question text",
+            f"1. {mc_tag} Question text",
             "   - A) Option",
             "   - B) Option",
             "   - C) Option",
             "   - D) Option",
-            "(Repeat for 5 questions)",
+            "",
+            f"2. {mc_tag} Question text",
+            "   - A) Option",
+            "   - B) Option",
+            "   - C) Option",
+            "   - D) Option",
+            "",
+            f"3. {mc_tag} Question text",
+            "   - A) Option",
+            "   - B) Option",
+            "   - C) Option",
+            "   - D) Option",
+            "",
+            f"4. {tf_tag} Statement or question text",
+            "   - A) True",
+            "   - B) False",
+            "",
+            f"5. {sa_tag} Short-answer question text",
             "",
             answer_heading,
             "",
             "1. B - short explanation",
-            "(Repeat for all 5)",
+            "2. C - short explanation",
+            "3. A - short explanation",
+            "4. A - short explanation (A=True, B=False)",
+            "5. short: expected short answer",
             "Rules:",
-            "- Exactly 5 multiple-choice questions.",
+            "- Exactly 5 questions total: 3 multiple_choice + 1 true_false + 1 short_answer.",
             "- Difficulty suitable for the student's grade.",
             "- Keep wording clear and age-appropriate.",
             "- Questions must align with topic/subject and not be generic.",
             "- Put each option on its own new line (never inline after the question sentence).",
             "- Add one blank line between questions.",
+            f"- Include the {mc_tag}/{tf_tag}/{sa_tag} tag in every question line.",
             f"- This is quiz round {quiz_round} in the same thread.",
             "- If round >= 2, generate a NEW set of 5 questions and avoid repeating prior stems/options.",
             "- Prefer different sub-skills each round (concept check, procedure, error-spotting, application, explain-why).",
@@ -988,7 +1072,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
         quiz_instructions = []
 
     if is_practice:
-        practice_heading = "## Hands-on Practice" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Pratique manuelle")
+        practice_heading = "## Hands-on Practice" if ui_lang == "en" else ("## 鍔ㄦ墜缁冧範" if ui_lang == "zh" else "## Pratique manuelle")
         practice_instructions = [
             "The user requested /practice.",
             "Generate ONE hands-on home practice case that a parent can run with the child to understand the topic.",
@@ -1029,11 +1113,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
         practice_instructions = []
 
     if is_teach_back:
-        teach_back_heading = (
-            "## Teach-back (Feynman Method)"
-            if ui_lang == "en"
-            else ("## 閻犳劘顫夊ù鏍媼閼肩紟鎺旂磼閸愌呯槑" if ui_lang == "zh" else "## Teach-back (m閼煎嵓hode Feynman)")
-        )
+        teach_back_heading = _TEACH_BACK_HEADING_BY_LANG.get(ui_lang, _TEACH_BACK_HEADING_BY_LANG["en"])
         teach_back_instructions = [
             "The user requested /teach-back.",
             "Generate a child-friendly teach-back guide using the Feynman method.",
@@ -1144,22 +1224,33 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
     reply = content.strip()
     if _is_make_quiz_message(input_data.message):
         reply = normalize_quiz_markdown(reply, normalize_ui_lang(getattr(input_data, "uiLang", "en")))
+        if not _quiz_reply_has_answer_key(reply):
+            raise RuntimeError("Quiz output missing answer key section.")
 
     return ChatRespondResponse(reply=reply, source="curricullm")
 
 
 def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = text.replace("\r\n", "\n")
-    quiz_heading = "## Quick Quiz" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Quiz rapide")
-    key_heading = "## Answer Key" if ui_lang == "en" else ("## ????" if ui_lang == "zh" else "## Corrige")
+    quiz_heading, key_heading = quiz_headings(ui_lang)
 
     out = re.sub(r"(?i)\bquick quiz\b", quiz_heading, out, count=1)
     out = re.sub(r"(?i)\banswer key\b", key_heading, out, count=1)
     out = re.sub(r"(?im)^quick quiz\s*$", quiz_heading, out)
     out = re.sub(r"(?im)^answer key\s*$", key_heading, out)
 
-    out = re.sub(r"(##\s*Quick Quiz|##\s*????|##\s*Quiz rapide)\s*(\d+\.\s)", r"\1\n\n\2", out, flags=re.IGNORECASE)
-    out = re.sub(r"(##\s*Answer Key|##\s*????|##\s*Corrige)\s*(\d+\.\s)", r"\1\n\n\2", out, flags=re.IGNORECASE)
+    out = re.sub(
+        rf"({re.escape(quiz_heading)}|##\s*Quick Quiz|##\s*Quiz rapide|##\s*快速测验)\s*(\d+\.\s)",
+        r"\1\n\n\2",
+        out,
+        flags=re.IGNORECASE,
+    )
+    out = re.sub(
+        rf"({re.escape(key_heading)}|##\s*Answer Key|##\s*Corrige|##\s*答案解析|##\s*答案|##\s*参考答案)\s*(\d+\.\s)",
+        r"\1\n\n\2",
+        out,
+        flags=re.IGNORECASE,
+    )
 
     # Force A/B/C/D options onto separate lines if model emitted them inline.
     out = re.sub(r"\s+([A-D]\))", r"\n- \1", out)
@@ -1170,6 +1261,768 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = re.sub(r"\n{3,}", "\n\n", out)
 
     return out.strip()
+
+
+def _quiz_reply_has_answer_key(text: str) -> bool:
+    out = (text or "").replace("\r\n", "\n")
+    has_heading = bool(re.search(r"(?im)^##\s*(answer key|corrige|答案解析|答案|参考答案)\s*$", out))
+    if not has_heading:
+        return False
+    answer_lines = re.findall(
+        r"(?im)^\s*\d+\.\s*(?:[A-Da-d]\b|short\s*:|answer\s*:|简答\s*:|réponse\s*:|reponse\s*:)",
+        out,
+    )
+    return len(answer_lines) >= 4
+
+
+def _split_quiz_and_answer_sections(quiz_text: str) -> tuple[str, str]:
+    normalized = (quiz_text or "").replace("\r\n", "\n")
+    m = re.search(r"(?im)^##\s*(answer key|corrige|答案解析|答案|参考答案)\s*$", normalized)
+    if not m:
+        return normalized, ""
+    return normalized[: m.start()].strip(), normalized[m.end() :].strip()
+
+
+def _strip_question_prefix(line: str) -> str:
+    out = (line or "").strip()
+    while True:
+        nxt = out
+        # 1. / 1) / 1、 / 1:
+        nxt = re.sub(r"^\s*\d+\s*[\.\)\、:：-]\s*", "", nxt).strip()
+        # 第1题 / 第 1 题:
+        nxt = re.sub(r"^\s*第\s*\d+\s*题\s*[:：\.\-]?\s*", "", nxt).strip()
+        # Q1 / q1:
+        nxt = re.sub(r"^\s*[Qq]\s*\d+\s*[:：\.\-]?\s*", "", nxt).strip()
+        if nxt == out:
+            break
+        out = nxt
+    return out
+
+
+def _extract_option_entries(block: str) -> list[tuple[str, str]]:
+    items: list[tuple[str, str]] = []
+    for raw in block.splitlines():
+        m = re.match(r"^\s*(?:[-*]\s*)?([A-Da-d])[\)\.\:]\s*(.+?)\s*$", raw)
+        if not m:
+            continue
+        label = m.group(1).upper()
+        text = m.group(2).strip()
+        if text:
+            items.append((label, text))
+    # Deduplicate labels while preserving order.
+    seen: set[str] = set()
+    out: list[tuple[str, str]] = []
+    for label, text in items:
+        if label in seen:
+            continue
+        seen.add(label)
+        out.append((label, text))
+    return out
+
+
+def _normalize_quiz_text(raw: str) -> str:
+    out = str(raw or "")
+    out = out.replace("\\(", "(").replace("\\)", ")")
+    out = out.replace("\\[", "[").replace("\\]", "]")
+    out = out.replace("\\{", "{").replace("\\}", "}")
+    out = re.sub(r"\s+", " ", out).strip()
+    return out
+
+
+def _normalize_short_answer_key(raw: str) -> str:
+    text = _normalize_quiz_text(raw)
+    text = re.sub(r"(?i)^(short|answer|short answer|简答|réponse|reponse)\s*[:：]?\s*", "", text).strip()
+    if not text:
+        return ""
+    low = text.lower()
+    if low in {"expected short answer", "a concise correct explanation.", "reference answer not provided"}:
+        return ""
+    return text
+
+
+def _extract_answer_key_map(answer_section: str) -> dict[int, str]:
+    key_map: dict[int, str] = {}
+    for raw in answer_section.splitlines():
+        m = re.match(r"^\s*(\d+)\.\s*(?:[-*]\s*)?([A-Da-d])\b", raw)
+        if not m:
+            continue
+        qn = int(m.group(1))
+        label = m.group(2).upper()
+        key_map[qn] = label
+    return key_map
+
+
+def _parse_structured_questions(quiz_text: str) -> list[StructuredQuizQuestion]:
+    question_section, answer_section = _split_quiz_and_answer_sections(quiz_text)
+    key_map = _extract_answer_key_map(answer_section)
+    short_answer_map: dict[int, str] = {}
+    for raw in answer_section.splitlines():
+        m = re.match(r"^\s*(\d+)\.\s*(?:short|answer|short answer|简答|réponse|reponse)\s*[:：]?\s*(.+?)\s*$", raw, flags=re.IGNORECASE)
+        if m:
+            short_answer_map[int(m.group(1))] = m.group(2).strip()
+
+    blocks = re.findall(r"(?ms)^\s*(\d+)\.\s*(.+?)(?=^\s*\d+\.\s|\Z)", question_section)
+    questions: list[StructuredQuizQuestion] = []
+    for qn_str, body in blocks:
+        qn = int(qn_str)
+        lines = [ln.rstrip() for ln in body.splitlines() if ln.strip()]
+        if not lines:
+            continue
+        question_text = _strip_question_prefix(f"{qn}. {lines[0]}").strip()
+        qtype = "multiple_choice"
+        tag = re.match(
+            r"^\s*\[(multiple_choice|mcq|true_false|tf|short_answer|short|选择题|判断题|简答题|qcm|vrai_faux|reponse_courte)\]\s*(.+)$",
+            question_text,
+            flags=re.IGNORECASE,
+        )
+        if tag:
+            raw = tag.group(1).lower()
+            if raw in {"true_false", "tf", "判断题", "vrai_faux"}:
+                qtype = "true_false"
+            elif raw in {"short_answer", "short", "简答题", "reponse_courte"}:
+                qtype = "short_answer"
+            question_text = tag.group(2).strip()
+        # Guard against inline options leaking into question stem.
+        question_text = re.split(r"\s+[A-Da-d][\)\.\:]\s+", question_text, maxsplit=1)[0].strip()
+        question_text = _normalize_quiz_text(_strip_question_prefix(question_text))
+
+        option_entries = _extract_option_entries(body)
+        options = [_normalize_quiz_text(text) for _, text in option_entries]
+        answer_label = key_map.get(qn)
+        option_map = {label: _normalize_quiz_text(text) for label, text in option_entries}
+
+        if qtype == "short_answer":
+            correct = _normalize_short_answer_key(short_answer_map.get(qn, "").strip())
+            if not correct:
+                # fallback if model used generic answer line format
+                generic_line = re.search(rf"(?im)^\s*{qn}\.\s*(.+?)\s*$", answer_section)
+                if generic_line:
+                    candidate = generic_line.group(1).strip()
+                    if candidate and not re.match(r"^[A-Da-d]\b", candidate):
+                        correct = _normalize_short_answer_key(candidate)
+            if not correct:
+                correct = _MISSING_REFERENCE_ANSWER
+            options = []
+        elif qtype == "true_false":
+            if len(options) < 2:
+                options = ["True", "False"]
+            correct = option_map.get(answer_label or "", "").strip()
+            if not correct:
+                text = short_answer_map.get(qn, "").strip().lower()
+                if text in {"true", "false"}:
+                    correct = text.title()
+            if not correct:
+                correct = options[0]
+        else:
+            if len(options) < 2:
+                continue
+            correct = _normalize_quiz_text(option_map.get(answer_label or "", options[0]).strip())
+        if not question_text:
+            question_text = f"Question {qn}"
+
+        questions.append(
+            StructuredQuizQuestion(
+                questionType=qtype,  # type: ignore[arg-type]
+                question=question_text,
+                options=options,
+                correctAnswer=correct,
+            )
+        )
+
+    if not questions:
+        raise RuntimeError("Could not parse structured quiz questions from /make-quiz text.")
+
+    return questions[:10]
+
+
+def generate_structured_quiz_from_text(quiz_text: str) -> StructuredQuizGenerateResponse:
+    # IMPORTANT product rule:
+    # Parent/teacher confirm quiz content in chat first; worksheet sent to children
+    # must match that confirmed content exactly.
+    # Therefore this endpoint performs deterministic parsing only and does NOT
+    # regenerate questions with LLM.
+    return StructuredQuizGenerateResponse(questions=_parse_structured_questions(quiz_text))
+
+
+def _normalize_structured_question_payload(item: Any) -> StructuredQuizQuestion | None:
+    if not isinstance(item, dict):
+        return None
+    raw_type = str(item.get("questionType", "multiple_choice") or "multiple_choice").strip().lower()
+    qtype = raw_type if raw_type in {"multiple_choice", "true_false", "short_answer"} else "multiple_choice"
+    question = str(item.get("question", "") or "").strip()
+    correct = str(item.get("correctAnswer", "") or "").strip()
+    options_raw = item.get("options", [])
+    options = [str(x).strip() for x in options_raw] if isinstance(options_raw, list) else []
+    options = [x for x in options if x]
+
+    if not question or not correct:
+        return None
+    if qtype in {"multiple_choice", "true_false"} and len(options) < 2:
+        if qtype == "true_false":
+            options = ["True", "False"]
+        else:
+            return None
+    if qtype == "short_answer":
+        options = []
+    return StructuredQuizQuestion(
+        questionType=qtype,  # type: ignore[arg-type]
+        question=question,
+        options=options,
+        correctAnswer=correct,
+    )
+
+
+def build_structured_quiz_prompt(quiz_text: str) -> str:
+    return "\n".join(
+        [
+            "You are BridgeEd AI turning a quiz draft into a child worksheet.",
+            "Return strict JSON only using this schema:",
+            '{"questions":[{"questionType":"multiple_choice|true_false|short_answer","question":"string","options":["string"],"correctAnswer":"string"}]}',
+            "Requirements:",
+            "- Create 5 questions total.",
+            "- Mix types for Australian school style: 3 multiple_choice, 1 true_false, 1 short_answer.",
+            "- Keep language child-friendly for primary/secondary students.",
+            "- Keep difficulty moderate and aligned to the draft topic.",
+            "- For true_false, options must be exactly ['True','False'].",
+            "- For short_answer, options must be an empty array.",
+            "- Ensure correctAnswer exactly matches one option for multiple_choice/true_false.",
+            "- Ensure each question tests a distinct sub-skill.",
+            "Quiz draft:",
+            quiz_text,
+        ]
+    )
+
+
+def generate_structured_quiz_with_curricullm(quiz_text: str) -> StructuredQuizGenerateResponse:
+    api_url = get_env("CURRICULLM_API_URL")
+    api_key = get_env("CURRICULLM_API_KEY")
+    model = get_env("CURRICULLM_MODEL", "CurricuLLM-AU")
+    auth_header = get_env("CURRICULLM_AUTH_HEADER", "Authorization")
+    auth_scheme = get_env("CURRICULLM_AUTH_SCHEME", "Bearer")
+
+    response = requests.post(
+        api_url,
+        headers={
+            "Content-Type": "application/json",
+            auth_header: f"{auth_scheme} {api_key}" if auth_scheme else api_key,
+        },
+        json={
+            "model": model,
+            "temperature": 0.55,
+            "top_p": 0.9,
+            "max_tokens": 2200,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You create structured school worksheets in strict JSON.",
+                },
+                {
+                    "role": "user",
+                    "content": build_structured_quiz_prompt(quiz_text),
+                },
+            ],
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    data = response.json()
+    content = (
+        data.get("choices", [{}])[0].get("message", {}).get("content")
+        or data.get("output_text")
+        or data.get("content")
+        or data.get("result")
+    )
+    payload: dict[str, Any]
+    if isinstance(content, dict):
+        payload = content
+    else:
+        if not isinstance(content, str) or not content.strip():
+            raise RuntimeError("CurricuLLM structured-quiz response did not contain usable content.")
+        payload = json.loads(extract_json_block(content))
+
+    raw_questions = payload.get("questions")
+    if not isinstance(raw_questions, list):
+        raise RuntimeError("Structured quiz payload missing 'questions' array.")
+    normalized: list[StructuredQuizQuestion] = []
+    for item in raw_questions:
+        q = _normalize_structured_question_payload(item)
+        if q is not None:
+            normalized.append(q)
+    if len(normalized) < 3:
+        raise RuntimeError("Structured quiz payload did not contain enough valid questions.")
+    return StructuredQuizGenerateResponse(questions=normalized[:10])
+
+
+def evaluate_structured_quiz_fallback(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
+    ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
+
+    copy = {
+        "en": {
+            "title": "## Quiz Feedback",
+            "score": "Score",
+            "encouragement_high": "Excellent work overall.",
+            "encouragement_mid": "Good progress, keep going.",
+            "encouragement_low": "You are building understanding - one step at a time.",
+            "unanswered": "Unanswered",
+            "per_question": "## Per-question feedback",
+            "q_title": "### Q{idx}",
+            "q_label": "- Question: {text}",
+            "your_answer": "- Your answer: {text}",
+            "no_answer": "- Your answer: (no answer)",
+            "correct_answer": "- Correct answer: {text}",
+            "result_correct": "- Result: Correct",
+            "result_wrong": "- Result: Not correct yet",
+            "feedback_correct": "- Feedback: Great job! You understood this point well.",
+            "feedback_unanswered": "- Feedback: No worries. Try this one again step by step.",
+            "feedback_wrong": "- Feedback: Nice try. {hint}",
+            "knowledge_point": "- Knowledge point: {text}",
+            "why_wrong": "- Why your answer is not correct: {text}",
+            "why_correct": "- Why the correct answer works: {text}",
+            "hint_option": "You chose option {student_opt}, but the best match is option {answer_opt}.",
+            "hint_generic": "Compare the key words in the question with each option, then eliminate two unlikely choices first.",
+            "why_wrong_generic": "Your option does not match the key clue in the stem as closely as the correct option.",
+            "why_correct_generic": "The correct option aligns more directly with the requirement in the question.",
+            "next_step": "Next step:",
+            "next_step_1": "- Revisit the incorrect questions and explain why the correct option is right in one sentence.",
+            "next_step_2": "- Then try one similar question without looking at notes.",
+        },
+        "zh": {
+            "title": "## 测验反馈",
+            "score": "得分",
+            "encouragement_high": "整体表现很棒，继续保持。",
+            "encouragement_mid": "进步很明显，继续加油。",
+            "encouragement_low": "你正在一步一步建立理解，这很不错。",
+            "unanswered": "未作答",
+            "per_question": "## 逐题反馈",
+            "q_title": "### 第{idx}题",
+            "q_label": "- 题目：{text}",
+            "your_answer": "- 你的答案：{text}",
+            "no_answer": "- 你的答案：（未作答）",
+            "correct_answer": "- 正确答案：{text}",
+            "result_correct": "- 结果：回答正确",
+            "result_wrong": "- 结果：暂时不正确",
+            "feedback_correct": "- 反馈：回答得很好，你已经掌握了这个知识点。",
+            "feedback_unanswered": "- 反馈：没关系，这题可以按步骤再试一次。",
+            "feedback_wrong": "- 反馈：这次很接近了。{hint}",
+            "knowledge_point": "- 知识点：{text}",
+            "why_wrong": "- 你这次为什么不对：{text}",
+            "why_correct": "- 为什么正确答案更合适：{text}",
+            "hint_option": "你选择了选项{student_opt}，更匹配题意的是选项{answer_opt}。",
+            "hint_generic": "先抓住题目关键词，再排除两个明显不合适的选项。",
+            "why_wrong_generic": "你的选项和题干关键线索匹配度不够高。",
+            "why_correct_generic": "正确选项与题目要求更直接一致。",
+            "next_step": "下一步：",
+            "next_step_1": "- 把答错的题再看一遍，并用一句话说明为什么正确答案是对的。",
+            "next_step_2": "- 然后不看笔记再做一道同类型题。",
+        },
+        "fr": {
+            "title": "## Retour du quiz",
+            "score": "Score",
+            "encouragement_high": "Excellent travail dans l'ensemble.",
+            "encouragement_mid": "Bon progres, continue comme ca.",
+            "encouragement_low": "Tu construis ta comprehension, etape par etape.",
+            "unanswered": "Sans reponse",
+            "per_question": "## Retour question par question",
+            "q_title": "### Q{idx}",
+            "q_label": "- Question : {text}",
+            "your_answer": "- Ta reponse : {text}",
+            "no_answer": "- Ta reponse : (pas de reponse)",
+            "correct_answer": "- Bonne reponse : {text}",
+            "result_correct": "- Resultat : Correct",
+            "result_wrong": "- Resultat : Pas encore correct",
+            "feedback_correct": "- Retour : Bravo, tu as bien compris ce point.",
+            "feedback_unanswered": "- Retour : Pas grave. Reprends cette question pas a pas.",
+            "feedback_wrong": "- Retour : Bien essaye. {hint}",
+            "knowledge_point": "- Point de connaissance : {text}",
+            "why_wrong": "- Pourquoi ta reponse n'est pas correcte : {text}",
+            "why_correct": "- Pourquoi la bonne reponse est correcte : {text}",
+            "hint_option": "Tu as choisi l'option {student_opt}, mais la meilleure correspondance est l'option {answer_opt}.",
+            "hint_generic": "Compare les mots-cles de la question avec chaque option, puis elimine d'abord deux options peu probables.",
+            "why_wrong_generic": "Ton option correspond moins bien a l'indice principal de l'enonce.",
+            "why_correct_generic": "La bonne option correspond plus directement a la consigne.",
+            "next_step": "Prochaine etape :",
+            "next_step_1": "- Revois les questions incorrectes et explique en une phrase pourquoi la bonne option est correcte.",
+            "next_step_2": "- Puis essaie une question similaire sans regarder tes notes.",
+        },
+    }[ui_lang]
+
+    total = len(input_data.questions)
+    if total <= 0:
+        raise RuntimeError("No quiz questions were submitted for evaluation.")
+
+    def _norm(s: str) -> str:
+        return re.sub(r"\s+", " ", (s or "").strip()).lower()
+
+    def _display_answer(answer: str) -> str:
+        raw = (answer or "").strip()
+        if raw and raw != _MISSING_REFERENCE_ANSWER:
+            return raw
+        if ui_lang == "zh":
+            return "参考答案待补充"
+        if ui_lang == "fr":
+            return "Reponse de reference a completer"
+        return "Reference answer pending"
+
+    def _extract_tokens(text: str) -> list[str]:
+        return [t for t in re.findall(r"[a-z0-9^]+", (text or "").lower()) if len(t) >= 2]
+
+    def _infer_knowledge_point(stem: str, options: list[str]) -> str:
+        joined = f"{stem} {' '.join(options)}".lower()
+        if re.search(r"(factor|factoring|factorise|factorize|因式|因数)", joined):
+            return "Factoring / 因式分解" if ui_lang != "fr" else "Factorisation"
+        if re.search(r"(fraction|分数)", joined):
+            return "Fractions / 分数" if ui_lang != "fr" else "Fractions"
+        if re.search(r"(quadratic|x\^2|二次)", joined):
+            return "Quadratic expressions / 二次表达式" if ui_lang != "fr" else "Expressions quadratiques"
+        if re.search(r"(equation|solve|方程|求解)", joined):
+            return "Equation solving / 方程求解" if ui_lang != "fr" else "Resolution d'equations"
+        if re.search(r"(algebra|expression|代数|表达式)", joined):
+            return "Algebraic expressions / 代数表达式" if ui_lang != "fr" else "Expressions algebriques"
+        return (
+            "Core concept in this question"
+            if ui_lang == "en"
+            else ("本题核心概念" if ui_lang == "zh" else "Concept central de la question")
+        )
+
+    def _build_specific_explanation(stem: str, student: str, answer: str, options: list[str]) -> tuple[str, str]:
+        stem_tokens = _extract_tokens(stem)
+        focus = stem_tokens[:5]
+        student_hits = [tok for tok in focus if tok in _norm(student)]
+        answer_hits = [tok for tok in focus if tok in _norm(answer)]
+        focus_text = ", ".join(focus) if focus else (
+            "question clues" if ui_lang == "en" else ("题干线索" if ui_lang == "zh" else "indices de l'enonce")
+        )
+        student_match = ", ".join(student_hits) if student_hits else (
+            "none" if ui_lang == "en" else ("较少" if ui_lang == "zh" else "faible")
+        )
+        answer_match = ", ".join(answer_hits) if answer_hits else (
+            "stronger alignment" if ui_lang == "en" else ("更高匹配" if ui_lang == "zh" else "meilleure correspondance")
+        )
+
+        if ui_lang == "zh":
+            why_wrong = (
+                f"题干关键线索是：{focus_text}。你选择的“{student}”与这些线索的对应较弱（匹配：{student_match}）。"
+                if student
+                else "你未作答，因此没有体现对题干关键线索的判断。"
+            )
+            why_correct = f"正确答案“{answer}”与题干线索更一致（匹配：{answer_match}），所以更符合题目要求。"
+            return why_wrong, why_correct
+
+        if ui_lang == "fr":
+            why_wrong = (
+                f"L'enonce met l'accent sur : {focus_text}. Ton choix '{student}' correspond moins a ces indices (correspondance : {student_match})."
+                if student
+                else "Tu n'as pas repondu, donc l'analyse des indices de l'enonce n'apparait pas."
+            )
+            why_correct = f"La bonne reponse '{answer}' correspond mieux aux indices de l'enonce (correspondance : {answer_match})."
+            return why_wrong, why_correct
+
+        why_wrong = (
+            f"The stem emphasizes: {focus_text}. Your choice '{student}' matches those clues weakly (match: {student_match})."
+            if student
+            else "No answer was submitted, so the key clues in the stem were not applied."
+        )
+        why_correct = f"The correct answer '{answer}' aligns better with those stem clues (match: {answer_match})."
+        return why_wrong, why_correct
+
+    correct = 0
+    feedback_rows: list[str] = []
+    unanswered_indexes: list[int] = []
+    for idx, q in enumerate(input_data.questions, start=1):
+        student = (q.studentAnswer or "").strip()
+        answer = (q.correctAnswer or "").strip()
+        shown_answer = _display_answer(answer)
+        stem = (q.question or "").strip()
+        stem_short = stem if len(stem) <= 120 else f"{stem[:117]}..."
+        options = [o.strip() for o in (q.options or []) if o and o.strip()]
+        knowledge_point = _infer_knowledge_point(stem, options)
+        if not student:
+            unanswered_indexes.append(idx)
+            why_wrong, why_correct = _build_specific_explanation(stem_short, student, answer, options)
+            feedback_rows.extend(
+                [
+                    copy["q_title"].format(idx=idx),
+                    copy["q_label"].format(text=stem_short),
+                    copy["no_answer"],
+                    copy["correct_answer"].format(text=shown_answer),
+                    copy["feedback_unanswered"],
+                    copy["knowledge_point"].format(text=knowledge_point),
+                    copy["why_wrong"].format(text=why_wrong),
+                    copy["why_correct"].format(text=why_correct),
+                    "",
+                ]
+            )
+            continue
+        if _norm(student) == _norm(answer):
+            correct += 1
+            feedback_rows.extend(
+                [
+                    copy["q_title"].format(idx=idx),
+                    copy["q_label"].format(text=stem_short),
+                    copy["your_answer"].format(text=student),
+                    copy["result_correct"],
+                    copy["feedback_correct"],
+                    "",
+                ]
+            )
+            continue
+
+        hint = ""
+        if options:
+            if any(_norm(answer) == _norm(opt) for opt in options):
+                answer_idx = next((i for i, opt in enumerate(options) if _norm(answer) == _norm(opt)), None)
+                student_idx = next((i for i, opt in enumerate(options) if _norm(student) == _norm(opt)), None)
+                if answer_idx is not None and student_idx is not None:
+                    hint = copy["hint_option"].format(
+                        student_opt=chr(ord("A") + student_idx),
+                        answer_opt=chr(ord("A") + answer_idx),
+                    )
+        if not hint:
+            hint = copy["hint_generic"]
+        why_wrong, why_correct = _build_specific_explanation(stem_short, student, answer, options)
+
+        feedback_rows.extend(
+            [
+                copy["q_title"].format(idx=idx),
+                copy["q_label"].format(text=stem_short),
+                copy["your_answer"].format(text=student),
+                copy["correct_answer"].format(text=shown_answer),
+                copy["result_wrong"],
+                copy["feedback_wrong"].format(hint=hint),
+                copy["knowledge_point"].format(text=knowledge_point),
+                copy["why_wrong"].format(text=why_wrong or copy["why_wrong_generic"]),
+                copy["why_correct"].format(text=why_correct or copy["why_correct_generic"]),
+                "",
+            ]
+        )
+
+    score = round((correct / total) * 100)
+    encouragement = (
+        copy["encouragement_high"]
+        if score >= 85
+        else (copy["encouragement_mid"] if score >= 60 else copy["encouragement_low"])
+    )
+    lines = [
+        copy["title"],
+        "",
+        f"{copy['score']}: {correct}/{total} ({score}%)",
+        encouragement,
+    ]
+    if unanswered_indexes:
+        lines.append(f"{copy['unanswered']}: {', '.join(str(i) for i in unanswered_indexes)}")
+    lines.extend(["", copy["per_question"], ""])
+    lines.extend(feedback_rows)
+    lines.extend(
+        [
+            copy["next_step"],
+            copy["next_step_1"],
+            copy["next_step_2"],
+        ]
+    )
+
+    return KnowledgeTonightCommandResponse(
+        reply="\n".join(lines).strip(),
+        source="demo-fallback",
+    )
+
+
+def build_eval_quiz_prompt(input_data: EvalQuizRequest) -> str:
+    ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
+    lang_name = reply_language_name(ui_lang)
+    rows: list[dict[str, Any]] = []
+    for i, q in enumerate(input_data.questions, start=1):
+        has_reference_answer = (q.correctAnswer or "").strip() not in {"", _MISSING_REFERENCE_ANSWER}
+        rows.append(
+            {
+                "index": i,
+                "questionType": q.questionType,
+                "question": q.question,
+                "options": q.options,
+                "correctAnswer": q.correctAnswer if has_reference_answer else "",
+                "hasReferenceAnswer": has_reference_answer,
+                "studentAnswer": q.studentAnswer,
+            }
+        )
+
+    scaffold = {
+        "en": [
+            "Use markdown with this structure exactly:",
+            "## Quiz Feedback",
+            "Score: X/Y (Z%)",
+            "1 short encouragement sentence.",
+            "",
+            "## Per-question feedback",
+            "### Q1",
+            "- Question: ...",
+            "- Your answer: ...",
+            "- Correct answer: ... (omit only when already correct and concise)",
+            "- Result: Correct / Not correct yet / Unanswered",
+            "- Knowledge point: ...",
+            "- Why your answer is not correct: ... (for wrong/unanswered)",
+            "- Why the correct answer works: ... (for wrong/unanswered)",
+            "- Feedback: ...",
+            "",
+            "Next step:",
+            "- ...",
+            "- ...",
+        ],
+        "zh": [
+            "严格使用以下 Markdown 结构：",
+            "## 测验反馈",
+            "得分: X/Y (Z%)",
+            "1句简短鼓励。",
+            "",
+            "## 逐题反馈",
+            "### 第1题",
+            "- 题目：...",
+            "- 你的答案：...",
+            "- 正确答案：...（若本题答对且内容简洁可省略）",
+            "- 结果：回答正确 / 暂时不正确 / 未作答",
+            "- 知识点：...",
+            "- 你这次为什么不对：...（仅错题/未作答）",
+            "- 为什么正确答案更合适：...（仅错题/未作答）",
+            "- 反馈：...",
+            "",
+            "下一步：",
+            "- ...",
+            "- ...",
+        ],
+        "fr": [
+            "Utilise exactement cette structure Markdown :",
+            "## Retour du quiz",
+            "Score : X/Y (Z%)",
+            "1 courte phrase d'encouragement.",
+            "",
+            "## Retour question par question",
+            "### Q1",
+            "- Question : ...",
+            "- Ta reponse : ...",
+            "- Bonne reponse : ... (peut etre omise si deja correcte et concise)",
+            "- Resultat : Correct / Pas encore correct / Sans reponse",
+            "- Point de connaissance : ...",
+            "- Pourquoi ta reponse n'est pas correcte : ... (seulement faux/sans reponse)",
+            "- Pourquoi la bonne reponse est correcte : ... (seulement faux/sans reponse)",
+            "- Retour : ...",
+            "",
+            "Prochaine etape :",
+            "- ...",
+            "- ...",
+        ],
+    }[ui_lang]
+
+    return "\n".join(
+        [
+            "You are BridgeEd AI evaluating a child's completed quiz.",
+            f"Write the full final feedback in {lang_name}.",
+            f"IMPORTANT: Every label/headline must be in {lang_name} only.",
+            "Do not keep English field labels unless the language is English.",
+            "Translate question stems and answer texts into the target language when needed; keep formulas/symbols unchanged.",
+            "Goal: be specific, kind, and educational.",
+            "For each question:",
+            "- If correct: praise briefly and name what was done right.",
+            "- If wrong: explain why the student's answer is not correct, why the correct answer is better, and what concept is being tested.",
+            "- If unanswered: gently encourage and explain what to look for next time.",
+            "- If hasReferenceAnswer is false, first infer a brief reasonable reference answer from the question/options, then evaluate.",
+            *scaffold,
+            "Do not output JSON.",
+            "Quiz data (JSON):",
+            json.dumps({"uiLang": ui_lang, "questions": rows}, ensure_ascii=False),
+        ]
+    )
+
+
+def evaluate_structured_quiz_with_curricullm(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
+    api_url = get_env("CURRICULLM_API_URL")
+    api_key = get_env("CURRICULLM_API_KEY")
+    model = get_env("CURRICULLM_MODEL", "CurricuLLM-AU")
+    auth_header = get_env("CURRICULLM_AUTH_HEADER", "Authorization")
+    auth_scheme = get_env("CURRICULLM_AUTH_SCHEME", "Bearer")
+
+    response = requests.post(
+        api_url,
+        headers={
+            "Content-Type": "application/json",
+            auth_header: f"{auth_scheme} {api_key}" if auth_scheme else api_key,
+        },
+        json={
+            "model": model,
+            "temperature": 0.35,
+            "top_p": 0.9,
+            "max_tokens": 9000,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are BridgeEd AI, a supportive K-12 learning feedback assistant.",
+                },
+                {
+                    "role": "user",
+                    "content": build_eval_quiz_prompt(input_data),
+                },
+            ],
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    data = response.json()
+    content = (
+        data.get("choices", [{}])[0].get("message", {}).get("content")
+        or data.get("output_text")
+        or data.get("content")
+        or data.get("result")
+    )
+    if isinstance(content, dict):
+        content = content.get("reply") or content.get("text") or ""
+    if not isinstance(content, str) or not content.strip():
+        raise RuntimeError("CurricuLLM eval-quiz response did not contain usable content.")
+    reply = content.strip()
+    ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
+    if ui_lang in {"zh", "fr"}:
+        pairs = (
+            [
+                (r"(?im)^##\s*Quiz Feedback\s*$", "## 测验反馈"),
+                (r"(?im)^##\s*Per-question feedback\s*$", "## 逐题反馈"),
+                (r"(?im)^\s*Score\s*:", "得分:"),
+                (r"(?im)^\s*Next step\s*:", "下一步:"),
+                (r"(?im)^\s*-\s*Question\s*:", "- 题目:"),
+                (r"(?im)^\s*-\s*Your answer\s*:", "- 你的答案:"),
+                (r"(?im)^\s*-\s*Correct answer\s*:", "- 正确答案:"),
+                (r"(?im)^\s*-\s*Result\s*:", "- 结果:"),
+                (r"(?im)^\s*-\s*Knowledge point\s*:", "- 知识点:"),
+                (r"(?im)^\s*-\s*Why your answer is not correct\s*:", "- 你这次为什么不对:"),
+                (r"(?im)^\s*-\s*Why the correct answer works\s*:", "- 为什么正确答案更合适:"),
+                (r"(?im)^\s*-\s*Feedback\s*:", "- 反馈:"),
+            ]
+            if ui_lang == "zh"
+            else [
+                (r"(?im)^##\s*Quiz Feedback\s*$", "## Retour du quiz"),
+                (r"(?im)^##\s*Per-question feedback\s*$", "## Retour question par question"),
+                (r"(?im)^\s*Score\s*:", "Score :"),
+                (r"(?im)^\s*Next step\s*:", "Prochaine etape :"),
+                (r"(?im)^\s*-\s*Question\s*:", "- Question :"),
+                (r"(?im)^\s*-\s*Your answer\s*:", "- Ta reponse :"),
+                (r"(?im)^\s*-\s*Correct answer\s*:", "- Bonne reponse :"),
+                (r"(?im)^\s*-\s*Result\s*:", "- Resultat :"),
+                (r"(?im)^\s*-\s*Knowledge point\s*:", "- Point de connaissance :"),
+                (r"(?im)^\s*-\s*Why your answer is not correct\s*:", "- Pourquoi ta reponse n'est pas correcte :"),
+                (r"(?im)^\s*-\s*Why the correct answer works\s*:", "- Pourquoi la bonne reponse est correcte :"),
+                (r"(?im)^\s*-\s*Feedback\s*:", "- Retour :"),
+            ]
+        )
+        for pattern, repl in pairs:
+            reply = re.sub(pattern, repl, reply)
+    return KnowledgeTonightCommandResponse(reply=reply, source="curricullm")
+
+
+def evaluate_structured_quiz(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
+    allow_fallback = get_bool_env("CURRICULLM_ALLOW_FALLBACK", True)
+    try:
+        return evaluate_structured_quiz_with_curricullm(input_data)
+    except Exception as exc:
+        if not allow_fallback:
+            raise
+        fallback = evaluate_structured_quiz_fallback(input_data)
+        return fallback.model_copy(update={"warning": str(exc)})
 
 
 def stream_respond_with_curricullm(input_data: ChatRespondRequest) -> Iterator[str]:
@@ -1245,6 +2098,22 @@ def respond_in_chat(input_data: ChatRespondRequest) -> ChatRespondResponse:
 
 def stream_respond_in_chat(input_data: ChatRespondRequest) -> Iterator[str]:
     allow_fallback = get_bool_env("CURRICULLM_ALLOW_FALLBACK", True)
+    # /make-quiz must include answer key reliably.
+    # Use non-stream path so normalization + answer-key validation always applies.
+    if _is_make_quiz_message(input_data.message):
+        try:
+            result = respond_with_curricullm(input_data)
+            if result.reply:
+                yield result.reply
+            return
+        except Exception:
+            if not allow_fallback:
+                raise
+            fallback = build_chat_fallback(input_data)
+            if fallback.reply:
+                yield fallback.reply
+            return
+
     try:
         yielded = False
         for chunk in stream_respond_with_curricullm(input_data):
@@ -1279,3 +2148,82 @@ def respond_knowledge_tonight(command: str, card_title: str) -> KnowledgeTonight
         )
     )
     return KnowledgeTonightCommandResponse(reply=result.reply, source=result.source, warning=result.warning)
+
+
+def build_translate_prompt(input_data: TranslateTextRequest) -> str:
+    target = input_data.language.strip()
+    source = input_data.sourceLanguage.strip() or "auto"
+    return "\n".join(
+        [
+            "You are a precise translation assistant.",
+            "Translate the input text into the target language.",
+            "Keep meaning, tone, and formatting (line breaks, bullets, markdown) as much as possible.",
+            "Do not add explanations.",
+            f"Target language: {target}",
+            f"Source language hint: {source}",
+            "Return only translated text.",
+            "Text:",
+            input_data.text,
+        ]
+    )
+
+
+def translate_text_with_curricullm(input_data: TranslateTextRequest) -> TranslateTextResponse:
+    api_url = get_env("CURRICULLM_API_URL")
+    api_key = get_env("CURRICULLM_API_KEY")
+    model = get_env("CURRICULLM_MODEL", "CurricuLLM-AU")
+    auth_header = get_env("CURRICULLM_AUTH_HEADER", "Authorization")
+    auth_scheme = get_env("CURRICULLM_AUTH_SCHEME", "Bearer")
+
+    response = requests.post(
+        api_url,
+        headers={
+            "Content-Type": "application/json",
+            auth_header: f"{auth_scheme} {api_key}" if auth_scheme else api_key,
+        },
+        json={
+            "model": model,
+            "temperature": 0.1,
+            "top_p": 1,
+            "max_tokens": 2000,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are a translation engine. Output translated text only.",
+                },
+                {
+                    "role": "user",
+                    "content": build_translate_prompt(input_data),
+                },
+            ],
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    data = response.json()
+    content = (
+        data.get("choices", [{}])[0].get("message", {}).get("content")
+        or data.get("output_text")
+        or data.get("content")
+        or data.get("result")
+    )
+    if isinstance(content, dict):
+        content = content.get("translatedText") or content.get("text") or content.get("reply") or ""
+    if not isinstance(content, str) or not content.strip():
+        raise RuntimeError("CurricuLLM translate response did not contain usable content.")
+    return TranslateTextResponse(translatedText=content.strip(), source="curricullm")
+
+
+def translate_text(input_data: TranslateTextRequest) -> TranslateTextResponse:
+    allow_fallback = get_bool_env("CURRICULLM_ALLOW_FALLBACK", True)
+    try:
+        return translate_text_with_curricullm(input_data)
+    except Exception as exc:
+        if not allow_fallback:
+            raise
+        # Safe fallback: return original text unchanged when LLM unavailable.
+        return TranslateTextResponse(
+            translatedText=input_data.text,
+            source="demo-fallback",
+            warning=str(exc),
+        )

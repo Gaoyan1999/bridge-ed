@@ -97,6 +97,34 @@ class KnowledgeTonightCommandResponse(BaseModel):
     warning: Optional[str] = None
 
 
+class StructuredQuizGenerateRequest(BaseModel):
+    quizText: str = Field(min_length=1)
+
+
+class StructuredQuizQuestion(BaseModel):
+    questionType: Literal["multiple_choice", "true_false", "short_answer"] = "multiple_choice"
+    question: str = Field(min_length=1)
+    options: list[str] = Field(default_factory=list, max_length=6)
+    correctAnswer: str = Field(min_length=1)
+
+
+class StructuredQuizGenerateResponse(BaseModel):
+    questions: list[StructuredQuizQuestion] = Field(min_length=1)
+
+
+class EvalQuizQuestion(BaseModel):
+    questionType: Literal["multiple_choice", "true_false", "short_answer"] = "multiple_choice"
+    question: str = Field(min_length=1)
+    options: list[str] = Field(default_factory=list, max_length=6)
+    correctAnswer: str = Field(min_length=1)
+    studentAnswer: str = ""
+
+
+class EvalQuizRequest(BaseModel):
+    questions: list[EvalQuizQuestion] = Field(min_length=1)
+    uiLang: Literal["en", "zh", "fr"] = "en"
+
+
 class ChatMessage(BaseModel):
     who: str = Field(min_length=1)
     type: Literal["in", "out"]
@@ -125,5 +153,17 @@ class ChatRespondRequest(BaseModel):
 
 class ChatRespondResponse(BaseModel):
     reply: str
+    source: Literal["curricullm", "demo-fallback"]
+    warning: Optional[str] = None
+
+
+class TranslateTextRequest(BaseModel):
+    language: str = Field(min_length=2, max_length=32)
+    text: str = Field(min_length=1)
+    sourceLanguage: str = Field(default="auto", min_length=2, max_length=32)
+
+
+class TranslateTextResponse(BaseModel):
+    translatedText: str
     source: Literal["curricullm", "demo-fallback"]
     warning: Optional[str] = None

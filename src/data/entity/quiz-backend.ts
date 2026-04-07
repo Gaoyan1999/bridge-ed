@@ -1,6 +1,7 @@
 export type QuizQuestion = {
+  questionType?: 'multiple_choice' | 'true_false' | 'short_answer';
   question: string;
-  options: string[];
+  options?: string[];
   correctAnswer: string;
   studentAnswer?: string;
 };
