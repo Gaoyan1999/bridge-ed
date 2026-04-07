@@ -716,6 +716,14 @@ _ANSWER_HEADING_PATTERN = (
 )
 
 
+def quiz_type_tags(ui_lang: str) -> tuple[str, str, str]:
+    if ui_lang == "zh":
+        return "[选择题]", "[判断题]", "[简答题]"
+    if ui_lang == "fr":
+        return "[QCM]", "[Vrai_Faux]", "[Reponse_Courte]"
+    return "[multiple choice]", "[true false]", "[short answer]"
+
+
 _PRACTICE_HEADING_BY_LANG = {
     "en": "## Hands-on Practice",
     "zh": "## 动手练习",
@@ -726,6 +734,34 @@ _TEACH_BACK_HEADING_BY_LANG = {
     "en": "## Teach-back (Feynman Method)",
     "zh": "## 费曼讲解练习",
     "fr": "## Teach-back (methode Feynman)",
+}
+
+_PRACTICE_SECTION_HEADINGS_BY_LANG = {
+    "en": [
+        ("Goal", "### Goal"),
+        ("Materials", "### Materials"),
+        ("Steps (10-15 min)", "### Steps (10-15 min)"),
+        ("Parent Coaching Script", "### Parent Coaching Script"),
+        ("Reflection Questions", "### Reflection Questions"),
+        ("Safety Note", "### Safety Note"),
+    ],
+    "zh": [
+        ("目标", "### 目标"),
+        ("材料", "### 材料"),
+        ("步骤（10-15分钟）", "### 步骤（10-15分钟）"),
+        ("步骤(10-15分钟)", "### 步骤（10-15分钟）"),
+        ("家长引导话术", "### 家长引导话术"),
+        ("反思问题", "### 反思问题"),
+        ("安全提示", "### 安全提示"),
+    ],
+    "fr": [
+        ("Objectif", "### Objectif"),
+        ("Materiel", "### Materiel"),
+        ("Etapes (10-15 min)", "### Etapes (10-15 min)"),
+        ("Script parent", "### Script parent"),
+        ("Questions de reflexion", "### Questions de reflexion"),
+        ("Note de securite", "### Note de securite"),
+    ],
 }
 
 _ROLE_COPY_BY_LANG = {
@@ -792,8 +828,8 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
         subject_l = subject.lower()
         is_math_subject = any(k in subject_l for k in ("math", "mathemat", "数学", "數學", "algebra"))
         heading, key_heading = quiz_headings(ui_lang)
+        mc_tag, tf_tag, sa_tag = quiz_type_tags(ui_lang)
         if ui_lang == "zh":
-            mc_tag, tf_tag, sa_tag = "[选择题]", "[判断题]", "[简答题]"
             if not is_math_subject:
                 return ChatRespondResponse(
                     reply=(
@@ -1135,12 +1171,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
 
     if is_quiz:
         quiz_heading, answer_heading = quiz_headings(ui_lang)
-        if ui_lang == "zh":
-            mc_tag, tf_tag, sa_tag = "[选择题]", "[判断题]", "[简答题]"
-        elif ui_lang == "fr":
-            mc_tag, tf_tag, sa_tag = "[QCM]", "[Vrai_Faux]", "[Reponse_Courte]"
-        else:
-            mc_tag, tf_tag, sa_tag = "[multiple_choice]", "[true_false]", "[short_answer]"
+        mc_tag, tf_tag, sa_tag = quiz_type_tags(ui_lang)
         quiz_instructions = [
             "The user requested /make-quiz.",
             "Generate a quiz list directly related to the provided card context/topic.",
@@ -1179,7 +1210,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
             "4. A - short explanation (A=True, B=False)",
             "5. short: expected short answer",
             "Rules:",
-            "- Exactly 5 questions total: 3 multiple_choice + 1 true_false + 1 short_answer.",
+            "- Exactly 5 questions total: 3 multiple choice + 1 true false + 1 short answer.",
             "- Difficulty suitable for the student's grade.",
             "- Keep wording clear and age-appropriate.",
             "- Questions must align with topic/subject and not be generic.",
@@ -1305,6 +1336,7 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
 
     is_quiz = _is_make_quiz_message(input_data.message)
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", input_data.message.strip().lower()))
+    is_practice = bool(re.match(r"^/?practice(\b|$)", input_data.message.strip().lower()))
     temperature = 0.7 if is_quiz else (0.65 if is_teach_back else 0.4)
     ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
     prompt = build_chat_prompt(input_data)
@@ -1377,6 +1409,8 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
                 _log_preview(reply, 1600),
             )
             raise RuntimeError("Quiz output missing answer key section.")
+    elif is_practice:
+        reply = normalize_practice_markdown(reply, ui_lang)
 
     return ChatRespondResponse(reply=reply, source="curricullm")
 
@@ -1384,15 +1418,15 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
 def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = text.replace("\r\n", "\n")
     quiz_heading, key_heading = quiz_headings(ui_lang)
+    mc_tag, tf_tag, sa_tag = quiz_type_tags(ui_lang)
 
-    out = re.sub(r"(?i)\bquick quiz\b", quiz_heading, out, count=1)
-    out = re.sub(r"(?i)\banswer key\b", key_heading, out, count=1)
-    out = re.sub(r"(?i)\bcorrect answers\b", key_heading, out, count=1)
-    out = re.sub(r"(?i)\banswers?(?:\s*&\s*explanations?)?\b", key_heading, out, count=1)
-    out = re.sub(r"(?im)^quick quiz\s*$", quiz_heading, out)
-    out = re.sub(r"(?im)^answer key\s*$", key_heading, out)
-    out = re.sub(r"(?im)^correct answers\s*$", key_heading, out)
-    out = re.sub(r"(?im)^answers?(?:\s*&\s*explanations?)?\s*$", key_heading, out)
+    out = re.sub(r"(?im)^\s*(?:##\s*)?quick quiz\s*$", quiz_heading, out)
+    out = re.sub(r"(?im)^\s*(?:##\s*)?answer key\s*$", key_heading, out)
+    out = re.sub(r"(?im)^\s*(?:##\s*)?correct answers\s*$", key_heading, out)
+    out = re.sub(r"(?im)^\s*(?:##\s*)?answers?(?:\s*&\s*explanations?)?\s*$", key_heading, out)
+    out = re.sub(r"(?i)\[multiple_choice\]", mc_tag, out)
+    out = re.sub(r"(?i)\[true_false\]", tf_tag, out)
+    out = re.sub(r"(?i)\[short_answer\]", sa_tag, out)
     # Some model outputs already include markdown headings, so repeated normalization
     # can create variants like "## ## Quick Quiz" or "## ## ## Answer Key Key".
     out = re.sub(r"(?im)^(?:\s*##\s*){2,}.*quick quiz.*$", quiz_heading, out)
@@ -1421,6 +1455,25 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = re.sub(r"([^\n])\s+(\d+\.\s)", r"\1\n\n\2", out)
     out = re.sub(r"\n{3,}", "\n\n", out)
 
+    return out.strip()
+
+
+def normalize_practice_markdown(text: str, ui_lang: str = "en") -> str:
+    out = (text or "").replace("\r\n", "\n").strip()
+    heading = _PRACTICE_HEADING_BY_LANG.get(ui_lang, _PRACTICE_HEADING_BY_LANG["en"])
+    if not re.search(r"(?im)^\s*##\s*", out):
+        out = f"{heading}\n\n{out}"
+    else:
+        out = re.sub(r"(?im)^\s*##\s*.*hands[- ]?on practice.*$", heading, out)
+        out = re.sub(r"(?im)^\s*##\s*动手练习\s*$", heading, out)
+        out = re.sub(r"(?im)^\s*##\s*pratique manuelle\s*$", heading, out)
+
+    for plain, markdown in _PRACTICE_SECTION_HEADINGS_BY_LANG.get(
+        ui_lang, _PRACTICE_SECTION_HEADINGS_BY_LANG["en"]
+    ):
+        out = re.sub(rf"(?im)^\s*(?:###\s*)?{re.escape(plain)}\s*$", markdown, out)
+
+    out = re.sub(r"\n{3,}", "\n\n", out)
     return out.strip()
 
 
@@ -1540,12 +1593,12 @@ def _parse_structured_questions(quiz_text: str) -> list[StructuredQuizQuestion]:
         question_text = _strip_question_prefix(f"{qn}. {lines[0]}").strip()
         qtype = "multiple_choice"
         tag = re.match(
-            r"^\s*\[(multiple_choice|mcq|true_false|tf|short_answer|short|选择题|判断题|简答题|qcm|vrai_faux|reponse_courte)\]\s*(.+)$",
+            r"^\s*\[(multiple_choice|multiple choice|mcq|true_false|true false|tf|short_answer|short answer|short|选择题|判断题|简答题|qcm|vrai_faux|vrai faux|reponse_courte|reponse courte)\]\s*(.+)$",
             question_text,
             flags=re.IGNORECASE,
         )
         if tag:
-            raw = tag.group(1).lower()
+            raw = tag.group(1).lower().replace(" ", "_")
             if raw in {"true_false", "tf", "判断题", "vrai_faux"}:
                 qtype = "true_false"
             elif raw in {"short_answer", "short", "简答题", "reponse_courte"}:
@@ -2275,9 +2328,13 @@ def respond_in_chat(input_data: ChatRespondRequest) -> ChatRespondResponse:
 
 def stream_respond_in_chat(input_data: ChatRespondRequest) -> Iterator[str]:
     allow_fallback = get_bool_env("CURRICULLM_ALLOW_FALLBACK", True)
+    is_quiz = _is_make_quiz_message(input_data.message)
+    is_practice = bool(re.match(r"^/?practice(\b|$)", input_data.message.strip().lower()))
     # /make-quiz must include answer key reliably.
-    # Use non-stream path so normalization + answer-key validation always applies.
-    if _is_make_quiz_message(input_data.message):
+    # /practice also benefits from non-stream normalization so markdown section
+    # headings render correctly in chat.
+    # Use non-stream path so normalization + validation always applies.
+    if is_quiz or is_practice:
         try:
             result = respond_with_curricullm(input_data)
             if result.reply:
