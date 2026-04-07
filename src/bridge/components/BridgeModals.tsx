@@ -319,7 +319,7 @@ export function BridgeModals() {
     return withToast(
       <div className="modal" id="modal-broadcast" role="dialog" aria-modal="true" aria-labelledby="modal-broadcast-title">
         <div className="modal__backdrop" onClick={onBackdropClose} aria-hidden="true" />
-        <div className="modal__box modal__box--rounded">
+        <div className="modal__box modal__box--rounded modal__box--medium">
           <BroadcastModal
             onClose={onBackdropClose}
             pushBroadcast={pushBroadcast}
