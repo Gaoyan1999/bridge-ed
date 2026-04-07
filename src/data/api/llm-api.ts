@@ -165,6 +165,7 @@ export type ChatRespondInput = {
     topic?: string;
     grade?: string;
     subject?: string;
+    teacherNotes?: string;
     classLessonTitle?: string;
     parentSummary?: string;
     tonightActions?: Array<{ preset: string; include: boolean; text?: string }>;
