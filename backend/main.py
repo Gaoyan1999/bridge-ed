@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from typing import Callable, TypeVar
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +42,7 @@ from .storage import create_card, delete_card, get_card, list_cards, update_card
 
 
 app = FastAPI(title="BridgeEd Backend", version="0.1.0")
+T = TypeVar("T")
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,6 +51,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _run_or_502(fn: Callable[[], T]) -> T:
+    try:
+        return fn()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @app.get("/health")
@@ -93,18 +102,12 @@ def learning_cards_delete(card_id: str) -> None:
 
 @app.post("/learning-cards/generate", response_model=LearningCardGenerateResponse)
 def learning_cards_generate(input_data: LearningCardGenerateRequest) -> LearningCardGenerateResponse:
-    try:
-        return generate_learning_card(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: generate_learning_card(input_data))
 
 
 @app.post("/chat/respond", response_model=ChatRespondResponse)
 def chat_respond(input_data: ChatRespondRequest) -> ChatRespondResponse:
-    try:
-        return respond_in_chat(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: respond_in_chat(input_data))
 
 
 @app.post("/chat/respond/stream")
@@ -129,63 +132,39 @@ def chat_respond_stream(input_data: ChatRespondRequest) -> StreamingResponse:
 
 @app.post("/learning-cards/child-knowledge/hero", response_model=LearningCardChildKnowledgeHeroResponse)
 def child_knowledge_hero(input_data: LearningCardChildKnowledgeGenerateRequest) -> LearningCardChildKnowledgeHeroResponse:
-    try:
-        return build_child_knowledge_hero(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: build_child_knowledge_hero(input_data))
 
 
 @app.post("/learning-cards/child-knowledge", response_model=LearningCardChildKnowledgeResponse)
 def child_knowledge(input_data: LearningCardChildKnowledgeGenerateRequest) -> LearningCardChildKnowledgeResponse:
-    try:
-        return generate_child_knowledge(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: generate_child_knowledge(input_data))
 
 
 @app.post("/learning-cards/knowledge-tonight/quiz", response_model=KnowledgeTonightCommandResponse)
 def knowledge_tonight_quiz(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
-    try:
-        return respond_knowledge_tonight("quiz", input_data.cardTitle)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: respond_knowledge_tonight("quiz", input_data.cardTitle))
 
 
 @app.post("/learning-cards/knowledge-tonight/practice", response_model=KnowledgeTonightCommandResponse)
 def knowledge_tonight_practice(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
-    try:
-        return respond_knowledge_tonight("practice", input_data.cardTitle)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: respond_knowledge_tonight("practice", input_data.cardTitle))
 
 
 @app.post("/learning-cards/knowledge-tonight/teach-back", response_model=KnowledgeTonightCommandResponse)
 def knowledge_tonight_teach_back(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
-    try:
-        return respond_knowledge_tonight("teach-back", input_data.cardTitle)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: respond_knowledge_tonight("teach-back", input_data.cardTitle))
 
 
 @app.post("/learning-cards/knowledge-tonight/structured-quiz", response_model=StructuredQuizGenerateResponse)
 def knowledge_tonight_structured_quiz(input_data: StructuredQuizGenerateRequest) -> StructuredQuizGenerateResponse:
-    try:
-        return generate_structured_quiz_from_text(input_data.quizText)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: generate_structured_quiz_from_text(input_data.quizText))
 
 
 @app.post("/learning-cards/knowledge-tonight/eval-quiz", response_model=KnowledgeTonightCommandResponse)
 def knowledge_tonight_eval_quiz(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
-    try:
-        return evaluate_structured_quiz(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: evaluate_structured_quiz(input_data))
 
 
 @app.post("/translate", response_model=TranslateTextResponse)
 def translate(input_data: TranslateTextRequest) -> TranslateTextResponse:
-    try:
-        return translate_text(input_data)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return _run_or_502(lambda: translate_text(input_data))
