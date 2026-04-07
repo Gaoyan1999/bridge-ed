@@ -546,6 +546,8 @@ export function ChatPanel({ active }: { active: boolean }) {
                 label={t('common.message')}
                 value={input}
                 onChange={setInput}
+                onSubmit={send}
+                enterToSubmit
                 placeholder={placeholder}
                 previewSlot={
                   pending.length > 0 ? (

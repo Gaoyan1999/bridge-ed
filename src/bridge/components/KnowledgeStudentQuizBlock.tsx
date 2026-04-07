@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getDataLayer } from '@/data';
 import type { QuizBackend } from '@/data/entity/quiz-backend';
@@ -17,9 +17,18 @@ function normalizeWorksheetText(raw: string): string {
 
 function normalizeQuestionText(raw: string): string {
   let out = normalizeWorksheetText(raw);
-  out = out.replace(/^\[(multiple_choice|true_false|short_answer|选择题|判断题|简答题|qcm|vrai_faux|reponse_courte)\]\s*/i, '');
-  while (/^\d+\.\s*/.test(out)) {
-    out = out.replace(/^\d+\.\s*/, '').trim();
+  out = out.replace(
+    /^\[(multiple_choice|true_false|short_answer|选择题|判断题|简答题|qcm|vrai_faux|reponse_courte)\]\s*/i,
+    '',
+  );
+  let prev = '';
+  while (out !== prev) {
+    prev = out;
+    out = out
+      .replace(/^\s*\d+\s*[.)、:：-]\s*/i, '')
+      .replace(/^\s*第\s*\d+\s*题\s*[:：.\-]?\s*/i, '')
+      .replace(/^\s*q\s*\d+\s*[:：.\-]?\s*/i, '')
+      .trim();
   }
   return out;
 }
@@ -158,7 +167,18 @@ export function KnowledgeStudentQuizBlock({
           aria-labelledby="modal-student-quiz-title"
         >
           <div className="modal__backdrop" aria-hidden="true" onClick={() => setModalQuiz(null)} />
-          <div className="modal__box modal__box--rounded modal__box--xlarge">
+          <div
+            className="modal__box modal__box--rounded modal__box--xlarge"
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter') return;
+              if (e.shiftKey) return;
+              const target = e.target as HTMLElement | null;
+              if (target?.tagName === 'BUTTON') return;
+              if (saving || !allDraftAnswered || Boolean(actionDisabled)) return;
+              e.preventDefault();
+              void onSubmit();
+            }}
+          >
             <div className="modal__header">
               <h3 id="modal-student-quiz-title" className="modal__title">
                 {t('knowledge.studentQuizModalTitle')}
@@ -169,13 +189,13 @@ export function KnowledgeStudentQuizBlock({
                 {selected.questions.map((q, qi) => (
                   <li key={qi} className="quiz-panel__question">
                     <p className="quiz-panel__qtext">
-                      {qi + 1}. {normalizeQuestionText(q.question)}
+                      {normalizeQuestionText(q.question)}
                     </p>
                     {(q.questionType ?? 'multiple_choice') === 'short_answer' ? (
                       <div className="quiz-panel__options">
                         <input
                           type="text"
-                          className="composer-input"
+                          className="field__input field__input--pill quiz-panel__short-answer"
                           value={draftAnswers[qi] ?? ''}
                           onChange={(e) => {
                             const val = e.target.value;

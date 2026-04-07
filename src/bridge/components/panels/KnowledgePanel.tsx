@@ -1188,6 +1188,8 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                 label={t('common.message')}
                 value={input}
                 onChange={setInput}
+                onSubmit={send}
+                enterToSubmit
                 placeholder={t('knowledge.composerPlaceholder')}
                 previewSlot={
                   pending.length > 0 ? (

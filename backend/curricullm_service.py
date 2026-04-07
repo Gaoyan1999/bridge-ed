@@ -1284,9 +1284,15 @@ def _split_quiz_and_answer_sections(quiz_text: str) -> tuple[str, str]:
 
 
 def _strip_question_prefix(line: str) -> str:
-    out = line
+    out = (line or "").strip()
     while True:
-        nxt = re.sub(r"^\s*\d+\.\s*", "", out).strip()
+        nxt = out
+        # 1. / 1) / 1、 / 1:
+        nxt = re.sub(r"^\s*\d+\s*[\.\)\、:：-]\s*", "", nxt).strip()
+        # 第1题 / 第 1 题:
+        nxt = re.sub(r"^\s*第\s*\d+\s*题\s*[:：\.\-]?\s*", "", nxt).strip()
+        # Q1 / q1:
+        nxt = re.sub(r"^\s*[Qq]\s*\d+\s*[:：\.\-]?\s*", "", nxt).strip()
         if nxt == out:
             break
         out = nxt

@@ -9,6 +9,8 @@ interface ComposerProps {
   placeholder?: string;
   value: string;
   onChange: (v: string) => void;
+  onSubmit?: () => void;
+  enterToSubmit?: boolean;
   /** Shown between the textarea and the action row (e.g. image previews). */
   previewSlot?: ReactNode;
   actions: ReactNode;
@@ -23,6 +25,8 @@ export function Composer({
   placeholder,
   value,
   onChange,
+  onSubmit,
+  enterToSubmit = false,
   previewSlot,
   actions,
   label = 'Message',
@@ -34,6 +38,14 @@ export function Composer({
     placeholder,
     value,
     onChange: (e) => onChange(e.target.value),
+    onKeyDown: (e) => {
+      if (!enterToSubmit) return;
+      if (e.key !== 'Enter') return;
+      if (e.shiftKey) return;
+      if ((e.nativeEvent as KeyboardEvent).isComposing) return;
+      e.preventDefault();
+      onSubmit?.();
+    },
   };
 
   return (
