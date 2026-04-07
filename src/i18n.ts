@@ -4,6 +4,14 @@ import en from './locales/en.json';
 import fr from './locales/fr.json';
 import zh from './locales/zh.json';
 
+/** i18n resource languages only: zh, fr, or everything else → English. */
+export function resolveI18nLng(code: string | undefined): 'en' | 'zh' | 'fr' {
+  const base = code?.split('-')[0]?.toLowerCase() ?? 'en';
+  if (base === 'zh') return 'zh';
+  if (base === 'fr') return 'fr';
+  return 'en';
+}
+
 function initialLanguage(): string {
   if (typeof window === 'undefined') return 'en';
   try {
@@ -33,10 +41,8 @@ void i18n.use(initReactI18next).init({
 
 i18n.on('languageChanged', (lng) => {
   try {
-    const short = lng.split('-')[0]?.toLowerCase() ?? 'en';
-    if (short === 'en' || short === 'zh' || short === 'fr') {
-      localStorage.setItem('i18nextLng', short);
-    }
+    const resolved = resolveI18nLng(lng);
+    localStorage.setItem('i18nextLng', resolved);
   } catch {
     /* ignore */
   }
