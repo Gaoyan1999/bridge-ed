@@ -11,6 +11,10 @@ export function normalizeQuizBackend(raw: QuizBackendInput): QuizBackend {
     studentId: String(raw.studentId).trim(),
     createdAt: String(raw.createdAt),
     questions: (raw.questions ?? []).map((q) => ({
+      questionType:
+        q.questionType === 'true_false' || q.questionType === 'short_answer'
+          ? q.questionType
+          : 'multiple_choice',
       question: String(q.question),
       options: (q.options ?? []).map(String),
       correctAnswer: String(q.correctAnswer),

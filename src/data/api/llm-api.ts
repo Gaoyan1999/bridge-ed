@@ -120,8 +120,9 @@ export type KnowledgeTonightCommandResult = {
 
 /** Structured multiple-choice items for a generated worksheet (per child). */
 export type StructuredQuizQuestion = {
+  questionType?: 'multiple_choice' | 'true_false' | 'short_answer';
   question: string;
-  options: string[];
+  options?: string[];
   correctAnswer: string;
 };
 
@@ -132,6 +133,19 @@ export type StructuredQuizResult = {
 /** Full MCQ rows (stem, options, model answer, student answer) for `evalQuiz`. */
 export type EvalQuizInput = {
   questions: QuizQuestion[];
+  uiLang?: 'en' | 'zh' | 'fr';
+};
+
+export type TranslateTextInput = {
+  language: string;
+  text: string;
+  sourceLanguage?: string;
+};
+
+export type TranslateTextResult = {
+  translatedText: string;
+  source?: 'curricullm' | 'demo-fallback';
+  warning?: string;
 };
 
 export type ChatRespondHistoryMessage = {
@@ -196,19 +210,29 @@ const MOCK_EVAL_QUIZ_REPLY =
   '- On any item where your answer differs from the model answer, try saying *why* you picked it in one sentence.\n\n' +
   'Reply with what felt easy or tricky, and we can go deeper next.';
 
+async function mockTranslateText(input: TranslateTextInput): Promise<TranslateTextResult> {
+  await new Promise((r) => setTimeout(r, 220));
+  return {
+    translatedText: input.text,
+    source: 'demo-fallback',
+  };
+}
+
 function mockKnowledgeGenerateStructuredQuiz(quizText: string): StructuredQuizResult {
   const hint = quizText.trim().slice(0, 120) || 'this topic';
   return {
     questions: [
       {
+        questionType: 'multiple_choice',
         question: `Based on the quiz discussion, what is the main idea of “${hint}”?`,
         options: ['Option A', 'Option B', 'Option C', 'Option D'],
         correctAnswer: 'Option B',
       },
       {
-        question: 'Which step should come first when reviewing?',
-        options: ['Plan', 'Guess', 'Skip', 'Ignore'],
-        correctAnswer: 'Plan',
+        questionType: 'short_answer',
+        question: 'In one sentence, explain the first step you should use when reviewing this topic.',
+        options: [],
+        correctAnswer: 'Identify what the question is asking and key terms first.',
       },
     ],
   };
@@ -521,6 +545,29 @@ export class LlmApi {
       throw new Error(text || 'Failed to evaluate worksheet.');
     }
     return res.json() as Promise<KnowledgeTonightCommandResult>;
+  }
+
+  /** Generic translation helper via backend `POST /translate`. */
+  async translateText(input: TranslateTextInput): Promise<TranslateTextResult> {
+    const body = {
+      language: input.language.trim(),
+      sourceLanguage: (input.sourceLanguage ?? 'auto').trim() || 'auto',
+      text: input.text,
+    };
+    if (!getUseLlm()) {
+      return mockTranslateText(body);
+    }
+    const base = getApiBaseUrl();
+    const res = await fetch(`${base}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Failed to translate text.');
+    }
+    return res.json() as Promise<TranslateTextResult>;
   }
 }
 

@@ -23,6 +23,8 @@ from .models import (
     LearningCardGenerateResponse,
     StructuredQuizGenerateRequest,
     StructuredQuizGenerateResponse,
+    TranslateTextRequest,
+    TranslateTextResponse,
 )
 from .curricullm_service import (
     build_child_knowledge_hero,
@@ -33,6 +35,7 @@ from .curricullm_service import (
     respond_in_chat,
     respond_knowledge_tonight,
     stream_respond_in_chat,
+    translate_text,
 )
 from .storage import create_card, delete_card, get_card, list_cards, update_card
 
@@ -176,5 +179,13 @@ def knowledge_tonight_structured_quiz(input_data: StructuredQuizGenerateRequest)
 def knowledge_tonight_eval_quiz(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
     try:
         return evaluate_structured_quiz(input_data)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/translate", response_model=TranslateTextResponse)
+def translate(input_data: TranslateTextRequest) -> TranslateTextResponse:
+    try:
+        return translate_text(input_data)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

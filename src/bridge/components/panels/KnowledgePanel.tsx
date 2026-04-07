@@ -799,6 +799,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         const api = getLlmApi();
         const result = await api.evalQuiz({
           questions: savedQuiz.questions.map((q) => ({ ...q })),
+          uiLang: uiLangFromI18n(i18n.resolvedLanguage ?? i18n.language ?? 'en'),
         });
         appendKnowledgeMessage(threadId, {
           who: 'BridgeEd AI',
@@ -817,7 +818,16 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         setTonightActionBusy(false);
       }
     },
-    [threadId, appendKnowledgeMessage, role, studentUserId, persistStudentPatch, t],
+    [
+      threadId,
+      appendKnowledgeMessage,
+      role,
+      studentUserId,
+      persistStudentPatch,
+      t,
+      i18n.language,
+      i18n.resolvedLanguage,
+    ],
   );
 
   const threadMsgCount = threadId ? (knowledgeThreads[threadId]?.length ?? 0) : 0;
@@ -858,11 +868,21 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         const childIds = parentChildrenIds.length > 0 ? parentChildrenIds : [''];
         const createdAt = new Date().toISOString();
         const questions = result.questions.map((q) => ({
+          questionType:
+            q.questionType === 'true_false' || q.questionType === 'short_answer'
+              ? q.questionType
+              : 'multiple_choice',
           question: q.question,
-          options: [...q.options],
+          options: [...(q.options ?? [])],
           correctAnswer: q.correctAnswer,
         }));
         const learningCardId = (currentBackend?.id ?? currentCard?.id ?? '').trim();
+        const existing = await dl.quizzes.listForParentAndLearningCard(pid, learningCardId);
+        for (const row of existing) {
+          if (childIds.includes(row.studentId)) {
+            await dl.quizzes.delete(row.id);
+          }
+        }
         for (const sid of childIds) {
           await dl.quizzes.put({
             id: crypto.randomUUID(),
