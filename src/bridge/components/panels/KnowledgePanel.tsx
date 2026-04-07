@@ -595,6 +595,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         topic: currentBackend.topic || currentCard.title,
         grade: currentBackend.grade || '',
         subject: currentBackend.subject || currentCard.subject,
+        teacherNotes: currentBackend.teacherNotes || '',
         classLessonTitle: currentBackend.classLessonTitle || '',
         parentSummary: currentBackend.parentSummary || currentCard.summary || '',
         tonightActions: (currentBackend.tonightActions || []).map((a) => ({
@@ -628,7 +629,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
     const v = input.trim();
     const apiMessage = v || (pending.length > 0 ? '[Image attachment]' : '');
     if (!apiMessage && !threadId) return;
-    const history = msgs.slice(-12).map((m) => ({
+    const isMakeQuiz = /^\/?(?:make-quiz|quiz)(\b|$)/i.test(apiMessage);
+    const baseHistory = isMakeQuiz ? msgs : msgs.slice(-12);
+    const history = baseHistory.map((m) => ({
       who: m.who,
       type: m.type,
       text: m.text,
@@ -721,7 +724,9 @@ export function KnowledgePanel({ active }: { active: boolean }) {
       }
       const api = getLlmApi();
       const title = currentCard?.title;
-      const history = msgs.slice(-12).map((m) => ({
+      const isMakeQuiz = /^\/?(?:make-quiz|quiz)(\b|$)/i.test(cmd);
+      const baseHistory = isMakeQuiz ? msgs : msgs.slice(-12);
+      const history = baseHistory.map((m) => ({
         who: m.who,
         type: m.type,
         text: m.text,

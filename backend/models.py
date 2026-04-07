@@ -135,6 +135,7 @@ class ChatCardContext(BaseModel):
     topic: str = ""
     grade: str = ""
     subject: str = ""
+    teacherNotes: str = ""
     classLessonTitle: str = ""
     parentSummary: str = ""
     tonightActions: list[dict[str, Any]] = Field(default_factory=list)

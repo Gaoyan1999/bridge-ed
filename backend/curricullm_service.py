@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any, Iterator
 from urllib.parse import quote_plus
@@ -28,10 +29,19 @@ from .models import (
 # Knowledge slash command: `/make-quiz` (preferred). Legacy `/quiz` still matched for old threads.
 _MATCH_MAKE_QUIZ = re.compile(r"^/?(?:make-quiz|quiz)(\b|$)", re.IGNORECASE)
 _MISSING_REFERENCE_ANSWER = "[REFERENCE_ANSWER_MISSING]"
+logger = logging.getLogger(__name__)
 
 
 def _is_make_quiz_message(text: str) -> bool:
     return bool(_MATCH_MAKE_QUIZ.match((text or "").strip()))
+
+
+def _log_preview(value: Any, limit: int = 500) -> str:
+    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+    text = text.replace("\r\n", "\n").replace("\n", "\\n")
+    if len(text) > limit:
+        return text[:limit] + "...[truncated]"
+    return text
 
 
 MOCK_CHILD_HERO_IMAGES: tuple[tuple[str, str], ...] = (
@@ -697,6 +707,15 @@ def quiz_headings(ui_lang: str) -> tuple[str, str]:
     return "## Quick Quiz", "## Answer Key"
 
 
+_QUIZ_HEADING_PATTERN = r"##\s*(?:Quick Quiz|Quiz rapide|快速测验)"
+_ANSWER_HEADING_PATTERN = (
+    r"##\s*(?:"
+    r"Answer Key|Answers|Correct Answers|Answer & Explanation|Answers & Explanations|"
+    r"Corrige|Reponses|Reponses et explications|"
+    r"答案解析|答案|参考答案)"
+)
+
+
 _PRACTICE_HEADING_BY_LANG = {
     "en": "## Hands-on Practice",
     "zh": "## 动手练习",
@@ -770,9 +789,43 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
         topic = (input_data.cardContext.topic if input_data.cardContext else "").strip() or input_data.threadTitle or "this topic"
         subject = (input_data.cardContext.subject if input_data.cardContext else "").strip() or "the subject"
         grade = (input_data.cardContext.grade if input_data.cardContext else "").strip() or "the student"
+        subject_l = subject.lower()
+        is_math_subject = any(k in subject_l for k in ("math", "mathemat", "数学", "數學", "algebra"))
         heading, key_heading = quiz_headings(ui_lang)
         if ui_lang == "zh":
             mc_tag, tf_tag, sa_tag = "[选择题]", "[判断题]", "[简答题]"
+            if not is_math_subject:
+                return ChatRespondResponse(
+                    reply=(
+                        f"{heading}\n\n"
+                        f"1. {mc_tag} 关于“{topic}”，下列哪一项最符合本课核心概念？\n"
+                        "   - A) 与课堂关键词和步骤一致的解释\n"
+                        "   - B) 与本课无关的随机事实\n"
+                        "   - C) 只背答案不看过程\n"
+                        "   - D) 跳过题干直接猜\n\n"
+                        f"2. {mc_tag} 在 {subject}（{grade}）里，学习“{topic}”的第一步更应该是？\n"
+                        "   - A) 先读题并找关键词\n"
+                        "   - B) 先抄别人答案\n"
+                        "   - C) 先写很长一段话\n"
+                        "   - D) 不看条件直接做\n\n"
+                        f"3. {mc_tag} 哪种练习最有助于巩固“{topic}”？\n"
+                        "   - A) 做一个例题并解释每一步\n"
+                        "   - B) 只看答案不练习\n"
+                        "   - C) 一直重复同一句定义\n"
+                        "   - D) 完全换到不相关主题\n\n"
+                        f"4. {tf_tag} 学习“{topic}”时，理解过程比只记结论更重要。\n"
+                        "   - A) 正确\n"
+                        "   - B) 错误\n\n"
+                        f"5. {sa_tag} 请用一句话说明“{topic}”在 {subject} 中的作用。\n\n"
+                        f"{key_heading}\n\n"
+                        "1. A - 核心概念应与课堂关键词和步骤一致。\n"
+                        "2. A - 先读题并找关键词能提升准确率。\n"
+                        "3. A - 解释步骤有助于真正掌握。\n"
+                        "4. A - 理解过程才能迁移到新题。\n"
+                        f"5. short: 能清楚说明“{topic}”的定义和用途。"
+                    ),
+                    source="demo-fallback",
+                )
             return ChatRespondResponse(
                 reply=(
                     f"{heading}\n\n"
@@ -809,6 +862,70 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
             mc_tag, tf_tag, sa_tag = "[QCM]", "[Vrai_Faux]", "[Reponse_Courte]"
         else:
             mc_tag, tf_tag, sa_tag = "[multiple_choice]", "[true_false]", "[short_answer]"
+        if not is_math_subject:
+            if ui_lang == "fr":
+                return ChatRespondResponse(
+                    reply=(
+                        f"{heading}\n\n"
+                        f"1. {mc_tag} Quelle proposition correspond le mieux a l'idee centrale de « {topic} » ?\n"
+                        "   - A) Une explication alignee avec les mots-cles et les etapes du cours\n"
+                        "   - B) Un fait aleatoire sans lien avec la lecon\n"
+                        "   - C) Memoriser la reponse sans comprendre\n"
+                        "   - D) Repondre sans lire l'enonce\n\n"
+                        f"2. {mc_tag} En {subject} ({grade}), quelle est la meilleure premiere etape pour « {topic} » ?\n"
+                        "   - A) Lire la question et reperer les mots-cles\n"
+                        "   - B) Copier une reponse d'un camarade\n"
+                        "   - C) Ecrire un long paragraphe d'abord\n"
+                        "   - D) Ignorer les contraintes de la question\n\n"
+                        f"3. {mc_tag} Quel type d'exercice aide le plus a consolider « {topic} » ?\n"
+                        "   - A) Faire un exemple puis expliquer chaque etape\n"
+                        "   - B) Lire seulement les reponses finales\n"
+                        "   - C) Repeter une definition sans application\n"
+                        "   - D) Changer vers un sujet non lie\n\n"
+                        f"4. {tf_tag} Pour apprendre « {topic} », comprendre la demarche est plus utile que memoriser le resultat.\n"
+                        "   - A) True\n"
+                        "   - B) False\n\n"
+                        f"5. {sa_tag} Explique en une phrase le role de « {topic} » en {subject}.\n\n"
+                        f"{key_heading}\n\n"
+                        "1. A - L'idee centrale doit rester alignee avec le cours.\n"
+                        "2. A - Identifier les mots-cles augmente la precision.\n"
+                        "3. A - Expliquer les etapes montre la comprehension.\n"
+                        "4. A - La demarche permet de transferer les apprentissages.\n"
+                        f"5. short: Une phrase claire sur la definition et l'utilite de « {topic} »."
+                    ),
+                    source="demo-fallback",
+                )
+            return ChatRespondResponse(
+                reply=(
+                    f"{heading}\n\n"
+                    f"1. {mc_tag} Which option best matches the core idea of {topic}?\n"
+                    "   - A) An explanation aligned with class keywords and steps\n"
+                    "   - B) A random fact from an unrelated topic\n"
+                    "   - C) Memorizing answers without understanding\n"
+                    "   - D) Guessing without reading the prompt\n\n"
+                    f"2. {mc_tag} In {subject} ({grade}), what is the best first step for a {topic} question?\n"
+                    "   - A) Read the prompt and identify key terms\n"
+                    "   - B) Copy a classmate's answer\n"
+                    "   - C) Write a long paragraph first\n"
+                    "   - D) Ignore constraints and guess\n\n"
+                    f"3. {mc_tag} Which practice helps most with {topic}?\n"
+                    "   - A) Solve one example and explain each step\n"
+                    "   - B) Only read final answers\n"
+                    "   - C) Repeat one definition without applying it\n"
+                    "   - D) Switch to an unrelated topic\n\n"
+                    f"4. {tf_tag} For learning {topic}, understanding the process matters more than memorizing outcomes.\n"
+                    "   - A) True\n"
+                    "   - B) False\n\n"
+                    f"5. {sa_tag} In one sentence, explain the role of {topic} in {subject}.\n\n"
+                    f"{key_heading}\n\n"
+                    "1. A - The core idea should align with class method and vocabulary.\n"
+                    "2. A - Identifying key terms improves accuracy.\n"
+                    "3. A - Explaining steps demonstrates real understanding.\n"
+                    "4. A - Process understanding transfers to new problems.\n"
+                    f"5. short: A clear one-sentence definition and purpose of {topic}."
+                ),
+                source="demo-fallback",
+            )
         return ChatRespondResponse(
             reply=(
                 f"{heading}\n"
@@ -964,8 +1081,13 @@ def build_chat_fallback(input_data: ChatRespondRequest) -> ChatRespondResponse:
 def build_chat_prompt(input_data: ChatRespondRequest) -> str:
     ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
     lang_name = reply_language_name(ui_lang)
+    message = input_data.message.strip().lower()
+    is_quiz = _is_make_quiz_message(message)
     history_lines = []
-    for msg in input_data.history[-8:]:
+    # Keep fuller thread context for /make-quiz so follow-up quiz generations can
+    # reuse prior explained knowledge and avoid repetition.
+    history_source = input_data.history if is_quiz else input_data.history[-12:]
+    for msg in history_source:
         speaker = "User" if msg.type == "out" else msg.who
         history_lines.append(f"{speaker}: {msg.text}")
 
@@ -978,6 +1100,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
                 f"- Topic: {cc.topic}",
                 f"- Grade: {cc.grade}",
                 f"- Subject: {cc.subject}",
+                f"- Teacher notes: {cc.teacherNotes}",
                 f"- Class/Lesson: {cc.classLessonTitle}",
                 f"- Parent summary: {cc.parentSummary}",
             ]
@@ -994,8 +1117,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
                 "- This is likely the first explanation request for this card. Start with a plain definition, one concrete example, and one immediate next step."
             )
 
-    message = input_data.message.strip().lower()
-    is_quiz = _is_make_quiz_message(message)
+    # reuse parsed command flags from the current message
     is_practice = bool(re.match(r"^/?practice(\b|$)", message))
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", message))
     prior_quiz_count = sum(
@@ -1061,6 +1183,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
             "- Difficulty suitable for the student's grade.",
             "- Keep wording clear and age-appropriate.",
             "- Questions must align with topic/subject and not be generic.",
+            "- Do NOT default to factoring/algebra/math unless the provided subject/topic is explicitly math-focused.",
             "- Put each option on its own new line (never inline after the question sentence).",
             "- Add one blank line between questions.",
             f"- Include the {mc_tag}/{tf_tag}/{sa_tag} tag in every question line.",
@@ -1072,7 +1195,7 @@ def build_chat_prompt(input_data: ChatRespondRequest) -> str:
         quiz_instructions = []
 
     if is_practice:
-        practice_heading = "## Hands-on Practice" if ui_lang == "en" else ("## 鍔ㄦ墜缁冧範" if ui_lang == "zh" else "## Pratique manuelle")
+        practice_heading = _PRACTICE_HEADING_BY_LANG.get(ui_lang, _PRACTICE_HEADING_BY_LANG["en"])
         practice_instructions = [
             "The user requested /practice.",
             "Generate ONE hands-on home practice case that a parent can run with the child to understand the topic.",
@@ -1183,6 +1306,20 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
     is_quiz = _is_make_quiz_message(input_data.message)
     is_teach_back = bool(re.match(r"^/?teach-?back(\b|$)", input_data.message.strip().lower()))
     temperature = 0.7 if is_quiz else (0.65 if is_teach_back else 0.4)
+    ui_lang = normalize_ui_lang(getattr(input_data, "uiLang", "en"))
+    prompt = build_chat_prompt(input_data)
+
+    logger.info(
+        "CurricuLLM chat request: ui_lang=%s is_quiz=%s role=%s thread_id=%s model=%s message=%s",
+        ui_lang,
+        is_quiz,
+        input_data.role,
+        input_data.threadId,
+        model,
+        _log_preview(input_data.message, 160),
+    )
+    if is_quiz:
+        logger.info("CurricuLLM quiz prompt preview: %s", _log_preview(prompt, 900))
 
     response = requests.post(
         api_url,
@@ -1202,7 +1339,7 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
                 },
                 {
                     "role": "user",
-                    "content": build_chat_prompt(input_data),
+                    "content": prompt,
                 },
             ],
         },
@@ -1210,6 +1347,11 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
     )
     response.raise_for_status()
     data = response.json()
+    logger.info(
+        "CurricuLLM chat raw response: status=%s body=%s",
+        response.status_code,
+        _log_preview(data, 1200),
+    )
     content = (
         data.get("choices", [{}])[0].get("message", {}).get("content")
         or data.get("output_text")
@@ -1219,12 +1361,21 @@ def respond_with_curricullm(input_data: ChatRespondRequest) -> ChatRespondRespon
     if isinstance(content, dict):
         content = content.get("reply") or content.get("text") or ""
     if not isinstance(content, str) or not content.strip():
+        logger.error("CurricuLLM chat response missing usable content: %s", _log_preview(data, 1200))
         raise RuntimeError("CurricuLLM chat response did not contain usable content.")
 
     reply = content.strip()
     if _is_make_quiz_message(input_data.message):
-        reply = normalize_quiz_markdown(reply, normalize_ui_lang(getattr(input_data, "uiLang", "en")))
+        logger.info("CurricuLLM quiz raw reply preview: %s", _log_preview(reply, 1200))
+        reply = normalize_quiz_markdown(reply, ui_lang)
+        logger.info("CurricuLLM quiz normalized reply preview: %s", _log_preview(reply, 1200))
         if not _quiz_reply_has_answer_key(reply):
+            logger.error(
+                "Quiz output missing answer key after normalization: ui_lang=%s thread_id=%s reply=%s",
+                ui_lang,
+                input_data.threadId,
+                _log_preview(reply, 1600),
+            )
             raise RuntimeError("Quiz output missing answer key section.")
 
     return ChatRespondResponse(reply=reply, source="curricullm")
@@ -1236,17 +1387,27 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
 
     out = re.sub(r"(?i)\bquick quiz\b", quiz_heading, out, count=1)
     out = re.sub(r"(?i)\banswer key\b", key_heading, out, count=1)
+    out = re.sub(r"(?i)\bcorrect answers\b", key_heading, out, count=1)
+    out = re.sub(r"(?i)\banswers?(?:\s*&\s*explanations?)?\b", key_heading, out, count=1)
     out = re.sub(r"(?im)^quick quiz\s*$", quiz_heading, out)
     out = re.sub(r"(?im)^answer key\s*$", key_heading, out)
+    out = re.sub(r"(?im)^correct answers\s*$", key_heading, out)
+    out = re.sub(r"(?im)^answers?(?:\s*&\s*explanations?)?\s*$", key_heading, out)
+    # Some model outputs already include markdown headings, so repeated normalization
+    # can create variants like "## ## Quick Quiz" or "## ## ## Answer Key Key".
+    out = re.sub(r"(?im)^(?:\s*##\s*){2,}.*quick quiz.*$", quiz_heading, out)
+    out = re.sub(r"(?im)^(?:\s*##\s*){2,}.*(?:answer key|answers?).*$", key_heading, out)
+    out = re.sub(r"(?im)^\s*##\s*quick quiz(?:\s+quick quiz)+\s*$", quiz_heading, out)
+    out = re.sub(r"(?im)^\s*##\s*answer key(?:\s+key)+\s*$", key_heading, out)
 
     out = re.sub(
-        rf"({re.escape(quiz_heading)}|##\s*Quick Quiz|##\s*Quiz rapide|##\s*快速测验)\s*(\d+\.\s)",
+        rf"({re.escape(quiz_heading)}|{_QUIZ_HEADING_PATTERN})\s*(\d+\.\s)",
         r"\1\n\n\2",
         out,
         flags=re.IGNORECASE,
     )
     out = re.sub(
-        rf"({re.escape(key_heading)}|##\s*Answer Key|##\s*Corrige|##\s*答案解析|##\s*答案|##\s*参考答案)\s*(\d+\.\s)",
+        rf"({re.escape(key_heading)}|{_ANSWER_HEADING_PATTERN})\s*(\d+\.\s)",
         r"\1\n\n\2",
         out,
         flags=re.IGNORECASE,
@@ -1265,11 +1426,11 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
 
 def _quiz_reply_has_answer_key(text: str) -> bool:
     out = (text or "").replace("\r\n", "\n")
-    has_heading = bool(re.search(r"(?im)^##\s*(answer key|corrige|答案解析|答案|参考答案)\s*$", out))
+    has_heading = bool(re.search(rf"(?im)^{_ANSWER_HEADING_PATTERN}\s*$", out))
     if not has_heading:
         return False
     answer_lines = re.findall(
-        r"(?im)^\s*\d+\.\s*(?:[A-Da-d]\b|short\s*:|answer\s*:|简答\s*:|réponse\s*:|reponse\s*:)",
+        r"(?im)^\s*\d+\.\s*(?:[A-Da-d]\b|short\s*:|answer\s*:|model answer\s*:|expected answer\s*:|简答\s*:|réponse\s*:|reponse\s*:)",
         out,
     )
     return len(answer_lines) >= 4
@@ -1277,7 +1438,7 @@ def _quiz_reply_has_answer_key(text: str) -> bool:
 
 def _split_quiz_and_answer_sections(quiz_text: str) -> tuple[str, str]:
     normalized = (quiz_text or "").replace("\r\n", "\n")
-    m = re.search(r"(?im)^##\s*(answer key|corrige|答案解析|答案|参考答案)\s*$", normalized)
+    m = re.search(rf"(?im)^{_ANSWER_HEADING_PATTERN}\s*$", normalized)
     if not m:
         return normalized, ""
     return normalized[: m.start()].strip(), normalized[m.end() :].strip()
@@ -1331,7 +1492,11 @@ def _normalize_quiz_text(raw: str) -> str:
 
 def _normalize_short_answer_key(raw: str) -> str:
     text = _normalize_quiz_text(raw)
-    text = re.sub(r"(?i)^(short|answer|short answer|简答|réponse|reponse)\s*[:：]?\s*", "", text).strip()
+    text = re.sub(
+        r"(?i)^(short|answer|short answer|model answer|expected answer|简答|réponse|reponse)\s*[:：]?\s*",
+        "",
+        text,
+    ).strip()
     if not text:
         return ""
     low = text.lower()
@@ -1357,7 +1522,11 @@ def _parse_structured_questions(quiz_text: str) -> list[StructuredQuizQuestion]:
     key_map = _extract_answer_key_map(answer_section)
     short_answer_map: dict[int, str] = {}
     for raw in answer_section.splitlines():
-        m = re.match(r"^\s*(\d+)\.\s*(?:short|answer|short answer|简答|réponse|reponse)\s*[:：]?\s*(.+?)\s*$", raw, flags=re.IGNORECASE)
+        m = re.match(
+            r"^\s*(\d+)\.\s*(?:short|answer|short answer|model answer|expected answer|简答|réponse|reponse)\s*[:：]?\s*(.+?)\s*$",
+            raw,
+            flags=re.IGNORECASE,
+        )
         if m:
             short_answer_map[int(m.group(1))] = m.group(2).strip()
 
@@ -2090,6 +2259,14 @@ def respond_in_chat(input_data: ChatRespondRequest) -> ChatRespondResponse:
     try:
         return respond_with_curricullm(input_data)
     except Exception as exc:
+        logger.exception(
+            "Falling back to demo chat response: ui_lang=%s role=%s thread_id=%s message=%s allow_fallback=%s",
+            normalize_ui_lang(getattr(input_data, "uiLang", "en")),
+            input_data.role,
+            input_data.threadId,
+            _log_preview(input_data.message, 160),
+            allow_fallback,
+        )
         if not allow_fallback:
             raise
         fallback = build_chat_fallback(input_data)
@@ -2107,6 +2284,14 @@ def stream_respond_in_chat(input_data: ChatRespondRequest) -> Iterator[str]:
                 yield result.reply
             return
         except Exception:
+            logger.exception(
+                "Falling back to demo quiz stream response: ui_lang=%s role=%s thread_id=%s message=%s allow_fallback=%s",
+                normalize_ui_lang(getattr(input_data, "uiLang", "en")),
+                input_data.role,
+                input_data.threadId,
+                _log_preview(input_data.message, 160),
+                allow_fallback,
+            )
             if not allow_fallback:
                 raise
             fallback = build_chat_fallback(input_data)
