@@ -97,6 +97,31 @@ class KnowledgeTonightCommandResponse(BaseModel):
     warning: Optional[str] = None
 
 
+class StructuredQuizGenerateRequest(BaseModel):
+    quizText: str = Field(min_length=1)
+
+
+class StructuredQuizQuestion(BaseModel):
+    question: str = Field(min_length=1)
+    options: list[str] = Field(min_length=2, max_length=6)
+    correctAnswer: str = Field(min_length=1)
+
+
+class StructuredQuizGenerateResponse(BaseModel):
+    questions: list[StructuredQuizQuestion] = Field(min_length=1)
+
+
+class EvalQuizQuestion(BaseModel):
+    question: str = Field(min_length=1)
+    options: list[str] = Field(min_length=2, max_length=6)
+    correctAnswer: str = Field(min_length=1)
+    studentAnswer: str = ""
+
+
+class EvalQuizRequest(BaseModel):
+    questions: list[EvalQuizQuestion] = Field(min_length=1)
+
+
 class ChatMessage(BaseModel):
     who: str = Field(min_length=1)
     type: Literal["in", "out"]

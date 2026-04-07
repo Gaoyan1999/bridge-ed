@@ -11,6 +11,7 @@ from .config import get_bool_env
 from .models import (
     ChatRespondRequest,
     ChatRespondResponse,
+    EvalQuizRequest,
     KnowledgeTonightCommandRequest,
     KnowledgeTonightCommandResponse,
     LearningCard,
@@ -20,11 +21,15 @@ from .models import (
     LearningCardCreate,
     LearningCardGenerateRequest,
     LearningCardGenerateResponse,
+    StructuredQuizGenerateRequest,
+    StructuredQuizGenerateResponse,
 )
 from .curricullm_service import (
     build_child_knowledge_hero,
+    evaluate_structured_quiz,
     generate_child_knowledge,
     generate_learning_card,
+    generate_structured_quiz_from_text,
     respond_in_chat,
     respond_knowledge_tonight,
     stream_respond_in_chat,
@@ -155,5 +160,21 @@ def knowledge_tonight_practice(input_data: KnowledgeTonightCommandRequest) -> Kn
 def knowledge_tonight_teach_back(input_data: KnowledgeTonightCommandRequest) -> KnowledgeTonightCommandResponse:
     try:
         return respond_knowledge_tonight("teach-back", input_data.cardTitle)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/knowledge-tonight/structured-quiz", response_model=StructuredQuizGenerateResponse)
+def knowledge_tonight_structured_quiz(input_data: StructuredQuizGenerateRequest) -> StructuredQuizGenerateResponse:
+    try:
+        return generate_structured_quiz_from_text(input_data.quizText)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/learning-cards/knowledge-tonight/eval-quiz", response_model=KnowledgeTonightCommandResponse)
+def knowledge_tonight_eval_quiz(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
+    try:
+        return evaluate_structured_quiz(input_data)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

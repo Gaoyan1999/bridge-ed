@@ -11,12 +11,15 @@ from .config import get_bool_env, get_env
 from .models import (
     ChatRespondRequest,
     ChatRespondResponse,
+    EvalQuizRequest,
     KnowledgeTonightCommandResponse,
     LearningCardChildKnowledgeGenerateRequest,
     LearningCardChildKnowledgeHeroResponse,
     LearningCardChildKnowledgeResponse,
     LearningCardGenerateRequest,
     LearningCardGenerateResponse,
+    StructuredQuizGenerateResponse,
+    StructuredQuizQuestion,
     TranslatedSummaries,
 )
 
@@ -1170,6 +1173,139 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = re.sub(r"\n{3,}", "\n\n", out)
 
     return out.strip()
+
+
+def _split_quiz_and_answer_sections(quiz_text: str) -> tuple[str, str]:
+    normalized = (quiz_text or "").replace("\r\n", "\n")
+    m = re.search(r"(?im)^##\s*(answer key|corrige|答案|参考答案)\s*$", normalized)
+    if not m:
+        return normalized, ""
+    return normalized[: m.start()].strip(), normalized[m.end() :].strip()
+
+
+def _strip_question_prefix(line: str) -> str:
+    return re.sub(r"^\s*\d+\.\s*", "", line).strip()
+
+
+def _extract_option_entries(block: str) -> list[tuple[str, str]]:
+    items: list[tuple[str, str]] = []
+    for raw in block.splitlines():
+        m = re.match(r"^\s*(?:[-*]\s*)?([A-Da-d])[\)\.\:]\s*(.+?)\s*$", raw)
+        if not m:
+            continue
+        label = m.group(1).upper()
+        text = m.group(2).strip()
+        if text:
+            items.append((label, text))
+    # Deduplicate labels while preserving order.
+    seen: set[str] = set()
+    out: list[tuple[str, str]] = []
+    for label, text in items:
+        if label in seen:
+            continue
+        seen.add(label)
+        out.append((label, text))
+    return out
+
+
+def _extract_answer_key_map(answer_section: str) -> dict[int, str]:
+    key_map: dict[int, str] = {}
+    for raw in answer_section.splitlines():
+        m = re.match(r"^\s*(\d+)\.\s*(?:[-*]\s*)?([A-Da-d])\b", raw)
+        if not m:
+            continue
+        qn = int(m.group(1))
+        label = m.group(2).upper()
+        key_map[qn] = label
+    return key_map
+
+
+def _parse_structured_questions(quiz_text: str) -> list[StructuredQuizQuestion]:
+    question_section, answer_section = _split_quiz_and_answer_sections(quiz_text)
+    key_map = _extract_answer_key_map(answer_section)
+
+    blocks = re.findall(r"(?ms)^\s*(\d+)\.\s*(.+?)(?=^\s*\d+\.\s|\Z)", question_section)
+    questions: list[StructuredQuizQuestion] = []
+    for qn_str, body in blocks:
+        qn = int(qn_str)
+        lines = [ln.rstrip() for ln in body.splitlines() if ln.strip()]
+        if not lines:
+            continue
+        question_text = _strip_question_prefix(f"{qn}. {lines[0]}").strip()
+        # Guard against inline options leaking into question stem.
+        question_text = re.split(r"\s+[A-Da-d][\)\.\:]\s+", question_text, maxsplit=1)[0].strip()
+
+        option_entries = _extract_option_entries(body)
+        if len(option_entries) < 2:
+            continue
+        options = [text for _, text in option_entries]
+
+        answer_label = key_map.get(qn)
+        option_map = {label: text for label, text in option_entries}
+        correct = option_map.get(answer_label or "", options[0]).strip()
+        if not question_text:
+            question_text = f"Question {qn}"
+
+        questions.append(
+            StructuredQuizQuestion(
+                question=question_text,
+                options=options,
+                correctAnswer=correct,
+            )
+        )
+
+    if not questions:
+        raise RuntimeError("Could not parse structured quiz questions from /make-quiz text.")
+
+    return questions[:10]
+
+
+def generate_structured_quiz_from_text(quiz_text: str) -> StructuredQuizGenerateResponse:
+    return StructuredQuizGenerateResponse(questions=_parse_structured_questions(quiz_text))
+
+
+def evaluate_structured_quiz(input_data: EvalQuizRequest) -> KnowledgeTonightCommandResponse:
+    total = len(input_data.questions)
+    if total <= 0:
+        raise RuntimeError("No quiz questions were submitted for evaluation.")
+
+    correct = 0
+    wrong_indexes: list[int] = []
+    unanswered_indexes: list[int] = []
+    for idx, q in enumerate(input_data.questions, start=1):
+        student = (q.studentAnswer or "").strip()
+        answer = (q.correctAnswer or "").strip()
+        if not student:
+            unanswered_indexes.append(idx)
+            continue
+        if student == answer:
+            correct += 1
+        else:
+            wrong_indexes.append(idx)
+
+    score = round((correct / total) * 100)
+    lines = [
+        "## Quiz Feedback",
+        "",
+        f"Score: {correct}/{total} ({score}%)",
+    ]
+    if unanswered_indexes:
+        lines.append(f"Unanswered: {', '.join(str(i) for i in unanswered_indexes)}")
+    if wrong_indexes:
+        lines.append(f"Need review: {', '.join(str(i) for i in wrong_indexes)}")
+    lines.extend(
+        [
+            "",
+            "Next step:",
+            "- Revisit the incorrect questions and explain why the correct option is right in one sentence.",
+            "- Then try one similar example without looking at notes.",
+        ]
+    )
+
+    return KnowledgeTonightCommandResponse(
+        reply="\n".join(lines).strip(),
+        source="demo-fallback",
+    )
 
 
 def stream_respond_with_curricullm(input_data: ChatRespondRequest) -> Iterator[str]:
