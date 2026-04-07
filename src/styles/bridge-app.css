@@ -5020,6 +5020,13 @@ html.theme-dark .main__canvas:has(#panel-mood.panel--mood.panel--student-fill.is
   max-height: min(84vh, 620px);
 }
 
+/* Medium size dialog for short forms (e.g. Broadcast). */
+.modal__box.modal__box--medium {
+  max-width: min(92vw, 560px);
+  height: auto;
+  max-height: min(86vh, 680px);
+}
+
 .modal__header {
   flex-shrink: 0;
   padding: 1.35rem 1.5rem 0;
