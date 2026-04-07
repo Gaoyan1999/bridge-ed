@@ -159,6 +159,8 @@
     "quizWorksheetDone": "A practice worksheet has been generated for your children.",
     "quizWorksheetGenerateError": "Could not generate the worksheet. Please try again",
     "ariaSuggestedTasks": "Tonight’s suggested tasks",
+    "parentPreviewExpand": "Show summary and tonight's actions",
+    "parentPreviewCollapse": "Hide summary and tonight's actions",
     "ariaSubjectStatus": "Subject and status",
     "ariaInboxLabels": "Subject and your progress",
     "inboxListAria": "Learning cards",
@@ -216,7 +218,11 @@
     "bookingCardTitle": "Scheduled 1:1",
     "bookingLabelTopic": "Topic",
     "bookingLabelWith": "With",
-    "bookingLabelWhen": "When"
+    "bookingLabelWhen": "When",
+    "seeTranslation": "See translation",
+    "seeOriginal": "See original",
+    "translating": "Translating…",
+    "translationFailed": "Couldn’t translate this broadcast right now."
   },
   "mood": {
     "emotion": "Emotion",

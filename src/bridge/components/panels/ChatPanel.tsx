@@ -16,13 +16,19 @@ import { Composer } from '@/bridge/components/ui/Composer';
 import { PanelHeader } from '@/bridge/components/ui/PanelHeader';
 import { cx } from '@/bridge/cx';
 import { MAX_MESSAGE_IMAGES, usePendingImageAttachments } from '@/bridge/usePendingImageAttachments';
+import { getLlmApi, uiLangFromI18n } from '@/data';
 import type { ParentBookingBackend } from '@/data/entity/parent-booking-backend';
 import type { UserBackend } from '@/data/entity/user-backend';
+import type { ThreadMessage } from '@/bridge/types';
 
 function formatClockLabel(iso: string, locale: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+}
+
+function messageUiKey(m: ThreadMessage, idx: number): string {
+  return `${idx}-${m.who}-${m.broadcastPost?.sentAt ?? ''}-${m.broadcastPost?.title ?? ''}-${m.text ?? ''}`;
 }
 
 function ChatInboxItemContent({ item }: { item: InboxItem }) {
@@ -156,6 +162,10 @@ export function ChatPanel({ active }: { active: boolean }) {
   const [input, setInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [teacherBookingPanelOpen, setTeacherBookingPanelOpen] = useState(false);
+  const [broadcastTranslations, setBroadcastTranslations] = useState<
+    Record<string, { title: string; body: string; showingTranslation: boolean }>
+  >({});
+  const [broadcastTranslating, setBroadcastTranslating] = useState<Record<string, boolean>>({});
 
   const { pending, addFromFileList, remove, clear } = usePendingImageAttachments({
     onReject: (reason) => {
@@ -238,6 +248,41 @@ export function ChatPanel({ active }: { active: boolean }) {
   };
 
   const hasChatBlock = chatItems.length > 0;
+  const uiLang = uiLangFromI18n(i18n.resolvedLanguage ?? i18n.language ?? 'en');
+
+  const toggleBroadcastTranslation = async (m: ThreadMessage, idx: number) => {
+    if (!m.broadcastPost) return;
+    const key = messageUiKey(m, idx);
+    const cached = broadcastTranslations[key];
+    if (cached) {
+      setBroadcastTranslations((prev) => ({
+        ...prev,
+        [key]: { ...cached, showingTranslation: !cached.showingTranslation },
+      }));
+      return;
+    }
+
+    setBroadcastTranslating((prev) => ({ ...prev, [key]: true }));
+    try {
+      const api = getLlmApi();
+      const [titleResult, bodyResult] = await Promise.all([
+        api.translateText({ language: uiLang, text: m.broadcastPost.title }),
+        api.translateText({ language: uiLang, text: m.broadcastPost.body }),
+      ]);
+      setBroadcastTranslations((prev) => ({
+        ...prev,
+        [key]: {
+          title: titleResult.translatedText,
+          body: bodyResult.translatedText,
+          showingTranslation: true,
+        },
+      }));
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : t('chat.translationFailed'));
+    } finally {
+      setBroadcastTranslating((prev) => ({ ...prev, [key]: false }));
+    }
+  };
 
   return (
     <section
@@ -441,6 +486,10 @@ export function ChatPanel({ active }: { active: boolean }) {
               <p className="panel__hint">{t('chat.noMessagesInThread')}</p>
             ) : (
               msgs.map((m, idx) => {
+                const msgKey = messageUiKey(m, idx);
+                const cachedTranslation = broadcastTranslations[msgKey];
+                const isTranslating = Boolean(broadcastTranslating[msgKey]);
+                const showingTranslated = Boolean(cachedTranslation?.showingTranslation);
                 const whoLabel =
                   m.who === 'You' ? t('common.you') : m.who === 'BridgeEd AI' ? t('common.bridgedAi') : m.who;
                 const showTeacherSpeakerLabel =
@@ -497,8 +546,28 @@ export function ChatPanel({ active }: { active: boolean }) {
                       <ChatTeacherReportMessage report={m.teacherReport} />
                     ) : m.broadcastPost ? (
                       <div className="msg__broadcast-card">
-                        <div className="msg__broadcast-title">{m.broadcastPost.title}</div>
-                        <div className="msg__broadcast-body">{m.broadcastPost.body}</div>
+                        <div className="msg__broadcast-title">
+                          {showingTranslated ? cachedTranslation?.title : m.broadcastPost.title}
+                        </div>
+                        <div className="msg__broadcast-body">
+                          {showingTranslated ? cachedTranslation?.body : m.broadcastPost.body}
+                        </div>
+                        {role === 'parent' ? (
+                          <div className="msg__broadcast-translation-row">
+                            <button
+                              type="button"
+                              className="msg__translation-label-btn"
+                              disabled={isTranslating}
+                              onClick={() => void toggleBroadcastTranslation(m, idx)}
+                            >
+                              {isTranslating
+                                ? t('chat.translating')
+                                : showingTranslated
+                                  ? t('chat.seeOriginal')
+                                  : t('chat.seeTranslation')}
+                            </button>
+                          </div>
+                        ) : null}
                       </div>
                     ) : m.bookingDetail ? (
                       <div className="booking-detail-card">

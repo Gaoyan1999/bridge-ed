@@ -42,7 +42,7 @@ type Props = {
   studentUserId: string;
   learningCardId: string;
   learningCardsEpoch: number;
-  /** After answers are saved: parent posts `/eval-quiz` and calls `evalQuiz`. */
+  /** After answers are saved: posts `/eval-quiz` and calls `evalQuiz` in background. */
   onSubmittedForEval?: (saved: QuizBackend) => void | Promise<void>;
   /** Align with composer tonight actions (thread busy / no thread). */
   actionDisabled?: boolean;
@@ -128,8 +128,8 @@ export function KnowledgeStudentQuizBlock({
       };
       await dl.quizzes.put(next);
       await load();
-      await onSubmittedForEval?.(next);
       setModalQuiz(null);
+      void onSubmittedForEval?.(next);
     } finally {
       setSaving(false);
     }

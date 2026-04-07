@@ -2164,6 +2164,22 @@ html.theme-dark .knowledge-parent-lc-preview .field--actions-pick--grouped .lear
   min-width: 0;
 }
 
+.knowledge-parent-preview-toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 0 0.35rem;
+}
+
+.knowledge-parent-preview-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
+}
+
 .knowledge-parent-lc-preview .learning-card-parent-panel .learning-card-review-summary {
   width: 100%;
   min-width: 0;
@@ -4146,6 +4162,34 @@ html.theme-dark .msg__role-tag {
   white-space: pre-wrap;
   font-size: inherit;
   line-height: 1.45;
+}
+
+.msg__broadcast-translation-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.45rem;
+}
+
+.msg__translation-label-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0;
+  cursor: pointer;
+}
+
+.msg__translation-label-btn:hover {
+  text-decoration: underline;
+}
+
+.msg__translation-label-btn:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  text-decoration: none;
 }
 
 .teacher-report-msg {

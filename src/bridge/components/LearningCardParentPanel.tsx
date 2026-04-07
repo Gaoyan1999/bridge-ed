@@ -1,6 +1,8 @@
-import { Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Checkbox } from 'react-aria-components';
+import { useState } from 'react';
 import { Markdown } from '@/bridge/components/Markdown';
+import { Button } from '@/bridge/components/ui/Button';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { cx } from '@/bridge/cx';
 import type { LearningCardTonightAction, LearningCardTonightActionPreset } from '@/bridge/types';
@@ -108,6 +110,8 @@ export function LearningCardParentKnowledgeView({
   onToggleTonightDone,
   tonightKicker,
   bridgedAiLabel,
+  expandLabel,
+  collapseLabel,
   tonightHeadingId = 'knowledge-parent-tonight-heading',
 }: {
   summaryText: string;
@@ -116,76 +120,103 @@ export function LearningCardParentKnowledgeView({
   onToggleTonightDone: (preset: LearningCardTonightActionPreset) => void;
   tonightKicker: string;
   bridgedAiLabel: string;
+  expandLabel: string;
+  collapseLabel: string;
   tonightHeadingId?: string;
 }) {
   const doneSet = new Set(tonightActionsDone ?? []);
   const showSummary = hasDisplayableSummary(summaryText);
   const showTonight = tonightActionsIncluded.length > 0;
   if (!showSummary && !showTonight) return null;
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <div className="knowledge-parent-lc-preview">
       <div className="learning-card-parent-panel">
-        {showSummary ? (
-          <div className="learning-card-review-summary">
-            <p className="knowledge-parent-summary__source">{bridgedAiLabel}</p>
-            <div className="learning-card-parent-summary-markdown field__input field__input--pill">
-              <Markdown className="knowledge-parent-summary-md">{summaryText.trim()}</Markdown>
-            </div>
-          </div>
-        ) : null}
-        {showTonight ? (
-          <div
-            className="field field--actions-pick field--actions-pick--grouped"
-            role="group"
-            aria-labelledby={tonightHeadingId}
+        <div className="knowledge-parent-preview-toggle-wrap">
+          <Button
+            variant="text"
+            sm
+            className="knowledge-parent-preview-toggle"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            aria-controls="knowledge-parent-preview-content"
           >
-            <p id={tonightHeadingId} className="learning-card-actions-section__kicker">
-              {tonightKicker}
-            </p>
-            <div className="learning-card-actions-group">
-              <ul className="learning-card-actions learning-card-actions--presets">
-                {tonightActionsIncluded.map((row, idx) => {
-                  const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
-                  const isLast = idx === tonightActionsIncluded.length - 1;
-                  const done = doneSet.has(row.preset);
-                  return (
-                    <li
-                      key={row.preset}
-                      className={cx(
-                        'learning-card-actions__row',
-                        'learning-card-actions__row--preset',
-                        'learning-card-actions__row--parent-track',
-                        isLast && 'learning-card-actions__row--last',
-                      )}
-                    >
-                      <button
-                        type="button"
-                        className={cx(
-                          'learning-card-actions__parent-row-btn',
-                          done && 'learning-card-actions__parent-row-btn--done',
-                        )}
-                        aria-pressed={done}
-                        aria-label={copy.title}
-                        onClick={() => onToggleTonightDone(row.preset)}
-                      >
-                        <span
-                          className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
-                          data-selected={done ? true : undefined}
-                          aria-hidden
-                        />
-                        <span className="learning-card-actions__preset-body">
-                          <span className="learning-card-actions__preset-title">{copy.title}</span>
-                          <span className="learning-card-actions__preset-desc">{copy.description}</span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+            {expanded ? (
+              <>
+                <ChevronUp strokeWidth={2.2} size={18} aria-hidden />
+                {collapseLabel}
+              </>
+            ) : (
+              <>
+                <ChevronDown strokeWidth={2.2} size={18} aria-hidden />
+                {expandLabel}
+              </>
+            )}
+          </Button>
+        </div>
+        <div id="knowledge-parent-preview-content" hidden={!expanded}>
+          {showSummary ? (
+            <div className="learning-card-review-summary">
+              <p className="knowledge-parent-summary__source">{bridgedAiLabel}</p>
+              <div className="learning-card-parent-summary-markdown field__input field__input--pill">
+                <Markdown className="knowledge-parent-summary-md">{summaryText.trim()}</Markdown>
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+          {showTonight ? (
+            <div
+              className="field field--actions-pick field--actions-pick--grouped"
+              role="group"
+              aria-labelledby={tonightHeadingId}
+            >
+              <p id={tonightHeadingId} className="learning-card-actions-section__kicker">
+                {tonightKicker}
+              </p>
+              <div className="learning-card-actions-group">
+                <ul className="learning-card-actions learning-card-actions--presets">
+                  {tonightActionsIncluded.map((row, idx) => {
+                    const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
+                    const isLast = idx === tonightActionsIncluded.length - 1;
+                    const done = doneSet.has(row.preset);
+                    return (
+                      <li
+                        key={row.preset}
+                        className={cx(
+                          'learning-card-actions__row',
+                          'learning-card-actions__row--preset',
+                          'learning-card-actions__row--parent-track',
+                          isLast && 'learning-card-actions__row--last',
+                        )}
+                      >
+                        <button
+                          type="button"
+                          className={cx(
+                            'learning-card-actions__parent-row-btn',
+                            done && 'learning-card-actions__parent-row-btn--done',
+                          )}
+                          aria-pressed={done}
+                          aria-label={copy.title}
+                          onClick={() => onToggleTonightDone(row.preset)}
+                        >
+                          <span
+                            className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
+                            data-selected={done ? true : undefined}
+                            aria-hidden
+                          />
+                          <span className="learning-card-actions__preset-body">
+                            <span className="learning-card-actions__preset-title">{copy.title}</span>
+                            <span className="learning-card-actions__preset-desc">{copy.description}</span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

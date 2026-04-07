@@ -159,6 +159,8 @@
     "quizWorksheetDone": "已经根据题目给孩子生成练习卷。",
     "quizWorksheetGenerateError": "生成试卷失败，请稍后再试。",
     "ariaSuggestedTasks": "今晚建议任务",
+    "parentPreviewExpand": "展开摘要和今晚行动",
+    "parentPreviewCollapse": "收起摘要和今晚行动",
     "ariaSubjectStatus": "科目与状态",
     "ariaInboxLabels": "科目与进度状态",
     "inboxListAria": "学习卡列表",
@@ -215,7 +217,11 @@
     "bookingCardTitle": "已确认 1:1",
     "bookingLabelTopic": "主题",
     "bookingLabelWith": "对象",
-    "bookingLabelWhen": "时间"
+    "bookingLabelWhen": "时间",
+    "seeTranslation": "查看翻译",
+    "seeOriginal": "查看原文",
+    "translating": "翻译中…",
+    "translationFailed": "这条广播暂时无法翻译。"
   },
   "mood": {
     "emotion": "情绪",
