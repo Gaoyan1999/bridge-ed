@@ -18,7 +18,7 @@ import type { Module, Role } from '@/bridge/types';
 import { cx } from '@/bridge/cx';
 import { resolveI18nLng } from '@/i18n';
 import { LanguageMenu } from '@/bridge/components/ui/LanguageMenu';
-import bridgeEdLogo from '@/BridgeED_logo.png';
+import bridgeEdLogo from '@/BridgeEd_log.svg';
 
 const ROLE_ICONS: Record<Role, LucideIcon> = {
   teacher: School,
@@ -208,7 +208,7 @@ export function Sidebar({
             <img
               src={bridgeEdLogo}
               alt="BridgeEd"
-              className="block h-12 w-12 object-contain"
+              className="block h-10 w-10 object-contain"
             />
             {!sidebarCollapsed ? (
               <span className="text-[1.125rem] font-semibold tracking-tight text-[var(--text)]">BridgeEd</span>
