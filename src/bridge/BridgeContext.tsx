@@ -5,7 +5,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -121,6 +120,11 @@ function initialKnowledgeMessagesForCard(card: LearningCardItem, role: Role): Th
   return [{ who: 'BridgeEd AI', type: 'in', text: body }];
 }
 
+function knowledgeViewerKeyFor(role: Role, currentUserId: string | null): string {
+  if (currentUserId) return `user:${currentUserId}`;
+  return `role:${role}`;
+}
+
 interface BridgeContextValue {
   role: Role;
   setRole: (r: Role) => void;
@@ -189,9 +193,13 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   const [module, setModuleState] = useState<Module>(() => parseModuleFromHash());
   const [inboxByRole, setInboxByRole] = useState(() => cloneInbox(INITIAL_INBOX));
   const [threads, setThreads] = useState(() => cloneThreads(INITIAL_THREADS));
-  const [knowledgeThreads, setKnowledgeThreads] = useState<Record<string, ThreadMessage[]>>({});
+  const [knowledgeThreadsByViewer, setKnowledgeThreadsByViewer] = useState<Record<string, Record<string, ThreadMessage[]>>>(
+    {},
+  );
   const [selectedInboxId, setSelectedInboxId] = useState<string | null>(null);
-  const [selectedKnowledgeThreadId, setSelectedKnowledgeThreadId] = useState<string | null>(null);
+  const [selectedKnowledgeThreadIdByViewer, setSelectedKnowledgeThreadIdByViewer] = useState<Record<string, string | null>>(
+    {},
+  );
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [learningCardsEpoch, setLearningCardsEpoch] = useState(0);
   const [studentMoodsEpoch, setStudentMoodsEpoch] = useState(0);
@@ -457,14 +465,9 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
       ? ((users.find((u) => u.id === currentUserId)?.role ?? 'teacher') as Role)
       : roleWhenNoUsers;
 
-  const prevRoleRef = useRef<Role | null>(null);
-  useEffect(() => {
-    const prev = prevRoleRef.current;
-    prevRoleRef.current = role;
-    if (role === 'student' && prev != null && prev !== 'student') {
-      setKnowledgeThreads({});
-    }
-  }, [role]);
+  const knowledgeViewerKey = useMemo(() => knowledgeViewerKeyFor(role, currentUserId), [role, currentUserId]);
+  const knowledgeThreads = knowledgeThreadsByViewer[knowledgeViewerKey] ?? {};
+  const selectedKnowledgeThreadId = selectedKnowledgeThreadIdByViewer[knowledgeViewerKey] ?? null;
 
   const currentUser: UserBackend | undefined =
     users.length > 0 && currentUserId ? users.find((u) => u.id === currentUserId) : undefined;
@@ -775,34 +778,68 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const seedKnowledgeThreadIfEmpty = useCallback(
-    (card: LearningCardItem) => {
+  const seedKnowledgeThreadIfEmptyForViewer = useCallback(
+    (viewerKey: string, viewerRole: Role, card: LearningCardItem) => {
       const id = card.threadId;
-      setKnowledgeThreads((prev) => {
-        if (prev[id]?.length) return prev;
-        return { ...prev, [id]: initialKnowledgeMessagesForCard(card, role) };
+      setKnowledgeThreadsByViewer((prev) => {
+        const viewerThreads = prev[viewerKey] ?? {};
+        if (viewerThreads[id]?.length) return prev;
+        return {
+          ...prev,
+          [viewerKey]: {
+            ...viewerThreads,
+            [id]: initialKnowledgeMessagesForCard(card, viewerRole),
+          },
+        };
       });
     },
-    [role],
+    [],
+  );
+
+  const seedKnowledgeThreadIfEmpty = useCallback(
+    (card: LearningCardItem) => {
+      seedKnowledgeThreadIfEmptyForViewer(knowledgeViewerKey, role, card);
+    },
+    [knowledgeViewerKey, role, seedKnowledgeThreadIfEmptyForViewer],
   );
 
   const removeKnowledgeThreadForDeletedCard = useCallback((threadId: string) => {
     const id = threadId.trim();
     if (!id) return;
-    setKnowledgeThreads((prev) => {
-      if (!(id in prev)) return prev;
-      const next = { ...prev };
-      delete next[id];
-      return next;
+    setKnowledgeThreadsByViewer((prev) => {
+      let changed = false;
+      const next: Record<string, Record<string, ThreadMessage[]>> = {};
+      for (const [viewerKey, viewerThreads] of Object.entries(prev)) {
+        if (!(id in viewerThreads)) {
+          next[viewerKey] = viewerThreads;
+          continue;
+        }
+        changed = true;
+        const viewerNext = { ...viewerThreads };
+        delete viewerNext[id];
+        next[viewerKey] = viewerNext;
+      }
+      return changed ? next : prev;
     });
-    setSelectedKnowledgeThreadId((cur) => (cur === id ? null : cur));
+    setSelectedKnowledgeThreadIdByViewer((prev) => {
+      let changed = false;
+      const next: Record<string, string | null> = {};
+      for (const [viewerKey, selectedId] of Object.entries(prev)) {
+        next[viewerKey] = selectedId === id ? null : selectedId;
+        if (next[viewerKey] !== selectedId) changed = true;
+      }
+      return changed ? next : prev;
+    });
   }, []);
 
   const openKnowledgeFromCard = (card: LearningCardItem) => {
     const id = card.threadId;
-    seedKnowledgeThreadIfEmpty(card);
+    const parent = users.find((u) => u.role === 'parent');
+    const targetRole: Role = parent ? 'parent' : role;
+    const targetUserId = parent?.id ?? currentUserId;
+    const targetViewerKey = knowledgeViewerKeyFor(targetRole, targetUserId);
+    seedKnowledgeThreadIfEmptyForViewer(targetViewerKey, targetRole, card);
     if (users.length > 0) {
-      const parent = users.find((u) => u.role === 'parent');
       if (parent) {
         setCurrentUserIdState(parent.id);
         persistViewUserId(parent.id);
@@ -810,7 +847,10 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
     } else {
       setRoleWhenNoUsers('parent');
     }
-    setSelectedKnowledgeThreadId(id);
+    setSelectedKnowledgeThreadIdByViewer((prev) => ({
+      ...prev,
+      [targetViewerKey]: id,
+    }));
     setModuleState('knowledge');
     if (typeof history !== 'undefined' && history.replaceState) {
       history.replaceState(null, '', '#knowledge');
@@ -825,11 +865,32 @@ export function BridgeProvider({ children }: { children: ReactNode }) {
   };
 
   const appendKnowledgeMessage = (threadId: string, msg: ThreadMessage) => {
-    setKnowledgeThreads((prev) => ({
-      ...prev,
-      [threadId]: [...(prev[threadId] ?? []), msg],
-    }));
+    setKnowledgeThreadsByViewer((prev) => {
+      const viewerThreads = prev[knowledgeViewerKey] ?? {};
+      return {
+        ...prev,
+        [knowledgeViewerKey]: {
+          ...viewerThreads,
+          [threadId]: [...(viewerThreads[threadId] ?? []), msg],
+        },
+      };
+    });
   };
+
+  const setSelectedKnowledgeThreadId: Dispatch<SetStateAction<string | null>> = useCallback(
+    (value) => {
+      setSelectedKnowledgeThreadIdByViewer((prev) => {
+        const current = prev[knowledgeViewerKey] ?? null;
+        const nextValue = typeof value === 'function' ? value(current) : value;
+        if (current === nextValue) return prev;
+        return {
+          ...prev,
+          [knowledgeViewerKey]: nextValue,
+        };
+      });
+    },
+    [knowledgeViewerKey],
+  );
 
   const openModal = (m: ModalState) => setModal(m);
   const closeModal = () => setModal({ type: 'none' });

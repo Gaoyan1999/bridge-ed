@@ -5,7 +5,7 @@ import type {
   LearningCardStudentFinishedType,
   LearningCardStudentLearningStatus,
 } from '@/data/entity/learning-card-backend';
-import type { QuizBackend } from '@/data/entity/quiz-backend';
+import type { QuizBackend, QuizQuestion } from '@/data/entity/quiz-backend';
 
 type StudentLearningStatusKey = LearningCardStudentLearningStatus;
 
@@ -873,7 +873,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
         const pid = parentUserId.trim();
         const childIds = parentChildrenIds.length > 0 ? parentChildrenIds : [''];
         const createdAt = new Date().toISOString();
-        const questions = result.questions.map((q) => ({
+        const questions: QuizQuestion[] = result.questions.map((q) => ({
           questionType:
             q.questionType === 'true_false' || q.questionType === 'short_answer'
               ? q.questionType
