@@ -1461,8 +1461,9 @@ def normalize_quiz_markdown(text: str, ui_lang: str = "en") -> str:
     out = re.sub(r"(?m)^\s*-\s*$\n(?=\s*-\s*[A-D]\))", "", out)
     out = re.sub(r"\n\s*-\s*\n\s*-\s*([A-D]\))", r"\n- \1", out)
 
-    # Add spacing between questions and answer-key items when they run together.
-    out = re.sub(r"([^\n])\s+(\d+\.\s)", r"\1\n\n\2", out)
+    # Add spacing only when a numbered item starts on the next line. Avoid matching
+    # numeric content inside question text such as "divide by 5.".
+    out = re.sub(r"(?m)([^\n])\n(\d+\.\s)", r"\1\n\n\2", out)
     out = re.sub(r"\n{3,}", "\n\n", out)
 
     return out.strip()
