@@ -1,12 +1,12 @@
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Checkbox } from 'react-aria-components';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Markdown } from '@/bridge/components/Markdown';
 import { Button } from '@/bridge/components/ui/Button';
 import { FieldTextArea } from '@/bridge/components/ui/FieldTextArea';
 import { cx } from '@/bridge/cx';
 import type { LearningCardTonightAction, LearningCardTonightActionPreset } from '@/bridge/types';
-import { LEARNING_CARD_TONIGHT_PRESET_LABELS } from '@/bridge/types';
 
 /** Teacher wizard: editable summary + checkbox tonight actions (same layout as parent preview). */
 export function LearningCardParentPanelTeacher({
@@ -32,6 +32,7 @@ export function LearningCardParentPanelTeacher({
   tonightHeadingId?: string;
   presetIncludeAriaLabel: (title: string) => string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="learning-card-parent-panel">
       <div className="learning-card-review-summary">
@@ -66,7 +67,8 @@ export function LearningCardParentPanelTeacher({
         <div className="learning-card-actions-group">
           <ul className="learning-card-actions learning-card-actions--presets">
             {tonightActions.map((row, idx) => {
-              const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
+              const title = t(`learningCard.wizard.tonightPreset.${row.preset}.title`);
+              const description = t(`learningCard.wizard.tonightPreset.${row.preset}.description`);
               const isLast = idx === tonightActions.length - 1;
               return (
                 <li
@@ -81,11 +83,11 @@ export function LearningCardParentPanelTeacher({
                     isSelected={row.include}
                     onChange={(v) => onTonightIncludeChange(row.preset, v)}
                     className="learning-card-actions__check learning-card-checkbox learning-card-checkbox--round"
-                    aria-label={presetIncludeAriaLabel(copy.title)}
+                    aria-label={presetIncludeAriaLabel(title)}
                   />
                   <div className="learning-card-actions__preset-body">
-                    <span className="learning-card-actions__preset-title">{copy.title}</span>
-                    <span className="learning-card-actions__preset-desc">{copy.description}</span>
+                    <span className="learning-card-actions__preset-title">{title}</span>
+                    <span className="learning-card-actions__preset-desc">{description}</span>
                   </div>
                 </li>
               );
@@ -124,6 +126,7 @@ export function LearningCardParentKnowledgeView({
   collapseLabel: string;
   tonightHeadingId?: string;
 }) {
+  const { t } = useTranslation();
   const doneSet = new Set(tonightActionsDone ?? []);
   const showSummary = hasDisplayableSummary(summaryText);
   const showTonight = tonightActionsIncluded.length > 0;
@@ -176,7 +179,8 @@ export function LearningCardParentKnowledgeView({
               <div className="learning-card-actions-group">
                 <ul className="learning-card-actions learning-card-actions--presets">
                   {tonightActionsIncluded.map((row, idx) => {
-                    const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[row.preset];
+                    const title = t(`learningCard.wizard.tonightPreset.${row.preset}.title`);
+                    const description = t(`learningCard.wizard.tonightPreset.${row.preset}.description`);
                     const isLast = idx === tonightActionsIncluded.length - 1;
                     const done = doneSet.has(row.preset);
                     return (
@@ -196,7 +200,7 @@ export function LearningCardParentKnowledgeView({
                             done && 'learning-card-actions__parent-row-btn--done',
                           )}
                           aria-pressed={done}
-                          aria-label={copy.title}
+                          aria-label={title}
                           onClick={() => onToggleTonightDone(row.preset)}
                         >
                           <span
@@ -205,8 +209,8 @@ export function LearningCardParentKnowledgeView({
                             aria-hidden
                           />
                           <span className="learning-card-actions__preset-body">
-                            <span className="learning-card-actions__preset-title">{copy.title}</span>
-                            <span className="learning-card-actions__preset-desc">{copy.description}</span>
+                            <span className="learning-card-actions__preset-title">{title}</span>
+                            <span className="learning-card-actions__preset-desc">{description}</span>
                           </span>
                         </button>
                       </li>

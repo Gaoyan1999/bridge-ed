@@ -417,6 +417,20 @@
       "parentSummary": "家长摘要",
       "aiHint": "各家庭会看到其偏好语言版本——我们会为每位家长自动翻译摘要。",
       "studentDiscovery": "学生发现（视频）",
+      "tonightPreset": {
+        "quiz": {
+          "title": "做一个小测或快速检查",
+          "description": "用几道短题确认孩子是否真正理解了核心概念。"
+        },
+        "parent_led_practice": {
+          "title": "设计一个亲子动手小任务或小实验",
+          "description": "家长和孩子一起做一个小活动，把知识点落到真实情境里。"
+        },
+        "explain_to_parent": {
+          "title": "反向讲解：让孩子讲给家长听",
+          "description": "让孩子用自己的话把主题讲一遍，快速判断是否真的掌握。"
+        }
+      },
       "childErrorFollowUp": " 请返回并重试生成。",
       "studentEmpty": "尚未为学生生成内容。请返回并重新生成。",
       "tonightActions": "今晚行动",
