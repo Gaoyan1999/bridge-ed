@@ -46,7 +46,6 @@ import { panelHintsForRole } from '@/bridge/panelHints';
 import { DEMO_PARENT_USER_ID } from '@/bridge/mockData';
 import type { TFunction } from 'i18next';
 import {
-  LEARNING_CARD_TONIGHT_PRESET_LABELS,
   isParentFacingTonightPreset,
   isStudentFacingTonightPreset,
   type LearningCardItem,
@@ -1249,7 +1248,7 @@ export function KnowledgePanel({ active }: { active: boolean }) {
                               pill
                               className="btn--sm knowledge-tonight-actions__btn"
                               id={`btn-knowledge-tonight-${action.preset}`}
-                              title={LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset].title}
+                              title={t(`learningCard.wizard.tonightPreset.${action.preset}.title`)}
                               disabled={tonightActionBusy || !threadId || streamingThreadId === threadId}
                               onClick={() => runTonightActionFlow(action.preset)}
                             >

@@ -4,7 +4,6 @@ import { Check, ListChecks } from 'lucide-react';
 import { Markdown } from '@/bridge/components/Markdown';
 import { Button } from '@/bridge/components/ui/Button';
 import {
-  LEARNING_CARD_TONIGHT_PRESET_LABELS,
   isParentFacingTonightPreset,
   type LearningCardItem,
   type LearningCardTonightActionPreset,
@@ -88,7 +87,7 @@ export function KnowledgeParentEmptyExample() {
                       pill
                       className="btn--sm knowledge-tonight-actions__btn"
                       disabled
-                      title={LEARNING_CARD_TONIGHT_PRESET_LABELS[a.preset].title}
+                      title={t(`learningCard.wizard.tonightPreset.${a.preset}.title`)}
                     >
                       {exampleTonightActionLabel(a.preset, t)}
                     </Button>
@@ -107,11 +106,12 @@ export function KnowledgeParentEmptyExample() {
             </h4>
             <ul className="knowledge-lc-detail__steps">
               {includedSteps.map((action) => {
-                const copy = LEARNING_CARD_TONIGHT_PRESET_LABELS[action.preset];
+                const title = t(`learningCard.wizard.tonightPreset.${action.preset}.title`);
+                const description = t(`learningCard.wizard.tonightPreset.${action.preset}.description`);
                 return (
                   <li key={action.preset} className="knowledge-lc-detail__step">
-                    <span className="knowledge-lc-detail__step-title">{copy.title}</span>
-                    <span className="knowledge-lc-detail__step-desc">{copy.description}</span>
+                    <span className="knowledge-lc-detail__step-title">{title}</span>
+                    <span className="knowledge-lc-detail__step-desc">{description}</span>
                   </li>
                 );
               })}
