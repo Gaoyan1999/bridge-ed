@@ -22,7 +22,7 @@ pip install -r backend/requirements.txt
 From the repo root:
 
 ```bash
-python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8787
+python3 -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8788
 ```
 
 (Using `python3 -m uvicorn` avoids “command not found” when the `uvicorn` executable is not on your `PATH`.)
@@ -33,7 +33,7 @@ Or use:
 pnpm run dev:backend
 ```
 
-The server listens on `http://localhost:8787` by default.
+The server listens on `http://localhost:8788` by default (see `pnpm run dev:backend` in the repo root).
 
 ## Frontend env
 
@@ -41,7 +41,7 @@ Set these for the Vite app:
 
 ```bash
 VITE_DATA_SOURCE=api
-VITE_API_BASE_URL=http://localhost:8787
+VITE_API_BASE_URL=http://localhost:8788
 ```
 
 ## Backend env
