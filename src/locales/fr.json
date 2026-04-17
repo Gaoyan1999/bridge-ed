@@ -417,6 +417,20 @@
       "parentSummary": "Résumé parents",
       "aiHint": "Chaque famille verra la version dans sa langue préférée — nous traduisons automatiquement le résumé.",
       "studentDiscovery": "Découverte élève (vidéos)",
+      "tonightPreset": {
+        "quiz": {
+          "title": "Faire un court quiz ou une vérification rapide",
+          "description": "Quelques questions courtes pour vérifier que l’idée est bien comprise."
+        },
+        "parent_led_practice": {
+          "title": "Concevoir une mini activité pratique",
+          "description": "Parent et enfant essaient une petite activité ou une application concrète."
+        },
+        "explain_to_parent": {
+          "title": "Teach-back - l’enfant explique au parent",
+          "description": "L’enfant vous explique le sujet pour montrer ce qu’il ou elle a compris."
+        }
+      },
       "childErrorFollowUp": " Revenez en arrière et relancez la génération.",
       "studentEmpty": "Rien n’a encore été généré pour les élèves. Revenez en arrière et relancez la génération.",
       "tonightActions": "Actions de ce soir",
