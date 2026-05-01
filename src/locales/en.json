@@ -418,6 +418,20 @@
       "parentSummary": "Parent summary",
       "aiHint": "Families will see this in their preferred language — we translate the summary automatically for each parent.",
       "studentDiscovery": "Student discovery (videos)",
+      "tonightPreset": {
+        "quiz": {
+          "title": "Do a short quiz or practice check",
+          "description": "A few quick questions to see if the idea has clicked."
+        },
+        "parent_led_practice": {
+          "title": "Design a hands-on mini task or experiment",
+          "description": "Parent and child try a small activity or real-world application together."
+        },
+        "explain_to_parent": {
+          "title": "Teach-back - child explains to parent",
+          "description": "The child walks you through the topic so you can tell they've understood."
+        }
+      },
       "childErrorFollowUp": " Go back and try generating again.",
       "studentEmpty": "Nothing generated for students yet. Go back and run generate again.",
       "tonightActions": "Tonight’s actions",
